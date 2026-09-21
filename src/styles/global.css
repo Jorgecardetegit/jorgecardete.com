@@ -22,8 +22,8 @@ a { color: var(--green); text-decoration: underline; text-decoration-thickness: 
 a:hover { color: var(--terracotta); }
 
 .shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(32px, 12vw, 220px); }
-.sidebar { flex: 1 1 260px; max-width: 340px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
-.main { flex: 999 1 520px; min-width: 320px; padding: 56px 40px 80px; max-width: 960px; }
+.sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
+.main { flex: 999 1 520px; min-width: 320px; padding: 56px 24px 80px 40px; max-width: 1140px; }
 
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
 .brand-name { font-family: var(--mono); font-size: 17px; font-weight: 500; letter-spacing: -0.4px; }
