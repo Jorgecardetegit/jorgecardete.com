@@ -9,16 +9,9 @@ const posts = (await getCollection('blog'))
 
 const tour = [
   { years: '2014–2018', html: 'Estudiante de diseño, fanzines fotocopiados y demasiadas horas en foros.' },
-  { years: '2018–2021', html: '<a href="#projects">Primer estudio</a>: identidad, web y todo lo que hiciera falta. Aprendí a maquetar por necesidad.' },
-  { years: '2021–2024', html: '<a href="#projects">Diseño de producto</a> en una empresa pequeña: sistemas de diseño, prototipos y bastante investigación.' },
+  { years: '2018–2021', html: '<a href="/proyectos/">Primer estudio</a>: identidad, web y todo lo que hiciera falta. Aprendí a maquetar por necesidad.' },
+  { years: '2021–2024', html: '<a href="/proyectos/">Diseño de producto</a> en una empresa pequeña: sistemas de diseño, prototipos y bastante investigación.' },
   { years: '2024–hoy', html: 'En solitario: proyectos propios, algo de consultoría y <a href="/blog/">escribir sobre el proceso</a>.' },
-];
-
-const projects = [
-  { meta: 'PROYECTO', title: 'Every System Is Broken' },
-  { meta: 'PROYECTO', title: 'Colisseum' },
-  { meta: 'PROYECTO', title: 'Hackspain' },
-  { meta: 'PROYECTO', title: 'UFV Labs' },
 ];
 
 ---
@@ -54,19 +47,6 @@ const projects = [
       <a class="pill" href="/blog/">Ver todo</a>
     </div>
     <PostList posts={posts} />
-  </section>
-
-  <section id="projects">
-    <h2 class="section">Proyectos</h2>
-    <div class="cards">
-      {projects.map((p) => (
-        <div class="card">
-          <div class="card-meta">{p.meta}</div>
-          <div class="card-title">{p.title}</div>
-          <p>Descripción del proyecto: qué es y qué hiciste tú. Dos frases bastan.</p>
-        </div>
-      ))}
-    </div>
   </section>
 
   <section id="about">
