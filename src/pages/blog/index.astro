@@ -1,12 +1,88 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import PostList from '../../components/PostList.astro';
 
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const y = post.data.date.getUTCFullYear();
+  byYear.set(y, [...(byYear.get(y) ?? []), post]);
+}
+
+const tagCounts = new Map<string, number>();
+for (const post of posts) for (const t of post.data.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+const topics = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([t]) => t);
+
+const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 ---
-<Base title="Blog" description="Notas sobre diseño, prototipado y proceso.">
-  <h1 class="hero">Blog</h1>
-  <p class="lead">Notas sobre diseño, prototipos y cosas que aprendo por el camino.</p>
-  <PostList posts={posts} />
+<Base title="Blog" description="Guías, tutoriales y notas sobre código y vida." sidebar={false}>
+  <h1 class="blog-title"><span aria-hidden="true">📝</span>Blog</h1>
+  <p class="blog-lead">Guías, tutoriales y notas sobre diseño, código y vida. <a href="/rss.xml">Suscríbete por RSS</a>.</p>
+
+  <div class="topics" role="group" aria-label="Filtrar por tema">
+    {topics.map((t) => <button type="button" class="topic" data-topic={t} aria-pressed="false">#{t}</button>)}
+  </div>
+
+  <label class="search">
+    <span aria-hidden="true">🔎</span>
+    <input type="search" id="q" placeholder={`Buscar ${posts.length} posts…`} aria-label="Buscar posts" />
+  </label>
+
+  {[...byYear.entries()].map(([year, items]) => (
+    <section class="year" data-year>
+      <div class="year-head">
+        <h2>{year}</h2>
+        <span class="count"><span data-count>{items.length}</span> posts</span>
+      </div>
+      {items.map((post) => (
+        <div class="entry" data-title={post.data.title.toLowerCase()} data-tags={post.data.tags.join(',')}>
+          <div class="entry-icon" aria-hidden="true">{post.data.icon}</div>
+          <div class="entry-main">
+            <div class="entry-title"><a href={`/blog/${post.id}/`}>{post.data.title}</a></div>
+            <time class="entry-date" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+          </div>
+          <div class="tags">
+            {post.data.tags.map((t) => <span class="tag">#{t}</span>)}
+          </div>
+        </div>
+      ))}
+    </section>
+  ))}
+  <p class="no-results" id="none" hidden>No hay posts que coincidan.</p>
 </Base>
+
+<script>
+  const input = document.getElementById('q') as HTMLInputElement;
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('.topic')];
+  const entries = [...document.querySelectorAll<HTMLElement>('.entry')];
+  const years = [...document.querySelectorAll<HTMLElement>('[data-year]')];
+  const none = document.getElementById('none')!;
+  let topic = '';
+
+  function apply() {
+    const q = input.value.trim().toLowerCase();
+    for (const e of entries) {
+      const okQ = !q || e.dataset.title!.includes(q) || e.dataset.tags!.includes(q);
+      const okT = !topic || e.dataset.tags!.split(',').includes(topic);
+      e.hidden = !(okQ && okT);
+    }
+    let visible = 0;
+    for (const y of years) {
+      const n = y.querySelectorAll('.entry:not([hidden])').length;
+      y.hidden = n === 0;
+      y.querySelector('[data-count]')!.textContent = String(n);
+      visible += n;
+    }
+    none.hidden = visible > 0;
+  }
+
+  input.addEventListener('input', apply);
+  for (const b of buttons) {
+    b.addEventListener('click', () => {
+      topic = topic === b.dataset.topic ? '' : b.dataset.topic!;
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.topic === topic)));
+      apply();
+    });
+  }
+</script>

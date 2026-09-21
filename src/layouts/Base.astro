@@ -5,12 +5,14 @@ interface Props {
   title: string;
   description?: string;
   type?: 'website' | 'article';
+  sidebar?: boolean;
 }
 
 const {
   title,
   description = 'Diseñador y desarrollador. Notas, proyectos y cosas a medio terminar.',
   type = 'website',
+  sidebar = true,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -39,6 +41,7 @@ const fullTitle = title === 'Inicio' ? 'tunombre.dev' : `${title} · tunombre.de
     />
   </head>
   <body>
+    {sidebar ? (
     <div class="shell">
       <aside class="sidebar">
         <a class="brand" href="/">
@@ -88,5 +91,13 @@ const fullTitle = title === 'Inicio' ? 'tunombre.dev' : `${title} · tunombre.de
         <slot />
       </main>
     </div>
+    ) : (
+    <div class="wide">
+      <a class="wide-brand" href="/">← tunombre.dev</a>
+      <main class="wide-main">
+        <slot />
+      </main>
+    </div>
+    )}
   </body>
 </html>
