@@ -22,7 +22,7 @@ a { color: var(--green); text-decoration: underline; text-decoration-thickness: 
 a:hover { color: var(--terracotta); }
 
 .shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; }
-.sidebar { flex: 1 1 260px; max-width: 340px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); }
+.sidebar { flex: 1 1 260px; max-width: 340px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; }
 .main { flex: 999 1 520px; min-width: 320px; padding: 56px 40px 80px clamp(48px, 9vw, 140px); max-width: 1120px; }
 
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
@@ -49,8 +49,9 @@ a:hover { color: var(--terracotta); }
 .nav .tri { width: 20px; height: 16px; clip-path: polygon(0 100%, 50% 0, 100% 100%); flex: none; }
 
 .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; }
-.side-links { display: flex; gap: 16px; font-family: var(--mono); font-size: 13px; }
-.side-links a { text-decoration: none; }
+.side-links { display: flex; gap: 18px; }
+.side-links a { display: inline-flex; color: var(--ink); }
+.side-links a:hover { color: var(--terracotta); }
 .side-note { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 
 .badge { display: inline-block; font-family: var(--pixel); font-size: 10px; line-height: 1.6; color: var(--bg); background: var(--red); border: 3px solid var(--ink); padding: 8px 12px; margin-bottom: 18px; box-shadow: 4px 4px 0 var(--shadow); }
@@ -105,7 +106,7 @@ section { margin-bottom: 64px; }
 .prose pre code { background: none; padding: 0; }
 
 @media (max-width: 720px) {
-  .sidebar { max-width: none; border-right: 0; border-bottom: 1px solid var(--line); }
+  .sidebar { max-width: none; border-right: 0; border-bottom: 1px solid var(--line); position: static; height: auto; overflow: visible; }
   .main { padding: 36px 20px 60px; }
 }
 
