@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin:0; padding:0; background:#7fc9e8; overflow:hidden; }
+  * { box-sizing:border-box; }
+  a { color:#7a4a9e; text-decoration:underline; }
+  a:hover { color:#c0603f; }
+  @keyframes bobY { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+  @keyframes blink { 0%,60% { opacity:1; } 61%,100% { opacity:0.25; } }
+  @keyframes popIn { 0% { transform:translateY(14px) scale(0.97); opacity:0; } 100% { transform:translateY(0) scale(1); opacity:1; } }
+  @keyframes ripple { 0% { background-position:0 0; } 100% { background-position:64px 32px; } }
+  @keyframes lamp { 0%,100% { opacity:0.85; } 50% { opacity:1; } }
+</style>
+</helmet>
+
+<div style="position:relative;width:100%;height:100vh;min-height:520px;overflow:hidden;background-color:#4fb8e8;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.30) 0 6px,transparent 6px 24px),repeating-linear-gradient(-45deg,rgba(255,255,255,0.12) 0 4px,transparent 4px 28px);animation:ripple 7s linear infinite;font-family:'Space Grotesk',system-ui,sans-serif;user-select:none;touch-action:none;">
+
+  <div ref="{{ viewportRef }}" style="position:absolute;inset:0;overflow:hidden;">
+    <div ref="{{ worldRef }}" style="position:absolute;top:0;left:0;width:1800px;height:1200px;transform-origin:0 0;transform:scale(0.45);opacity:0;will-change:transform;">
+
+      <div style="position:absolute;left:52px;top:52px;width:1696px;height:1096px;background:rgba(126,226,247,0.45);border-radius:150px;"></div>
+      <div style="position:absolute;left:88px;top:88px;width:1624px;height:1024px;background:rgba(255,255,255,0.45);border-radius:140px;"></div>
+      <div style="position:absolute;left:108px;top:108px;width:1584px;height:984px;background-color:#ecd9ad;background-image:radial-gradient(rgba(255,255,255,0.45) 2px,transparent 3px);background-size:22px 22px;border-radius:130px;box-shadow:0 14px 0 rgba(6,44,74,0.14);"></div>
+      <div style="position:absolute;left:150px;top:150px;width:1500px;height:900px;border-radius:100px;overflow:hidden;background-color:#8ed05f;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.10) 0 3px,transparent 3px 30px),repeating-linear-gradient(45deg,transparent 0 100px,#dcc48f 100px 104px,#e9d6a8 104px 192px,#dcc48f 192px 196px,transparent 196px 300px),repeating-linear-gradient(-45deg,transparent 0 100px,#dcc48f 100px 104px,#e9d6a8 104px 192px,#dcc48f 192px 196px,transparent 196px 300px),repeating-linear-gradient(45deg,#84c755 0 150px,#8ed05f 150px 300px);box-shadow:inset 0 -14px 0 rgba(63,122,53,0.20);"></div>
+
+      <div style="position:absolute;left:780px;top:1000px;width:70px;height:158px;background-color:#8b5a2b;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,0.22) 0 4px,transparent 4px 30px);border:5px solid #5c3b1e;border-radius:4px;"></div>
+      <div style="position:absolute;left:764px;top:1112px;width:16px;height:38px;background:#5c3b1e;border-radius:3px;"></div>
+      <div style="position:absolute;left:850px;top:1112px;width:16px;height:38px;background:#5c3b1e;border-radius:3px;"></div>
+
+      <div style="position:absolute;left:280px;top:360px;width:230px;height:200px;z-index:12;">
+        <div style="position:absolute;left:-12px;top:176px;width:254px;height:36px;background:rgba(58,40,20,0.18);border-radius:50%;"></div>
+        <div style="position:absolute;left:28px;top:-34px;width:28px;height:46px;background:#d8cfbb;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:-18px;top:0;width:266px;height:98px;background-color:#b7a3dd;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.10) 0 3px,transparent 3px 22px),repeating-linear-gradient(0deg,rgba(255,255,255,0.22) 0 4px,transparent 4px 18px);clip-path:polygon(0 100%,15% 0,85% 0,100% 100%);"></div>
+        <div style="position:absolute;left:118px;top:0;width:10px;height:98px;background:rgba(255,255,255,0.55);"></div>
+        <div style="position:absolute;left:-18px;top:86px;width:266px;height:14px;background:#5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:96px;width:230px;height:104px;background:#f8f1de;border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;right:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;left:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;right:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;right:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;left:89px;top:128px;width:52px;height:72px;background-color:#b5553f;background-image:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(0,0,0,0.18));border:5px solid #5c3b1e;border-radius:4px 4px 0 0;"></div>
+        <div style="position:absolute;left:126px;top:164px;width:9px;height:9px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:-52px;top:-104px;width:334px;text-align:center;">
+          <span style="display:inline-block;background:#8b5a2b;border:6px solid #5c3b1e;border-radius:6px;padding:12px 16px;font-family:'Press Start 2P',monospace;font-size:34px;color:#fdf3dd;">ABOUT ME</span>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:760px;top:190px;width:230px;height:200px;z-index:12;">
+        <div style="position:absolute;left:-12px;top:176px;width:254px;height:36px;background:rgba(58,40,20,0.18);border-radius:50%;"></div>
+        <div style="position:absolute;left:28px;top:-34px;width:28px;height:46px;background:#d8cfbb;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:-18px;top:0;width:266px;height:98px;background-color:#9fc4e0;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.10) 0 3px,transparent 3px 22px),repeating-linear-gradient(0deg,rgba(255,255,255,0.22) 0 4px,transparent 4px 18px);clip-path:polygon(0 100%,15% 0,85% 0,100% 100%);"></div>
+        <div style="position:absolute;left:118px;top:0;width:10px;height:98px;background:rgba(255,255,255,0.55);"></div>
+        <div style="position:absolute;left:-18px;top:86px;width:266px;height:14px;background:#5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:96px;width:230px;height:104px;background:#f8f1de;border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;right:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;left:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;right:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;right:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;left:89px;top:128px;width:52px;height:72px;background-color:#b5553f;background-image:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(0,0,0,0.18));border:5px solid #5c3b1e;border-radius:4px 4px 0 0;"></div>
+        <div style="position:absolute;left:126px;top:164px;width:9px;height:9px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:-52px;top:-104px;width:334px;text-align:center;">
+          <span style="display:inline-block;background:#8b5a2b;border:6px solid #5c3b1e;border-radius:6px;padding:12px 16px;font-family:'Press Start 2P',monospace;font-size:34px;color:#fdf3dd;">PROYECTOS</span>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:1290px;top:300px;width:230px;height:200px;z-index:12;">
+        <div style="position:absolute;left:-12px;top:176px;width:254px;height:36px;background:rgba(58,40,20,0.18);border-radius:50%;"></div>
+        <div style="position:absolute;left:28px;top:-34px;width:28px;height:46px;background:#d8cfbb;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:-18px;top:0;width:266px;height:98px;background-color:#8dbfa4;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.10) 0 3px,transparent 3px 22px),repeating-linear-gradient(0deg,rgba(255,255,255,0.22) 0 4px,transparent 4px 18px);clip-path:polygon(0 100%,15% 0,85% 0,100% 100%);"></div>
+        <div style="position:absolute;left:118px;top:0;width:10px;height:98px;background:rgba(255,255,255,0.55);"></div>
+        <div style="position:absolute;left:-18px;top:86px;width:266px;height:14px;background:#5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:96px;width:230px;height:104px;background:#f8f1de;border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;right:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;left:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;right:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;right:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;left:89px;top:128px;width:52px;height:72px;background-color:#b5553f;background-image:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(0,0,0,0.18));border:5px solid #5c3b1e;border-radius:4px 4px 0 0;"></div>
+        <div style="position:absolute;left:126px;top:164px;width:9px;height:9px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:-52px;top:-104px;width:334px;text-align:center;">
+          <span style="display:inline-block;background:#8b5a2b;border:6px solid #5c3b1e;border-radius:6px;padding:12px 16px;font-family:'Press Start 2P',monospace;font-size:34px;color:#fdf3dd;">SKILLS</span>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:330px;top:820px;width:230px;height:200px;z-index:12;">
+        <div style="position:absolute;left:-12px;top:176px;width:254px;height:36px;background:rgba(58,40,20,0.18);border-radius:50%;"></div>
+        <div style="position:absolute;left:28px;top:-34px;width:28px;height:46px;background:#d8cfbb;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:-18px;top:0;width:266px;height:98px;background-color:#e3a8bd;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.10) 0 3px,transparent 3px 22px),repeating-linear-gradient(0deg,rgba(255,255,255,0.22) 0 4px,transparent 4px 18px);clip-path:polygon(0 100%,15% 0,85% 0,100% 100%);"></div>
+        <div style="position:absolute;left:118px;top:0;width:10px;height:98px;background:rgba(255,255,255,0.55);"></div>
+        <div style="position:absolute;left:-18px;top:86px;width:266px;height:14px;background:#5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:96px;width:230px;height:104px;background:#f8f1de;border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;right:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;left:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;right:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;right:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;left:89px;top:128px;width:52px;height:72px;background-color:#b5553f;background-image:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(0,0,0,0.18));border:5px solid #5c3b1e;border-radius:4px 4px 0 0;"></div>
+        <div style="position:absolute;left:126px;top:164px;width:9px;height:9px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:-52px;top:-104px;width:334px;text-align:center;">
+          <span style="display:inline-block;background:#8b5a2b;border:6px solid #5c3b1e;border-radius:6px;padding:12px 16px;font-family:'Press Start 2P',monospace;font-size:34px;color:#fdf3dd;">INTERESES</span>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:1000px;top:730px;width:230px;height:200px;z-index:12;">
+        <div style="position:absolute;left:-12px;top:176px;width:254px;height:36px;background:rgba(58,40,20,0.18);border-radius:50%;"></div>
+        <div style="position:absolute;left:28px;top:-34px;width:28px;height:46px;background:#d8cfbb;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:-18px;top:0;width:266px;height:98px;background-color:#d9b36c;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.10) 0 3px,transparent 3px 22px),repeating-linear-gradient(0deg,rgba(255,255,255,0.22) 0 4px,transparent 4px 18px);clip-path:polygon(0 100%,15% 0,85% 0,100% 100%);"></div>
+        <div style="position:absolute;left:118px;top:0;width:10px;height:98px;background:rgba(255,255,255,0.55);"></div>
+        <div style="position:absolute;left:-18px;top:86px;width:266px;height:14px;background:#5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:96px;width:230px;height:104px;background:#f8f1de;border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;right:14px;top:110px;width:8px;height:76px;background:#a9744a;"></div>
+        <div style="position:absolute;left:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;right:24px;top:118px;width:48px;height:42px;background:#cfe9f7;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;right:46px;top:118px;width:4px;height:42px;background:#5c3b1e;"></div>
+        <div style="position:absolute;left:89px;top:128px;width:52px;height:72px;background-color:#b5553f;background-image:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(0,0,0,0.18));border:5px solid #5c3b1e;border-radius:4px 4px 0 0;"></div>
+        <div style="position:absolute;left:126px;top:164px;width:9px;height:9px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:-52px;top:-104px;width:334px;text-align:center;">
+          <span style="display:inline-block;background:#8b5a2b;border:6px solid #5c3b1e;border-radius:6px;padding:12px 16px;font-family:'Press Start 2P',monospace;font-size:34px;color:#fdf3dd;">BLOG</span>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:620px;top:470px;width:96px;height:118px;">
+        <div style="position:absolute;left:8px;bottom:-6px;width:80px;height:20px;background:rgba(58,40,20,0.20);border-radius:50%;"></div>
+        <div style="position:absolute;left:38px;bottom:0;width:22px;height:38px;background:#8b5a2b;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:0;width:60px;height:58px;background:#6fbf52;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:36px;top:6px;width:60px;height:58px;background:#7fcf5e;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:18px;top:26px;width:60px;height:54px;background:#63b24a;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:14px;top:10px;width:18px;height:12px;background:rgba(255,255,255,0.45);border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:1480px;top:760px;width:96px;height:118px;">
+        <div style="position:absolute;left:8px;bottom:-6px;width:80px;height:20px;background:rgba(58,40,20,0.20);border-radius:50%;"></div>
+        <div style="position:absolute;left:38px;bottom:0;width:22px;height:38px;background:#8b5a2b;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:0;width:60px;height:58px;background:#6fbf52;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:36px;top:6px;width:60px;height:58px;background:#7fcf5e;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:18px;top:26px;width:60px;height:54px;background:#63b24a;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:14px;top:10px;width:18px;height:12px;background:rgba(255,255,255,0.45);border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:180px;top:640px;width:96px;height:118px;">
+        <div style="position:absolute;left:8px;bottom:-6px;width:80px;height:20px;background:rgba(58,40,20,0.20);border-radius:50%;"></div>
+        <div style="position:absolute;left:38px;bottom:0;width:22px;height:38px;background:#8b5a2b;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:0;width:60px;height:58px;background:#f0aec6;border:5px solid #c06f92;border-radius:50%;"></div>
+        <div style="position:absolute;left:36px;top:6px;width:60px;height:58px;background:#f8c2d6;border:5px solid #c06f92;border-radius:50%;"></div>
+        <div style="position:absolute;left:18px;top:26px;width:60px;height:54px;background:#eda1bd;border:5px solid #c06f92;border-radius:50%;"></div>
+        <div style="position:absolute;left:14px;top:10px;width:18px;height:12px;background:rgba(255,255,255,0.55);border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:880px;top:430px;width:96px;height:118px;">
+        <div style="position:absolute;left:8px;bottom:-6px;width:80px;height:20px;background:rgba(58,40,20,0.20);border-radius:50%;"></div>
+        <div style="position:absolute;left:38px;bottom:0;width:22px;height:38px;background:#8b5a2b;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:0;width:60px;height:58px;background:#f0aec6;border:5px solid #c06f92;border-radius:50%;"></div>
+        <div style="position:absolute;left:36px;top:6px;width:60px;height:58px;background:#f8c2d6;border:5px solid #c06f92;border-radius:50%;"></div>
+        <div style="position:absolute;left:18px;top:26px;width:60px;height:54px;background:#eda1bd;border:5px solid #c06f92;border-radius:50%;"></div>
+        <div style="position:absolute;left:14px;top:10px;width:18px;height:12px;background:rgba(255,255,255,0.55);border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:1180px;top:520px;width:96px;height:118px;">
+        <div style="position:absolute;left:8px;bottom:-6px;width:80px;height:20px;background:rgba(58,40,20,0.20);border-radius:50%;"></div>
+        <div style="position:absolute;left:38px;bottom:0;width:22px;height:38px;background:#8b5a2b;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:0;width:60px;height:58px;background:#6fbf52;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:36px;top:6px;width:60px;height:58px;background:#7fcf5e;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:18px;top:26px;width:60px;height:54px;background:#63b24a;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:14px;top:10px;width:18px;height:12px;background:rgba(255,255,255,0.45);border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:660px;top:890px;width:96px;height:118px;">
+        <div style="position:absolute;left:8px;bottom:-6px;width:80px;height:20px;background:rgba(58,40,20,0.20);border-radius:50%;"></div>
+        <div style="position:absolute;left:38px;bottom:0;width:22px;height:38px;background:#8b5a2b;border:5px solid #5c3b1e;border-radius:3px;"></div>
+        <div style="position:absolute;left:0;top:0;width:60px;height:58px;background:#6fbf52;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:36px;top:6px;width:60px;height:58px;background:#7fcf5e;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:18px;top:26px;width:60px;height:54px;background:#63b24a;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:14px;top:10px;width:18px;height:12px;background:rgba(255,255,255,0.45);border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:560px;top:690px;width:26px;height:120px;">
+        <div style="position:absolute;left:0;bottom:0;width:26px;height:12px;background:#3a3a3a;border-radius:3px;"></div>
+        <div style="position:absolute;left:9px;bottom:8px;width:8px;height:82px;background:#3a3a3a;"></div>
+        <div style="position:absolute;left:-6px;top:0;width:38px;height:36px;background:#f7e08a;border:5px solid #3a3a3a;border-radius:4px;animation:lamp 3s ease-in-out infinite;"></div>
+      </div>
+      <div style="position:absolute;left:1290px;top:610px;width:26px;height:120px;">
+        <div style="position:absolute;left:0;bottom:0;width:26px;height:12px;background:#3a3a3a;border-radius:3px;"></div>
+        <div style="position:absolute;left:9px;bottom:8px;width:8px;height:82px;background:#3a3a3a;"></div>
+        <div style="position:absolute;left:-6px;top:0;width:38px;height:36px;background:#f7e08a;border:5px solid #3a3a3a;border-radius:4px;animation:lamp 3s ease-in-out infinite 1s;"></div>
+      </div>
+      <div style="position:absolute;left:420px;top:900px;width:26px;height:120px;">
+        <div style="position:absolute;left:0;bottom:0;width:26px;height:12px;background:#3a3a3a;border-radius:3px;"></div>
+        <div style="position:absolute;left:9px;bottom:8px;width:8px;height:82px;background:#3a3a3a;"></div>
+        <div style="position:absolute;left:-6px;top:0;width:38px;height:36px;background:#f7e08a;border:5px solid #3a3a3a;border-radius:4px;animation:lamp 3s ease-in-out infinite 2s;"></div>
+      </div>
+
+      <div style="position:absolute;left:660px;top:640px;width:130px;height:54px;">
+        <div style="position:absolute;left:0;top:18px;width:130px;height:36px;background-color:#8b5a2b;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.18) 0 3px,transparent 3px 24px);border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:12px;top:0;width:34px;height:30px;background:#6fbf52;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:46px;top:-4px;width:34px;height:32px;background:#7fcf5e;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:82px;top:2px;width:34px;height:28px;background:#63b24a;border:5px solid #3f7a35;border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute;left:1120px;top:420px;width:130px;height:54px;">
+        <div style="position:absolute;left:0;top:18px;width:130px;height:36px;background-color:#8b5a2b;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.18) 0 3px,transparent 3px 24px);border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:12px;top:0;width:34px;height:30px;background:#6fbf52;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:46px;top:-4px;width:34px;height:32px;background:#7fcf5e;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:82px;top:2px;width:34px;height:28px;background:#63b24a;border:5px solid #3f7a35;border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute;left:250px;top:640px;width:130px;height:54px;">
+        <div style="position:absolute;left:0;top:18px;width:130px;height:36px;background-color:#8b5a2b;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,0.18) 0 3px,transparent 3px 24px);border:5px solid #5c3b1e;border-radius:4px;"></div>
+        <div style="position:absolute;left:12px;top:0;width:34px;height:30px;background:#6fbf52;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:46px;top:-4px;width:34px;height:32px;background:#7fcf5e;border:5px solid #3f7a35;border-radius:50%;"></div>
+        <div style="position:absolute;left:82px;top:2px;width:34px;height:28px;background:#63b24a;border:5px solid #3f7a35;border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:840px;top:900px;width:44px;height:24px;">
+        <div style="position:absolute;left:0;top:6px;width:14px;height:14px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:16px;top:0;width:14px;height:14px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:30px;top:8px;width:14px;height:14px;background:#f2c94c;border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute;left:1420px;top:520px;width:44px;height:24px;">
+        <div style="position:absolute;left:0;top:6px;width:14px;height:14px;background:#f291b8;border-radius:50%;"></div>
+        <div style="position:absolute;left:16px;top:0;width:14px;height:14px;background:#f291b8;border-radius:50%;"></div>
+        <div style="position:absolute;left:30px;top:8px;width:14px;height:14px;background:#f291b8;border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute;left:480px;top:560px;width:44px;height:24px;">
+        <div style="position:absolute;left:0;top:6px;width:14px;height:14px;background:#f291b8;border-radius:50%;"></div>
+        <div style="position:absolute;left:16px;top:0;width:14px;height:14px;background:#f291b8;border-radius:50%;"></div>
+        <div style="position:absolute;left:30px;top:8px;width:14px;height:14px;background:#f291b8;border-radius:50%;"></div>
+      </div>
+      <div style="position:absolute;left:940px;top:990px;width:44px;height:24px;">
+        <div style="position:absolute;left:0;top:6px;width:14px;height:14px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:16px;top:0;width:14px;height:14px;background:#f2c94c;border-radius:50%;"></div>
+        <div style="position:absolute;left:30px;top:8px;width:14px;height:14px;background:#f2c94c;border-radius:50%;"></div>
+      </div>
+
+      <div style="position:absolute;left:1330px;top:900px;width:150px;height:96px;">
+        <div style="position:absolute;left:18px;top:56px;width:10px;height:40px;background:#8b5a2b;border:4px solid #5c3b1e;"></div>
+        <div style="position:absolute;right:18px;top:56px;width:10px;height:40px;background:#8b5a2b;border:4px solid #5c3b1e;"></div>
+        <div style="position:absolute;left:0;top:0;width:150px;height:62px;background:#f3e3c0;border:6px solid #5c3b1e;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;font-size:18px;color:#5c3b1e;line-height:1.5;text-align:center;">PLAZA</div>
+      </div>
+
+      <div ref="{{ playerRef }}" style="position:absolute;left:0;top:0;width:48px;height:70px;will-change:transform;z-index:40;">
+        <div style="position:absolute;left:4px;bottom:-8px;width:40px;height:13px;background:rgba(58,40,20,0.22);border-radius:50%;"></div>
+        <div ref="{{ playerInnerRef }}" style="position:absolute;left:0;top:0;width:48px;height:70px;">
+          <div style="position:absolute;left:6px;top:0;width:36px;height:16px;background:#8b5a2b;border:4px solid #4a2f18;border-radius:12px 12px 0 0;"></div>
+          <div style="position:absolute;left:10px;top:12px;width:28px;height:20px;background:#f7d3ae;border:4px solid #4a2f18;border-radius:4px;"></div>
+          <div style="position:absolute;left:16px;top:20px;width:5px;height:5px;background:#3c2a1a;"></div>
+          <div style="position:absolute;left:28px;top:20px;width:5px;height:5px;background:#3c2a1a;"></div>
+          <div style="position:absolute;left:3px;top:10px;width:10px;height:28px;background:#8b5a2b;border:4px solid #4a2f18;border-radius:4px;"></div>
+          <div style="position:absolute;right:3px;top:10px;width:10px;height:28px;background:#8b5a2b;border:4px solid #4a2f18;border-radius:4px;"></div>
+          <div style="position:absolute;left:8px;top:31px;width:32px;height:24px;background:#ef8fa8;border:4px solid #4a2f18;border-radius:5px;"></div>
+          <div style="position:absolute;left:10px;top:54px;width:12px;height:13px;background:#5c3b1e;border:4px solid #4a2f18;border-radius:3px;"></div>
+          <div style="position:absolute;right:10px;top:54px;width:12px;height:13px;background:#5c3b1e;border:4px solid #4a2f18;border-radius:3px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="position:absolute;left:16px;top:16px;display:flex;flex-direction:column;gap:8px;z-index:200;">
+    <div style="background:#8b5a2b;border:5px solid #5c3b1e;border-radius:6px;padding:10px 14px;font-family:'Press Start 2P',monospace;font-size:12px;color:#fdf3dd;letter-spacing:1px;">EL PUEBLO · PLAYER ONE</div>
+    <div style="background:#fdf3dd;border:5px solid #5c3b1e;border-radius:6px;padding:8px 12px;font-family:'Press Start 2P',monospace;font-size:8px;line-height:1.7;color:#5c3b1e;">WASD / FLECHAS · MOVER<br />E · ENTRAR</div>
+  </div>
+
+  <sc-if value="{{ nearName }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:210;background:#fdf3dd;border:6px solid #5c3b1e;border-radius:8px;box-shadow:0 8px 0 rgba(58,40,20,0.30);padding:14px 22px;display:flex;align-items:center;gap:12px;">
+      <div style="font-family:'Press Start 2P',monospace;font-size:11px;color:#c0603f;animation:blink 1s steps(1) infinite;">[E]</div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:11px;color:#5c3b1e;">ENTRAR EN {{ nearName }}</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isTouch }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:230;display:flex;justify-content:space-between;align-items:flex-end;padding:20px;pointer-events:none;">
+      <div style="position:relative;width:168px;height:168px;pointer-events:auto;">
+        <div onPointerDown="{{ padUp.start }}" onPointerUp="{{ padUp.end }}" onPointerCancel="{{ padUp.end }}" onPointerLeave="{{ padUp.end }}" style="position:absolute;left:56px;top:0;width:56px;height:56px;background:#fdf3dd;border:5px solid #5c3b1e;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5c3b1e;font-size:20px;touch-action:none;">▲</div>
+        <div onPointerDown="{{ padLeft.start }}" onPointerUp="{{ padLeft.end }}" onPointerCancel="{{ padLeft.end }}" onPointerLeave="{{ padLeft.end }}" style="position:absolute;left:0;top:56px;width:56px;height:56px;background:#fdf3dd;border:5px solid #5c3b1e;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5c3b1e;font-size:20px;touch-action:none;">◀</div>
+        <div onPointerDown="{{ padRight.start }}" onPointerUp="{{ padRight.end }}" onPointerCancel="{{ padRight.end }}" onPointerLeave="{{ padRight.end }}" style="position:absolute;left:112px;top:56px;width:56px;height:56px;background:#fdf3dd;border:5px solid #5c3b1e;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5c3b1e;font-size:20px;touch-action:none;">▶</div>
+        <div onPointerDown="{{ padDown.start }}" onPointerUp="{{ padDown.end }}" onPointerCancel="{{ padDown.end }}" onPointerLeave="{{ padDown.end }}" style="position:absolute;left:56px;top:112px;width:56px;height:56px;background:#fdf3dd;border:5px solid #5c3b1e;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5c3b1e;font-size:20px;touch-action:none;">▼</div>
+      </div>
+      <div onPointerDown="{{ interact }}" style="width:84px;height:84px;border-radius:50%;background:#c0603f;border:6px solid #5c3b1e;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;font-size:20px;color:#fdf3dd;pointer-events:auto;touch-action:none;">A</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;z-index:300;background:rgba(58,40,20,0.60);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="position:relative;width:100%;max-width:720px;max-height:88%;overflow-y:auto;background:#fdf7e6;border:8px solid #5c3b1e;border-radius:10px;box-shadow:0 14px 0 rgba(58,40,20,0.35);animation:popIn 0.18s ease-out;">
+
+        <div onClick="{{ closePanel }}" style="position:absolute;right:14px;top:14px;width:40px;height:40px;background:#c0603f;border:5px solid #5c3b1e;border-radius:6px;color:#fdf3dd;font-family:'Press Start 2P',monospace;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;" style-hover="background:#9e4a2e;">X</div>
+
+        <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="background:#b7a3dd;padding:20px 24px;border-bottom:6px solid #5c3b1e;font-family:'Press Start 2P',monospace;font-size:14px;color:#3d2a55;">ABOUT ME</div>
+            <div style="padding:28px 24px;">
+              <p style="margin:0 0 20px;font-size:17px;line-height:1.7;color:#4a3520;text-wrap:pretty;">Hola, soy Player One. Diseño y construyo cosas para la web: interfaces, pequeñas herramientas y experimentos que normalmente empiezan como una idea tonta un domingo por la tarde.</p>
+              <p style="margin:0 0 24px;font-size:17px;line-height:1.7;color:#4a3520;text-wrap:pretty;">Me interesa el punto donde el diseño y el código se tocan, y hacer que las cosas se sientan bien al usarlas, no solo que funcionen.</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
+                <div style="background:#f3e3c0;border:4px solid #5c3b1e;border-radius:6px;padding:14px;">
+                  <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;margin-bottom:8px;">CLASE</div>
+                  <div style="font-family:'Press Start 2P',monospace;font-size:11px;color:#4a3520;">Diseñador</div>
+                </div>
+                <div style="background:#f3e3c0;border:4px solid #5c3b1e;border-radius:6px;padding:14px;">
+                  <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;margin-bottom:8px;">BASE</div>
+                  <div style="font-family:'Press Start 2P',monospace;font-size:11px;color:#4a3520;">Madrid</div>
+                </div>
+                <div style="background:#f3e3c0;border:4px solid #5c3b1e;border-radius:6px;padding:14px;">
+                  <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;margin-bottom:8px;">NIVEL</div>
+                  <div style="font-family:'Press Start 2P',monospace;font-size:11px;color:#4a3520;">5 años</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="background:#9fc4e0;padding:20px 24px;border-bottom:6px solid #5c3b1e;font-family:'Press Start 2P',monospace;font-size:14px;color:#26445c;">PROYECTOS</div>
+            <div style="padding:28px 24px;display:flex;flex-direction:column;gap:16px;">
+              <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                  <div style="font-family:'Press Start 2P',monospace;font-size:12px;color:#4a3520;">Proyecto uno</div>
+                  <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;">2025</div>
+                </div>
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#4a3520;">Una frase corta sobre qué era, qué hiciste tú y qué pasó después. Aquí va el enlace al caso de estudio.</p>
+              </div>
+              <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                  <div style="font-family:'Press Start 2P',monospace;font-size:12px;color:#4a3520;">Proyecto dos</div>
+                  <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;">2024</div>
+                </div>
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#4a3520;">Una frase corta sobre qué era, qué hiciste tú y qué pasó después.</p>
+              </div>
+              <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+                  <div style="font-family:'Press Start 2P',monospace;font-size:12px;color:#4a3520;">Proyecto tres</div>
+                  <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;">2023</div>
+                </div>
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#4a3520;">Una frase corta sobre qué era, qué hiciste tú y qué pasó después.</p>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSkills }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="background:#8dbfa4;padding:20px 24px;border-bottom:6px solid #5c3b1e;font-family:'Press Start 2P',monospace;font-size:14px;color:#254437;">SKILLS</div>
+            <div style="padding:28px 24px;display:flex;flex-direction:column;gap:20px;">
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-family:'Press Start 2P',monospace;font-size:10px;color:#4a3520;"><span>Diseño de producto</span><span>90</span></div>
+                <div style="height:22px;background:#e8d9b8;border:4px solid #5c3b1e;border-radius:4px;"><div style="width:90%;height:100%;background:#8dbfa4;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-family:'Press Start 2P',monospace;font-size:10px;color:#4a3520;"><span>Prototipado</span><span>85</span></div>
+                <div style="height:22px;background:#e8d9b8;border:4px solid #5c3b1e;border-radius:4px;"><div style="width:85%;height:100%;background:#8dbfa4;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-family:'Press Start 2P',monospace;font-size:10px;color:#4a3520;"><span>HTML / CSS</span><span>80</span></div>
+                <div style="height:22px;background:#e8d9b8;border:4px solid #5c3b1e;border-radius:4px;"><div style="width:80%;height:100%;background:#8dbfa4;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-family:'Press Start 2P',monospace;font-size:10px;color:#4a3520;"><span>Motion</span><span>60</span></div>
+                <div style="height:22px;background:#e8d9b8;border:4px solid #5c3b1e;border-radius:4px;"><div style="width:60%;height:100%;background:#8dbfa4;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-family:'Press Start 2P',monospace;font-size:10px;color:#4a3520;"><span>Investigación</span><span>55</span></div>
+                <div style="height:22px;background:#e8d9b8;border:4px solid #5c3b1e;border-radius:4px;"><div style="width:55%;height:100%;background:#8dbfa4;"></div></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isInterests }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="background:#e3a8bd;padding:20px 24px;border-bottom:6px solid #5c3b1e;font-family:'Press Start 2P',monospace;font-size:14px;color:#5b2b3c;">INTERESES</div>
+            <div style="padding:28px 24px;">
+              <p style="margin:0 0 22px;font-size:17px;line-height:1.7;color:#4a3520;text-wrap:pretty;">Lo que hago cuando no estoy delante de una pantalla (y algunas cosas que hago delante de una pantalla pero por gusto).</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
+                <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:16px;font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.6;color:#4a3520;">Pixel art</div>
+                <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:16px;font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.6;color:#4a3520;">Escalada</div>
+                <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:16px;font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.6;color:#4a3520;">Cocinar</div>
+                <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:16px;font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.6;color:#4a3520;">Vinilos</div>
+                <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:16px;font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.6;color:#4a3520;">Tipografía</div>
+                <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:16px;font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.6;color:#4a3520;">Speedruns</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isBlog }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="background:#d9b36c;padding:20px 24px;border-bottom:6px solid #5c3b1e;font-family:'Press Start 2P',monospace;font-size:14px;color:#4a3520;">BLOG</div>
+            <div style="padding:28px 24px;display:flex;flex-direction:column;gap:12px;">
+              <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:18px;">
+                <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;margin-bottom:10px;">MAR 2026</div>
+                <div style="font-size:19px;font-weight:700;color:#4a3520;margin-bottom:6px;">Título del primer artículo</div>
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#4a3520;">Dos líneas de resumen para que se entienda de qué va antes de hacer clic.</p>
+              </div>
+              <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:18px;">
+                <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;margin-bottom:10px;">ENE 2026</div>
+                <div style="font-size:19px;font-weight:700;color:#4a3520;margin-bottom:6px;">Título del segundo artículo</div>
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#4a3520;">Dos líneas de resumen para que se entienda de qué va antes de hacer clic.</p>
+              </div>
+              <div style="border:4px solid #5c3b1e;border-radius:6px;background:#f3e3c0;padding:18px;">
+                <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:#8b5a2b;margin-bottom:10px;">NOV 2025</div>
+                <div style="font-size:19px;font-weight:700;color:#4a3520;margin-bottom:6px;">Título del tercer artículo</div>
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#4a3520;">Dos líneas de resumen para que se entienda de qué va antes de hacer clic.</p>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="padding:0 24px 24px;">
+          <div onClick="{{ closePanel }}" style="display:inline-block;background:#8b5a2b;border:5px solid #5c3b1e;border-radius:6px;color:#fdf3dd;font-family:'Press Start 2P',monospace;font-size:10px;padding:14px 18px;cursor:pointer;" style-hover="background:#6f4620;">← VOLVER AL PUEBLO [ESC]</div>
+        </div>
+
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;moveSpeed&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:4.6,&quot;min&quot;:2,&quot;max&quot;:9,&quot;step&quot;:0.2,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Juego&quot;}}">
+class Component extends DCLogic {
+  state = { near: null, open: null, isTouch: false };
+
+  houses = [
+    { id: 'about',     name: 'ABOUT ME',  x: 280,  y: 360, w: 230, h: 200 },
+    { id: 'projects',  name: 'PROYECTOS', x: 760,  y: 190, w: 230, h: 200 },
+    { id: 'skills',    name: 'SKILLS',    x: 1290, y: 300, w: 230, h: 200 },
+    { id: 'interests', name: 'INTERESES', x: 330,  y: 820, w: 230, h: 200 },
+    { id: 'blog',      name: 'BLOG',      x: 1000, y: 730, w: 230, h: 200 }
+  ];
+
+  W = 1800; H = 1200;
+  pos = { x: 820, y: 620 };
+  keys = {};
+  pad = { up: false, down: false, left: false, right: false };
+  facing = 1;
+  walkT = 0;
+
+  viewportRef = React.createRef();
+  worldRef = React.createRef();
+  playerRef = React.createRef();
+  playerInnerRef = React.createRef();
+
+  componentDidMount() {
+    this.onKeyDown = (e) => {
+      const k = e.key.toLowerCase();
+      if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
+      this.keys[k] = true;
+      if (k === 'e' || k === 'enter') this.interact();
+      if (k === 'escape') this.closePanel();
+    };
+    this.onKeyUp = (e) => { this.keys[e.key.toLowerCase()] = false; };
+    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keyup', this.onKeyUp);
+
+    this.mq = window.matchMedia('(pointer: coarse)');
+    this.syncTouch = () => {
+      const t = this.mq.matches;
+      if (t !== this.state.isTouch) this.setState({ isTouch: t });
+    };
+    this.syncTouch();
+    this.mq.addEventListener('change', this.syncTouch);
+    window.addEventListener('resize', this.syncTouch);
+
+    this.last = performance.now();
+    this.tick = (t) => {
+      this.step(Math.min(48, t - this.last));
+      this.last = t;
+      this.raf = requestAnimationFrame(this.tick);
+    };
+    this.raf = requestAnimationFrame(this.tick);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('keyup', this.onKeyUp);
+    if (this.mq) this.mq.removeEventListener('change', this.syncTouch);
+    window.removeEventListener('resize', this.syncTouch);
+    cancelAnimationFrame(this.raf);
+  }
+
+  onLand(x, y) {
+    const L = 186, T = 186, R = 1614, B = 1014, r = 120;
+    if (x < L || x > R || y < T || y > B) return false;
+    const cx = x < L + r ? L + r : (x > R - r ? R - r : x);
+    const cy = y < T + r ? T + r : (y > B - r ? B - r : y);
+    return Math.hypot(x - cx, y - cy) <= r;
+  }
+
+  hitsHouse(x, y) {
+    const hw = 18, ht = 12;
+    for (const h of this.houses) {
+      const top = h.y + 60;
+      if (x + hw > h.x && x - hw < h.x + h.w && y > top && y - ht < h.y + h.h - 4) {
+        const doorL = h.x + h.w / 2 - 28, doorR = h.x + h.w / 2 + 28;
+        if (x > doorL && x < doorR && y > h.y + h.h - 24) continue;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  canStand(x, y) { return this.onLand(x, y) && !this.hitsHouse(x, y); }
+
+  step(dt) {
+    const k = this.keys, p = this.pad;
+    let dx = 0, dy = 0;
+    if (k['a'] || k['arrowleft'] || p.left) dx -= 1;
+    if (k['d'] || k['arrowright'] || p.right) dx += 1;
+    if (k['w'] || k['arrowup'] || p.up) dy -= 1;
+    if (k['s'] || k['arrowdown'] || p.down) dy += 1;
+
+    const moving = (dx || dy) && !this.state.open;
+    if (moving) {
+      const len = Math.hypot(dx, dy) || 1;
+      const sp = (this.props.moveSpeed ?? 4.6) * (dt / 16.67);
+      const nx = this.pos.x + (dx / len) * sp;
+      const ny = this.pos.y + (dy / len) * sp;
+      if (this.canStand(nx, this.pos.y)) this.pos.x = nx;
+      if (this.canStand(this.pos.x, ny)) this.pos.y = ny;
+      if (dx) this.facing = dx > 0 ? 1 : -1;
+      this.walkT += dt / 90;
+    } else {
+      this.walkT = 0;
+    }
+
+    const bob = moving ? Math.abs(Math.sin(this.walkT)) * -5 : 0;
+    const pl = this.playerRef.current;
+    if (pl) pl.style.transform = 'translate3d(' + (this.pos.x - 24) + 'px,' + (this.pos.y - 64) + 'px,0)';
+    const inner = this.playerInnerRef.current;
+    if (inner) inner.style.transform = 'translateY(' + bob + 'px) scaleX(' + this.facing + ')';
+
+    const vp = this.viewportRef.current, wd = this.worldRef.current;
+    if (vp && wd) {
+      const vw = vp.clientWidth, vh = vp.clientHeight;
+      const padX = 20, padTop = 132, padBottom = this.state.isTouch ? 176 : 28;
+      const bw = Math.max(120, vw - padX * 2), bh = Math.max(120, vh - padTop - padBottom);
+      const s = Math.min(bw / this.W, bh / this.H);
+      const sw = this.W * s, sh = this.H * s;
+      wd.style.transform = 'translate3d(' + Math.round(padX + (bw - sw) / 2) + 'px,' + Math.round(padTop + (bh - sh) / 2) + 'px,0) scale(' + s + ')';
+      if (wd.style.opacity !== '1') wd.style.opacity = '1';
+    }
+
+    let near = null;
+    for (const h of this.houses) {
+      const dxd = this.pos.x - (h.x + h.w / 2);
+      const dyd = this.pos.y - (h.y + h.h + 8);
+      if (Math.hypot(dxd, dyd) < 82) { near = h; break; }
+    }
+    const id = near ? near.id : null;
+    if (id !== (this.state.near ? this.state.near.id : null)) this.setState({ near });
+  }
+
+  interact = () => {
+    if (this.state.open) { this.setState({ open: null }); return; }
+    if (this.state.near) this.setState({ open: this.state.near.id });
+  };
+
+  closePanel = () => { this.setState({ open: null }); };
+
+  mkPad(dir) {
+    return {
+      start: (e) => { e.preventDefault(); this.pad[dir] = true; },
+      end: (e) => { if (e) e.preventDefault(); this.pad[dir] = false; }
+    };
+  }
+
+  renderVals() {
+    const open = this.state.open;
+    return {
+      viewportRef: this.viewportRef,
+      worldRef: this.worldRef,
+      playerRef: this.playerRef,
+      playerInnerRef: this.playerInnerRef,
+      nearName: !open && this.state.near ? this.state.near.name : null,
+      isTouch: this.state.isTouch,
+      panelOpen: !!open,
+      isAbout: open === 'about',
+      isProjects: open === 'projects',
+      isSkills: open === 'skills',
+      isInterests: open === 'interests',
+      isBlog: open === 'blog',
+      interact: this.interact,
+      closePanel: this.closePanel,
+      padUp: this.padUp || (this.padUp = this.mkPad('up')),
+      padDown: this.padDown || (this.padDown = this.mkPad('down')),
+      padLeft: this.padLeft || (this.padLeft = this.mkPad('left')),
+      padRight: this.padRight || (this.padRight = this.mkPad('right'))
+    };
+  }
+}
+</script>
+</body>
+</html>
