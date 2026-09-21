@@ -21,9 +21,9 @@ body { color: var(--ink); font-family: 'Karla', system-ui, sans-serif; }
 a { color: var(--green); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 a:hover { color: var(--terracotta); }
 
-.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; }
+.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(24px, 8vw, 140px); }
 .sidebar { flex: 1 1 260px; max-width: 340px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; }
-.main { flex: 999 1 520px; min-width: 320px; padding: 56px 40px 80px clamp(48px, 9vw, 140px); max-width: 1120px; }
+.main { flex: 999 1 520px; min-width: 320px; padding: 56px 40px 80px; max-width: 960px; }
 
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
 .brand-name { font-family: var(--mono); font-size: 17px; font-weight: 500; letter-spacing: -0.4px; }
@@ -106,6 +106,7 @@ section { margin-bottom: 64px; }
 .prose pre code { background: none; padding: 0; }
 
 @media (max-width: 720px) {
+  .shell { padding-left: 0; }
   .sidebar { max-width: none; border-right: 0; border-bottom: 1px solid var(--line); position: static; height: auto; overflow: visible; }
   .main { padding: 36px 20px 60px; }
 }
