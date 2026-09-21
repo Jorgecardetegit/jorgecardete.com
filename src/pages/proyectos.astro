@@ -1,14 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
 
+const desc = 'Descripción del proyecto: qué es y qué hiciste tú. Dos frases bastan.';
 const projects = [
-  { name: 'Every System Is Broken', desc: 'Descripción del proyecto: qué es y qué hiciste tú. Dos frases bastan.', color: '#b5553f' },
-  { name: 'Colisseum', desc: 'Descripción del proyecto: qué es y qué hiciste tú. Dos frases bastan.', color: '#3f6f52' },
-  { name: 'Hackspain', desc: 'Descripción del proyecto: qué es y qué hiciste tú. Dos frases bastan.', color: '#6b5ea8' },
-  { name: 'UFV Labs', desc: 'Descripción del proyecto: qué es y qué hiciste tú. Dos frases bastan.', color: '#c9a227' },
+  { name: 'Every System Is Broken', tags: ['seguridad', 'hacking'], desc, color: '#b5553f' },
+  { name: 'Colisseum', tags: ['hackathon'], desc, color: '#3f6f52' },
+  { name: 'Hackspain', tags: ['hackathon', 'comunidad'], desc, color: '#6b5ea8' },
+  { name: 'UFV Labs', tags: ['universidad', 'laboratorio'], desc, color: '#c9a227' },
+  { name: 'UFV Parking', tags: ['computer-vision', 'ufv'], desc, color: '#b5623c' },
+  { name: 'Cell Vision', tags: ['computer-vision', 'ml'], desc, color: '#3f6f52' },
+  { name: 'OCR Parser', tags: ['ocr', 'ml', 'parsing'], desc, color: '#6b5ea8' },
+  { name: 'Gather Simulator', tags: ['simulacion'], desc, color: '#c9a227' },
 ];
 ---
-<Base title="Proyectos" description="Proyectos: Every System Is Broken, Colisseum, Hackspain y UFV Labs.">
+<Base title="Proyectos" description="Proyectos: Every System Is Broken, Colisseum, Hackspain, UFV Labs, UFV Parking, Cell Vision, OCR Parser y Gather Simulator.">
   <div class="badge">MUNDO 3 — PROYECTOS</div>
   <h1 class="hero">Proyectos</h1>
   <p class="lead">Cosas que he construido, organizado o puesto en marcha.</p>
@@ -20,6 +25,9 @@ const projects = [
           <h2 class="startup-name">{p.name}</h2>
           <div class="startup-role">Proyecto</div>
           <p class="startup-desc">{p.desc}</p>
+          <div class="tags">
+            {p.tags.map((t) => <span class="tag">#{t}</span>)}
+          </div>
         </div>
         <div class="startup-img" style={`--c:${p.color}`} aria-hidden="true">
           <span>{p.name[0]}</span>
