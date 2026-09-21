@@ -1,16 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const desc = 'Descripción del proyecto: qué es y qué hiciste tú. Dos frases bastan.';
+const desc = 'Descripción del proyecto en una frase.';
+const links = [{ label: 'Código', url: '#' }, { label: 'Demo', url: '#' }];
 const projects = [
-  { name: 'Every System Is Broken', tags: ['seguridad', 'hacking'], desc, color: '#b5553f' },
-  { name: 'Colisseum', tags: ['hackathon'], desc, color: '#3f6f52' },
-  { name: 'Hackspain', tags: ['hackathon', 'comunidad'], desc, color: '#6b5ea8' },
-  { name: 'UFV Labs', tags: ['universidad', 'laboratorio'], desc, color: '#c9a227' },
-  { name: 'UFV Parking', tags: ['computer-vision', 'ufv'], desc, color: '#b5623c' },
-  { name: 'Cell Vision', tags: ['computer-vision', 'ml'], desc, color: '#3f6f52' },
-  { name: 'OCR Parser', tags: ['ocr', 'ml', 'parsing'], desc, color: '#6b5ea8' },
-  { name: 'Gather Simulator', tags: ['simulacion'], desc, color: '#c9a227' },
+  { name: 'Every System Is Broken', year: '20XX', tags: ['seguridad', 'hacking'], desc, links, color: '#b5553f' },
+  { name: 'Colisseum', year: '20XX', tags: ['hackathon'], desc, links, color: '#3f6f52' },
+  { name: 'Hackspain', year: '20XX', tags: ['hackathon', 'comunidad'], desc, links, color: '#6b5ea8' },
+  { name: 'UFV Labs', year: '20XX', tags: ['universidad', 'laboratorio'], desc, links, color: '#c9a227' },
+  { name: 'UFV Parking', year: '20XX', tags: ['computer-vision', 'ufv'], desc, links, color: '#b5623c' },
+  { name: 'Cell Vision', year: '20XX', tags: ['computer-vision', 'ml'], desc, links, color: '#3f6f52' },
+  { name: 'OCR Parser', year: '20XX', tags: ['ocr', 'ml', 'parsing'], desc, links, color: '#6b5ea8' },
+  { name: 'Gather Simulator', year: '20XX', tags: ['simulacion'], desc, links, color: '#c9a227' },
 ];
 ---
 <Base title="Proyectos" description="Proyectos: Every System Is Broken, Colisseum, Hackspain, UFV Labs, UFV Parking, Cell Vision, OCR Parser y Gather Simulator.">
@@ -18,19 +19,20 @@ const projects = [
   <h1 class="hero">Proyectos</h1>
   <p class="lead">Cosas que he construido, organizado o puesto en marcha.</p>
 
-  <ul class="startups">
+  <ul class="pgrid">
     {projects.map((p) => (
-      <li class="startup">
-        <div class="startup-body">
-          <h2 class="startup-name">{p.name}</h2>
-          <div class="startup-role">Proyecto</div>
-          <p class="startup-desc">{p.desc}</p>
-          <div class="tags">
-            {p.tags.map((t) => <span class="tag">#{t}</span>)}
-          </div>
+      <li class="pcard">
+        <div class="pcard-top">
+          <time class="pcard-year">{p.year}</time>
+          <span class="pcard-mark" style={`background:${p.color}`} aria-hidden="true"></span>
         </div>
-        <div class="startup-img" style={`--c:${p.color}`} aria-hidden="true">
-          <span>{p.name[0]}</span>
+        <h2 class="pcard-name">{p.name}</h2>
+        <p class="pcard-desc">{p.desc}</p>
+        <div class="tags">
+          {p.tags.map((t) => <span class="tag">#{t}</span>)}
+        </div>
+        <div class="pcard-links">
+          {p.links.map((l) => <a href={l.url}>{l.label}</a>)}
         </div>
       </li>
     ))}
