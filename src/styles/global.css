@@ -21,7 +21,7 @@ body { color: var(--ink); font-family: 'Karla', system-ui, sans-serif; }
 a { color: var(--green); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 a:hover { color: var(--terracotta); }
 
-.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(32px, 11vw, 200px); }
+.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(32px, 12vw, 220px); }
 .sidebar { flex: 1 1 260px; max-width: 340px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
 .main { flex: 999 1 520px; min-width: 320px; padding: 56px 40px 80px; max-width: 960px; }
 
