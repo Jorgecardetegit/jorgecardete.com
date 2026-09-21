@@ -131,15 +131,14 @@ section { margin-bottom: 64px; }
 .paper-btn:hover { color: var(--ink); background: var(--card); transform: translate(-1px, -1px); }
 .paper-doi { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 .pgrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-.pcard { display: flex; flex-direction: column; gap: 10px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; padding: 20px 22px; box-shadow: 5px 5px 0 var(--shadow); }
-.pcard:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--shadow); }
+.pcard { position: relative; display: flex; flex-direction: column; gap: 10px; background: var(--card); border: 1px solid rgba(31,29,26,0.18); border-top: 6px solid var(--c); border-radius: 6px; padding: 18px 22px 20px; transition: border-color .15s, background .15s; }
+.pcard:hover { background: #ebe2cb; border-color: var(--ink); border-top-color: var(--c); }
 .pcard-top { display: flex; justify-content: space-between; align-items: center; }
 .pcard-year { font-family: var(--mono); font-size: 13px; color: var(--muted); }
-.pcard-mark { width: 18px; height: 14px; clip-path: polygon(0 100%, 50% 0, 100% 100%); }
 .pcard-name { margin: 0; font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -0.4px; }
 .pcard-desc { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--text-soft); }
 .pcard .tags { margin-top: 2px; }
-.pcard-links { display: flex; gap: 16px; margin-top: auto; padding-top: 10px; font-family: var(--mono); font-size: 13px; font-weight: 500; }
+.pcard-links { display: flex; gap: 16px; margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(31,29,26,0.12); font-family: var(--mono); font-size: 13px; font-weight: 500; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { font-family: var(--mono); font-size: 13px; background: var(--card); border: 3px solid var(--ink); border-radius: 3px; padding: 7px 13px; box-shadow: 3px 3px 0 var(--shadow); }
 

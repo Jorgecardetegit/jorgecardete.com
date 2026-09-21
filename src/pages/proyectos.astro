@@ -21,10 +21,9 @@ const projects = [
 
   <ul class="pgrid">
     {projects.map((p) => (
-      <li class="pcard">
+      <li class="pcard" style={`--c:${p.color}`}>
         <div class="pcard-top">
           <time class="pcard-year">{p.year}</time>
-          <span class="pcard-mark" style={`background:${p.color}`} aria-hidden="true"></span>
         </div>
         <h2 class="pcard-name">{p.name}</h2>
         <p class="pcard-desc">{p.desc}</p>
