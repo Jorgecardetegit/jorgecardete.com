@@ -13,7 +13,7 @@ const color = (tag: string) => palette[[...tag].reduce((n, c) => n + c.charCodeA
 
 const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
-<Base title="Blog" description="Guías, tutoriales y notas sobre diseño, código y vida." sidebar={false}>
+<Base title="Blog" description="Guías, tutoriales y notas sobre diseño, código y vida.">
   <div class="panel">
     <header class="head">
       <div class="photo" aria-hidden="true">Tu foto</div>
@@ -50,15 +50,8 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
   <p class="back"><a href="/rss.xml">RSS</a></p>
 </Base>
 
-<style is:global>
-  .wide { padding: 0 32px; min-height: 0; }
-  .wide-main { max-width: 1400px; margin: 0 auto; }
-  .wide-brand { display: block; max-width: 1400px; margin: 0 auto; padding: 24px 0 0; }
-  @media (max-width: 720px) { .wide { padding: 0 16px; } }
-</style>
-
 <style>
-  .panel { padding: 32px 0 0 }
+  .panel { padding: 0 }
   .head { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; margin-bottom: 48px; }
   .photo { flex: none; width: 205px; height: 205px; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); }
   .intro-block { flex: 1 1 320px; min-width: 260px; }
