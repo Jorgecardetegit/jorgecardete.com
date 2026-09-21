@@ -20,7 +20,12 @@ const projects = [
   { meta: '2023 · WEB', title: 'Proyecto tres' },
 ];
 
-const interests = ['pixel art', 'escalada', 'cocinar', 'vinilos', 'tipografía', 'speedruns'];
+const startups = [
+  { name: 'Zapic', role: 'Co-founder', desc: 'AI agents for social media management.', url: 'zapic.com', color: '#6b5ea8' },
+  { name: 'Fractal', role: 'Founding engineer', desc: 'AI agents for Solana. We raised a €300K pre-seed and scaled to 20.', url: 'fractal.com', color: '#3f6f52' },
+  { name: 'Grupo Cardete Ventures', role: 'Co-founder & CTO', desc: 'Roadside assistance and express transport in Madrid and Barcelona.', url: 'grupocardete.com', color: '#b5623c' },
+  { name: 'The Deep Hub', role: 'Founder', desc: 'A paid ML publication: 570+ articles, ~100 contributors.', url: 'thedeephub.com', color: '#c9a227' },
+];
 ---
 <Base title="Inicio">
   <div class="badge">MUNDO 1 — PORTFOLIO</div>
@@ -69,12 +74,23 @@ const interests = ['pixel art', 'escalada', 'cocinar', 'vinilos', 'tipografía',
     </div>
   </section>
 
-  <section id="interests">
-    <h2 class="section">Intereses</h2>
-    <p class="para">Lo que hago cuando no estoy delante de una pantalla, y algunas cosas que hago delante de una pantalla pero por gusto.</p>
-    <div class="chips">
-      {interests.map((i) => <span class="chip">{i}</span>)}
-    </div>
+  <section id="startups">
+    <h2 class="section">Startups</h2>
+    <ul class="startups">
+      {startups.map((s) => (
+        <li class="startup">
+          <div class="startup-body">
+            <h3 class="startup-name"><a href={`https://${s.url}`}>{s.name}</a></h3>
+            <div class="startup-role">{s.role}</div>
+            <p class="startup-desc">{s.desc}</p>
+            <a class="startup-url" href={`https://${s.url}`}>{s.url} ↗</a>
+          </div>
+          <a class="startup-img" href={`https://${s.url}`} aria-label={s.name} style={`--c:${s.color}`}>
+            <span>{s.name[0]}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
   </section>
 
   <section id="about">
