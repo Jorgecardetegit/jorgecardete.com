@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+
+const startups = [
+  { name: 'Zapic', role: 'Co-founder', desc: 'AI agents for social media management.', url: 'zapic.com', color: '#6b5ea8' },
+  { name: 'Fractal', role: 'Founding engineer', desc: 'AI agents for Solana. We raised a €300K pre-seed and scaled to 20.', url: 'fractal.com', color: '#3f6f52' },
+  { name: 'Grupo Cardete Ventures', role: 'Co-founder & CTO', desc: 'Roadside assistance and express transport in Madrid and Barcelona.', url: 'grupocardete.com', color: '#b5623c' },
+  { name: 'The Deep Hub', role: 'Founder', desc: 'A paid ML publication: 570+ articles, ~100 contributors.', url: 'thedeephub.com', color: '#c9a227' },
+];
+---
+<Base title="Startups" description="Startups que he fundado o en las que he trabajado: Zapic, Fractal, Grupo Cardete Ventures y The Deep Hub.">
+  <div class="badge">MUNDO 3 — STARTUPS</div>
+  <h1 class="hero">Startups</h1>
+  <p class="lead">Cosas que he fundado o ayudado a construir desde el principio.</p>
+
+  <ul class="startups">
+    {startups.map((s) => (
+      <li class="startup">
+        <div class="startup-body">
+          <h2 class="startup-name"><a href={`https://${s.url}`}>{s.name}</a></h2>
+          <div class="startup-role">{s.role}</div>
+          <p class="startup-desc">{s.desc}</p>
+          <a class="startup-url" href={`https://${s.url}`}>{s.url} ↗</a>
+        </div>
+        <a class="startup-img" href={`https://${s.url}`} aria-label={s.name} style={`--c:${s.color}`}>
+          <span>{s.name[0]}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Base>
