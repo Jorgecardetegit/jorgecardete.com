@@ -1,0 +1,92 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  type?: 'website' | 'article';
+}
+
+const {
+  title,
+  description = 'Diseñador y desarrollador. Notas, proyectos y cosas a medio terminar.',
+  type = 'website',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const fullTitle = title === 'Inicio' ? 'tunombre.dev' : `${title} · tunombre.dev`;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="brand" href="/">
+          <div class="avatar" aria-hidden="true">
+            <div style="left:3px;top:0;width:24px;height:9px;background:#8b5a2b;border-radius:8px 8px 0 0;"></div>
+            <div style="left:6px;top:7px;width:18px;height:13px;background:#f7d3ae;"></div>
+            <div style="left:10px;top:12px;width:3px;height:3px;background:#1f1d1a;border:0;"></div>
+            <div style="left:18px;top:12px;width:3px;height:3px;background:#1f1d1a;border:0;"></div>
+            <div style="left:5px;top:19px;width:20px;height:11px;background:#b5553f;"></div>
+          </div>
+          <span class="brand-name">tunombre.dev</span>
+        </a>
+
+        <p class="intro">Soy <a href="/#about">[Tu nombre]</a>, diseñador y desarrollador. Esto es mi jardín digital: notas, proyectos y cosas a medio terminar.</p>
+
+        <div>
+          <div class="label-pixel">EL MAPA</div>
+          <div class="map">
+            <div class="island"></div>
+            <div class="grass"></div>
+            <a class="house" href="/#about" title="Sobre mí" style="left:19%;top:26%;"><div style="background:#6b5ea8;"></div></a>
+            <a class="house" href="/blog/" title="Blog" style="left:58%;top:22%;"><div style="background:#b5623c;"></div></a>
+            <a class="house" href="/#projects" title="Proyectos" style="left:24%;top:58%;"><div style="background:#3f6f52;"></div></a>
+            <a class="house" href="/#interests" title="Intereses" style="left:63%;top:56%;"><div style="background:#c9a227;"></div></a>
+            <div class="plaza"></div>
+          </div>
+          <div class="map-hint">Pulsa una casa · o <a href="/quest/">juega el mapa entero</a></div>
+        </div>
+
+        <nav class="nav" aria-label="Principal">
+          <a href="/blog/"><span class="tri" style="background:#b5623c;"></span>Blog</a>
+          <a href="/#projects"><span class="tri" style="background:#3f6f52;"></span>Proyectos</a>
+          <a href="/#interests"><span class="tri" style="background:#c9a227;"></span>Intereses</a>
+          <a href="/#about"><span class="tri" style="background:#6b5ea8;"></span>Sobre mí</a>
+        </nav>
+
+        <div class="side-foot">
+          <div class="side-links">
+            <a href="mailto:hola@tunombre.dev">Email</a>
+            <a href="https://github.com/Jorgecardetegit">GitHub</a>
+            <a href="/rss.xml">RSS</a>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 4);
+
+const tour = [
+  { years: '2014–2018', html: 'Estudiante de diseño, fanzines fotocopiados y demasiadas horas en foros.' },
+  { years: '2018–2021', html: '<a href="#projects">Primer estudio</a>: identidad, web y todo lo que hiciera falta. Aprendí a maquetar por necesidad.' },
+  { years: '2021–2024', html: '<a href="#projects">Diseño de producto</a> en una empresa pequeña: sistemas de diseño, prototipos y bastante investigación.' },
+  { years: '2024–hoy', html: 'En solitario: proyectos propios, algo de consultoría y <a href="/blog/">escribir sobre el proceso</a>.' },
+];
+
+const projects = [
+  { meta: '2025 · PRODUCTO', title: 'Proyecto uno' },
+  { meta: '2024 · IDENTIDAD', title: 'Proyecto dos' },
+  { meta: '2023 · WEB', title: 'Proyecto tres' },
+];
+
+const interests = ['pixel art', 'escalada', 'cocinar', 'vinilos', 'tipografía', 'speedruns'];
+---
+<Base title="Inicio">
+  <div class="badge">MUNDO 1 — PORTFOLIO</div>
+  <h1 class="hero">Hola, soy [Tu nombre]</h1>
+  <p class="lead">Diseñador de producto, desarrollador a ratos, coleccionista de proyectos sin terminar.</p>
+
+  <div class="tour-wrap">
+    <div class="tour">
+      <h2 class="sub">Un breve recorrido</h2>
+      <div class="tour-list">
+        {tour.map((t) => (
+          <div class="tour-item">
+            <div class="tour-year">{t.years}</div>
+            <p set:html={t.html} />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div class="portrait">Tu foto o avatar</div>
+      <div class="note">Y si prefieres el pueblo pixelado, <a href="/quest/">entra al mapa</a>.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <section id="posts">
+    <div class="posts-head">
+      <h2 class="section">Último</h2>
+      <a class="pill" href="/blog/">Ver todo</a>
+    </div>
+    <PostList posts={posts} />
+  </section>
+
+  <section id="projects">
+    <h2 class="section">Proyectos</h2>
+    <div class="cards">
+      {projects.map((p) => (
+        <div class="card">
+          <div class="card-meta">{p.meta}</div>
+          <div class="card-title">{p.title}</div>
+          <p>Qué era, qué hiciste tú y qué pasó después. Dos frases bastan.</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section id="interests">
+    <h2 class="section">Intereses</h2>
+    <p class="para">Lo que hago cuando no estoy delante de una pantalla, y algunas cosas que hago delante de una pantalla pero por gusto.</p>
+    <div class="chips">
+      {interests.map((i) => <span class="chip">{i}</span>)}
+    </div>
+  </section>
+
+  <section id="about">
+    <h2 class="section">Sobre mí</h2>
+    <p class="about-p">Me interesa el punto donde el diseño y el código se tocan: que las cosas se sientan bien al usarlas, no solo que funcionen. Trabajo mejor cuando puedo prototipar pronto y tirar cosas a la basura sin drama.</p>
+    <p class="about-p">Si quieres que trabajemos juntos, <a href="mailto:hola@tunombre.dev">escríbeme</a>. Respondo a casi todo.</p>
+  </section>
+</Base>
