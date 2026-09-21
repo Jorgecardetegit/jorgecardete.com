@@ -8,18 +8,17 @@ const tagCounts = new Map<string, number>();
 for (const post of posts) for (const t of post.data.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
 const topics = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
 
-const palette = ['#ef7f5c', '#f0b84a', '#5aa7e6', '#7ecb8f', '#c08ae6'];
+const palette = ['#b5623c', '#3f6f52', '#6b5ea8', '#9a7b12', '#b5553f'];
 const color = (tag: string) => palette[[...tag].reduce((n, c) => n + c.charCodeAt(0), 0) % palette.length];
 
 const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
 <Base title="Blog" description="Guías, tutoriales y notas sobre diseño, código y vida." sidebar={false}>
-  <link slot="head" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" />
-
   <div class="panel">
     <header class="head">
       <div class="photo" aria-hidden="true">Tu foto</div>
       <div class="intro-block">
+        <div class="badge">MUNDO 2 — BLOG</div>
         <h1 class="big">Blog</h1>
         <p class="role">Diseño, código y cosas a medio terminar</p>
       </div>
@@ -52,35 +51,36 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
 </Base>
 
 <style is:global>
-  body { background: #82b3cb; }
-  .wide-brand { color: #0f2a38; margin-left: max(0px, calc((100% - 1120px) / 2)); }
   .wide-main { max-width: 1120px; }
+  .wide-brand { margin-left: max(0px, calc((100% - 1120px) / 2)); }
 </style>
 
 <style>
-  .panel { background: #212528; color: #f2f2ee; font-family: 'Space Mono', monospace; padding: 52px 52px 0; box-shadow: 0 30px 60px rgba(15, 42, 56, 0.35); min-height: 560px; }
-  .head { display: flex; flex-wrap: wrap; gap: 32px 52px; align-items: flex-start; margin-bottom: 56px; }
-  .photo { flex: none; width: 205px; height: 205px; background: #82b3cb; display: grid; place-items: center; font-size: 13px; color: #0f2a38; }
+  .panel { background: var(--card); border: 3px solid var(--ink); box-shadow: 8px 8px 0 var(--shadow); padding: 48px 48px 0; min-height: 520px; }
+  .head { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; margin-bottom: 48px; }
+  .photo { flex: none; width: 205px; height: 205px; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); }
   .intro-block { flex: 1 1 320px; min-width: 260px; }
-  .big { margin: 0 0 24px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: clamp(56px, 9vw, 104px); line-height: 0.95; letter-spacing: -3px; color: #fff; text-shadow: -3px 3px 0 #f0b84a, -6px 6px 0 #5aa7e6; }
-  .role { margin: 0; font-size: 17px; color: #9aa3a8; }
-  .filters { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 10px; }
-  .f { font: inherit; font-size: 13px; color: #f2f2ee; background: none; border: 0; padding: 1px 3px; cursor: pointer; }
-  .f:hover { text-decoration: underline; }
-  .f[aria-pressed='true'] { background: #f2f2ee; color: #212528; }
-  .search-row { margin: -28px 0 36px; }
-  .search-row input { width: 100%; max-width: 420px; font: inherit; font-size: 15px; color: #f2f2ee; background: transparent; border: 1px solid #4b555b; padding: 10px 12px; outline: none; }
-  .search-row input:focus { border-color: #f2f2ee; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); border-top: 1px solid #5d6b72; border-left: 1px solid #5d6b72; }
-  .cell { position: relative; display: flex; flex-direction: column; min-height: 204px; padding: 16px; border-right: 1px solid #5d6b72; border-bottom: 1px solid #5d6b72; color: #f2f2ee; text-decoration: none; }
+  .big { margin: 0 0 20px; font-family: var(--display); font-weight: 800; font-size: clamp(56px, 9vw, 96px); line-height: 0.95; letter-spacing: -3px; color: var(--ink); text-shadow: 3px 3px 0 var(--gold), 6px 6px 0 var(--terracotta); }
+  .role { margin: 0; font-size: 19px; line-height: 1.55; color: var(--text-soft); }
+  .filters { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 10px; }
+  .f { font-family: var(--mono); font-size: 13px; color: var(--ink); background: none; border: 0; border-radius: 3px; padding: 3px 8px; cursor: pointer; }
+  .f:hover { background: rgba(63, 111, 82, 0.12); }
+  .f[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
+  .search-row { margin: -24px 0 32px; }
+  .search-row input { width: 100%; max-width: 420px; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--bg); border: 3px solid var(--ink); border-radius: 3px; padding: 10px 12px; outline: none; }
+  .search-row input:focus { box-shadow: 3px 3px 0 var(--shadow); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); border-top: 3px solid var(--ink); margin: 0 -51px -3px; }
+  .cell:first-child { border-left: 3px solid var(--ink); }
+  .cell { display: flex; flex-direction: column; min-height: 204px; padding: 18px; border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink); color: var(--ink); text-decoration: none; background: var(--bg); }
   .cell[hidden] { display: none; }
-  .cell:hover, .cell:focus-visible { background: #2a2f33; color: #fff; }
-  .cat { font-size: 12px; margin-bottom: 4px; }
-  .when { font-size: 12px; color: #9aa3a8; }
-  .ttl { margin: auto 0; padding: 12px 0; text-align: center; font-size: 18px; line-height: 1.4; text-wrap: balance; }
-  .none { padding: 32px 0; color: #9aa3a8; font-size: 14px; }
-  .back { text-align: center; margin: 20px 0 0; font-size: 12px; font-family: 'Space Mono', monospace; }
-  @media (max-width: 720px) { .panel { padding: 28px 20px 0; } .photo { width: 140px; height: 140px; } }
+  .cell:hover, .cell:focus-visible { background: #e9e2d0; color: var(--ink); }
+  .cell:hover .ttl { color: var(--green); }
+  .cat { font-family: var(--pixel); font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; line-height: 1.5; }
+  .when { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .ttl { margin: auto 0; padding: 12px 0; text-align: center; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.3; letter-spacing: -0.3px; text-wrap: balance; }
+  .none { padding: 32px 0; color: var(--muted); font-family: var(--mono); font-size: 14px; }
+  .back { text-align: center; margin: 28px 0 0; font-family: var(--mono); font-size: 12px; }
+  @media (max-width: 720px) { .panel { padding: 28px 20px 0; } .grid { margin: 0 -23px -3px; } .photo { width: 140px; height: 140px; } }
 </style>
 
 <script>
