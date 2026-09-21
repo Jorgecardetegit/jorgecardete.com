@@ -4,84 +4,117 @@ import Base from '../../layouts/Base.astro';
 
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const byYear = new Map<number, typeof posts>();
-for (const post of posts) {
-  const y = post.data.date.getUTCFullYear();
-  byYear.set(y, [...(byYear.get(y) ?? []), post]);
-}
-
 const tagCounts = new Map<string, number>();
 for (const post of posts) for (const t of post.data.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
-const topics = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([t]) => t);
+const topics = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
 
-const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+const palette = ['#ef7f5c', '#f0b84a', '#5aa7e6', '#7ecb8f', '#c08ae6'];
+const color = (tag: string) => palette[[...tag].reduce((n, c) => n + c.charCodeAt(0), 0) % palette.length];
+
+const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
-<Base title="Blog" description="Guías, tutoriales y notas sobre código y vida." sidebar={false}>
-  <h1 class="blog-title"><span aria-hidden="true">📝</span>Blog</h1>
-  <p class="blog-lead">Guías, tutoriales y notas sobre diseño, código y vida. <a href="/rss.xml">Suscríbete por RSS</a>.</p>
+<Base title="Blog" description="Guías, tutoriales y notas sobre diseño, código y vida." sidebar={false}>
+  <link slot="head" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" />
 
-  <div class="topics" role="group" aria-label="Filtrar por tema">
-    {topics.map((t) => <button type="button" class="topic" data-topic={t} aria-pressed="false">#{t}</button>)}
-  </div>
-
-  <label class="search">
-    <span aria-hidden="true">🔎</span>
-    <input type="search" id="q" placeholder={`Buscar ${posts.length} posts…`} aria-label="Buscar posts" />
-  </label>
-
-  {[...byYear.entries()].map(([year, items]) => (
-    <section class="year" data-year>
-      <div class="year-head">
-        <h2>{year}</h2>
-        <span class="count"><span data-count>{items.length}</span> posts</span>
+  <div class="panel">
+    <header class="head">
+      <div class="photo" aria-hidden="true">Tu foto</div>
+      <div class="intro-block">
+        <h1 class="big">Blog</h1>
+        <p class="role">Diseño, código y cosas a medio terminar</p>
       </div>
-      {items.map((post) => (
-        <div class="entry" data-title={post.data.title.toLowerCase()} data-tags={post.data.tags.join(',')}>
-          <div class="entry-icon" aria-hidden="true">{post.data.icon}</div>
-          <div class="entry-main">
-            <div class="entry-title"><a href={`/blog/${post.id}/`}>{post.data.title}</a></div>
-            <time class="entry-date" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
-          </div>
-          <div class="tags">
-            {post.data.tags.map((t) => <span class="tag">#{t}</span>)}
-          </div>
-        </div>
-      ))}
-    </section>
-  ))}
-  <p class="no-results" id="none" hidden>No hay posts que coincidan.</p>
+      <nav class="filters" aria-label="Filtrar posts">
+        <button type="button" class="f" data-topic="" aria-pressed="true">Todos los posts</button>
+        {topics.map((t) => <button type="button" class="f" data-topic={t} aria-pressed="false">{t}</button>)}
+        <button type="button" class="f" id="toggle-search" aria-expanded="false">Buscar</button>
+      </nav>
+    </header>
+
+    <div class="search-row" id="search-row" hidden>
+      <input type="search" id="q" placeholder={`Buscar entre ${posts.length} posts…`} aria-label="Buscar posts" />
+    </div>
+
+    <div class="grid" id="grid">
+      {posts.map((post) => {
+        const main = post.data.tags[0];
+        return (
+          <a class="cell" href={`/blog/${post.id}/`} data-title={post.data.title.toLowerCase()} data-tags={post.data.tags.join(',')}>
+            <span class="cat" style={`color:${color(main ?? '')}`}>{main ?? 'nota'}</span>
+            <time class="when" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+            <span class="ttl">{post.data.title}</span>
+          </a>
+        );
+      })}
+    </div>
+    <p class="none" id="none" hidden>No hay posts que coincidan.</p>
+  </div>
+  <p class="back"><a href="/rss.xml">RSS</a></p>
 </Base>
+
+<style is:global>
+  body { background: #82b3cb; }
+  .wide-brand { color: #0f2a38; margin-left: max(0px, calc((100% - 1120px) / 2)); }
+  .wide-main { max-width: 1120px; }
+</style>
+
+<style>
+  .panel { background: #212528; color: #f2f2ee; font-family: 'Space Mono', monospace; padding: 52px 52px 0; box-shadow: 0 30px 60px rgba(15, 42, 56, 0.35); min-height: 560px; }
+  .head { display: flex; flex-wrap: wrap; gap: 32px 52px; align-items: flex-start; margin-bottom: 56px; }
+  .photo { flex: none; width: 205px; height: 205px; background: #82b3cb; display: grid; place-items: center; font-size: 13px; color: #0f2a38; }
+  .intro-block { flex: 1 1 320px; min-width: 260px; }
+  .big { margin: 0 0 24px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: clamp(56px, 9vw, 104px); line-height: 0.95; letter-spacing: -3px; color: #fff; text-shadow: -3px 3px 0 #f0b84a, -6px 6px 0 #5aa7e6; }
+  .role { margin: 0; font-size: 17px; color: #9aa3a8; }
+  .filters { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 10px; }
+  .f { font: inherit; font-size: 13px; color: #f2f2ee; background: none; border: 0; padding: 1px 3px; cursor: pointer; }
+  .f:hover { text-decoration: underline; }
+  .f[aria-pressed='true'] { background: #f2f2ee; color: #212528; }
+  .search-row { margin: -28px 0 36px; }
+  .search-row input { width: 100%; max-width: 420px; font: inherit; font-size: 15px; color: #f2f2ee; background: transparent; border: 1px solid #4b555b; padding: 10px 12px; outline: none; }
+  .search-row input:focus { border-color: #f2f2ee; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); border-top: 1px solid #5d6b72; border-left: 1px solid #5d6b72; }
+  .cell { position: relative; display: flex; flex-direction: column; min-height: 204px; padding: 16px; border-right: 1px solid #5d6b72; border-bottom: 1px solid #5d6b72; color: #f2f2ee; text-decoration: none; }
+  .cell[hidden] { display: none; }
+  .cell:hover, .cell:focus-visible { background: #2a2f33; color: #fff; }
+  .cat { font-size: 12px; margin-bottom: 4px; }
+  .when { font-size: 12px; color: #9aa3a8; }
+  .ttl { margin: auto 0; padding: 12px 0; text-align: center; font-size: 18px; line-height: 1.4; text-wrap: balance; }
+  .none { padding: 32px 0; color: #9aa3a8; font-size: 14px; }
+  .back { text-align: center; margin: 20px 0 0; font-size: 12px; font-family: 'Space Mono', monospace; }
+  @media (max-width: 720px) { .panel { padding: 28px 20px 0; } .photo { width: 140px; height: 140px; } }
+</style>
 
 <script>
   const input = document.getElementById('q') as HTMLInputElement;
-  const buttons = [...document.querySelectorAll<HTMLButtonElement>('.topic')];
-  const entries = [...document.querySelectorAll<HTMLElement>('.entry')];
-  const years = [...document.querySelectorAll<HTMLElement>('[data-year]')];
+  const row = document.getElementById('search-row')!;
+  const toggle = document.getElementById('toggle-search')!;
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('.f[data-topic]')];
+  const cells = [...document.querySelectorAll<HTMLElement>('.cell')];
   const none = document.getElementById('none')!;
   let topic = '';
 
   function apply() {
     const q = input.value.trim().toLowerCase();
-    for (const e of entries) {
-      const okQ = !q || e.dataset.title!.includes(q) || e.dataset.tags!.includes(q);
-      const okT = !topic || e.dataset.tags!.split(',').includes(topic);
-      e.hidden = !(okQ && okT);
-    }
     let visible = 0;
-    for (const y of years) {
-      const n = y.querySelectorAll('.entry:not([hidden])').length;
-      y.hidden = n === 0;
-      y.querySelector('[data-count]')!.textContent = String(n);
-      visible += n;
+    for (const c of cells) {
+      const okQ = !q || c.dataset.title!.includes(q) || c.dataset.tags!.includes(q);
+      const okT = !topic || c.dataset.tags!.split(',').includes(topic);
+      c.hidden = !(okQ && okT);
+      if (!c.hidden) visible++;
     }
     none.hidden = visible > 0;
   }
 
   input.addEventListener('input', apply);
+  toggle.addEventListener('click', () => {
+    row.hidden = !row.hidden;
+    toggle.setAttribute('aria-expanded', String(!row.hidden));
+    if (!row.hidden) input.focus();
+    else { input.value = ''; apply(); }
+  });
   for (const b of buttons) {
     b.addEventListener('click', () => {
-      topic = topic === b.dataset.topic ? '' : b.dataset.topic!;
-      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.topic === topic)));
+      topic = b.dataset.topic!;
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       apply();
     });
   }
