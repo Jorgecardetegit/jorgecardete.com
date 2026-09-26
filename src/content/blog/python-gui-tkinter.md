@@ -5,6 +5,7 @@ date: 2024-02-05
 tags: [python, tkinter, gui]
 icon: "🪟"
 cover: "/blog/covers/python-gui-tkinter.jpg"
+topic: practice
 ---
 
 *Creating a desktop app with the Python Toolkit. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/build-your-first-python-gui-with-tkinter-c44ac52a83b1).*

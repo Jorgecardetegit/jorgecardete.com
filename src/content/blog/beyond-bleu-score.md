@@ -5,6 +5,7 @@ date: 2023-11-03
 tags: [nlp, metrics, machine-translation]
 icon: "🔤"
 cover: "/blog/covers/beyond-bleu-score.jpg"
+topic: ai
 ---
 
 *Machine Translation’s Favorite Metric. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/beyond-bleu-score-unraveling-the-myths-of-machine-translations-favorite-metric-afac33f56de8).*

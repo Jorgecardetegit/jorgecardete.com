@@ -5,6 +5,7 @@ date: 2024-02-01
 tags: [python, performance]
 icon: "🐢"
 cover: "/blog/covers/por-que-python-es-lento.jpg"
+topic: practice
 ---
 
 *Exploring the trade-offs between ease of use and execution speed. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/but-why-python-is-so-slow-da1a4fb9be92).*

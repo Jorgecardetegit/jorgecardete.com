@@ -10,6 +10,8 @@ const blog = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
     icon: z.string().default('💾'),
+    // Temática con la que se agrupa en el listado del blog (etiquetas en src/i18n/topics.ts).
+    topic: z.enum(['vision', 'ml', 'ai', 'practice']),
     // Imagen de portada en /public (p. ej. /blog/covers/<slug>.jpg).
     cover: z.string().optional(),
     // Posición fija al principio del listado del blog; el resto va por fecha.

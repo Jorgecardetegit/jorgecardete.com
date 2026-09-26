@@ -5,6 +5,7 @@ date: 2024-02-14
 tags: [computer-vision, haar-cascades, machine-learning]
 icon: "🧭"
 cover: "/blog/covers/antes-de-las-cnn-parte-2.jpg"
+topic: vision
 ---
 
 *A quick introduction to Haar Cascades. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/but-what-was-before-cnns-part-2-992ffbac9cf1).*

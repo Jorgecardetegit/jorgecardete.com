@@ -6,6 +6,7 @@ tags: [computer-vision, image-processing, interpolation]
 icon: "🖼️"
 order: 7
 cover: "/blog/covers/art-science-interpolation.jpg"
+topic: vision
 ---
 
 *Exploring the pillars of image processing. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/the-art-and-science-of-interpolation-b12b99f2e053).*

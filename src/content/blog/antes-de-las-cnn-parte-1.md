@@ -5,6 +5,7 @@ date: 2024-02-12
 tags: [computer-vision, hog, machine-learning]
 icon: "🧭"
 cover: "/blog/covers/antes-de-las-cnn-parte-1.jpg"
+topic: vision
 ---
 
 *A Quick Introduction to Histograms of Oriented Gradients. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/but-what-was-before-convolutional-neural-networks-part-1-d654737b026a).*

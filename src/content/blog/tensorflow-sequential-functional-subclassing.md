@@ -5,6 +5,7 @@ date: 2024-02-06
 tags: [tensorflow, keras, deep-learning]
 icon: "🧱"
 cover: "/blog/covers/tensorflow-sequential-functional-subclassing.jpg"
+topic: ml
 ---
 
 *Choosing the best architecture for your model. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/sequential-vs-functional-vs-subclassing-api-in-tensorflow-8bfcfe91859d).*

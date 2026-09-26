@@ -6,6 +6,7 @@ tags: [machine-learning]
 icon: "📈"
 order: 5
 cover: "/blog/covers/state-space-models.jpg"
+topic: ml
 ---
 
 *A brief guide to the foundation of dynamic system analysis. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/gentle-introduction-to-state-space-models-e8cd7501e0cf).*

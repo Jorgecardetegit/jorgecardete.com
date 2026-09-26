@@ -5,6 +5,7 @@ date: 2023-11-15
 tags: [machine-learning, clustering, papers]
 icon: "🪣"
 cover: "/blog/covers/kwikbucks-clustering.jpg"
+topic: ml
 ---
 
 *Novel Clustering Algorithm that Combines the Benefits of Embedding Models with the Quality of Cross-Attention. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/revolutionizing-data-clustering-kwikbucks-algorithm-149b7ae88125).*

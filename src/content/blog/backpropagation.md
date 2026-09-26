@@ -6,6 +6,7 @@ tags: [deep-learning, neural-networks, math]
 icon: "🔁"
 order: 2
 cover: "/blog/covers/backpropagation.jpg"
+topic: ml
 ---
 
 *From mystery to mastery: Decoding the engine behind Neural Networks. Publicado originalmente en [Towards AI](https://medium.com/towards-artificial-intelligence/backpropagation-2eeb25201095).*

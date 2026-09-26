@@ -5,6 +5,7 @@ date: 2023-12-19
 tags: [ai, robotics, ethics]
 icon: "🤖"
 cover: "/blog/covers/asimov-tres-leyes-robotica.jpg"
+topic: ai
 ---
 
 *Bridging science fiction and reality. Publicado originalmente en [Short. Sweet. Valuable.](https://medium.com/short-sweet-valuable/isaac-asimov-and-the-three-laws-of-robotics-34aac542d050).*

@@ -5,6 +5,7 @@ date: 2024-02-05
 tags: [machine-learning, rnn, training]
 icon: "🧑‍🏫"
 cover: "/blog/covers/teacher-forcing.jpg"
+topic: ml
 ---
 
 *Changing the mindset of traditional models. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/teacher-forcing-in-machine-learning-4a51e12a0c59).*
