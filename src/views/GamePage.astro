@@ -213,7 +213,7 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .game-iris { position: absolute; left: var(--iris-x, 50%); top: var(--iris-y, 50%); width: 300vmax; height: 300vmax; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 300vmax var(--ink); pointer-events: none; opacity: 0; }
   .game.is-leaving .game-iris { opacity: 1; width: 0; height: 0; transition: width .45s ease-in, height .45s ease-in; }
   /* Interior de la casa: un modal con el estilo de las tarjetas de la web. */
-  .room { width: min(760px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 0; background: var(--bg); color: var(--ink); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--shadow); overflow: hidden; flex-direction: column; }
+  .room { width: min(820px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 0; background: var(--bg); color: var(--ink); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--shadow); overflow: hidden; flex-direction: column; }
   .room[open] { display: flex; animation: pop .22s ease-out; }
   .room::backdrop { background: rgba(31, 29, 26, 0.55); }
   @keyframes pop { from { transform: translateY(14px) scale(.97); opacity: 0; } }
@@ -223,11 +223,11 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .room-head h2 { margin: 2px 0 0; font-family: var(--display); font-weight: 800; font-size: 30px; letter-spacing: -0.8px; color: var(--bg); text-shadow: 2px 2px 0 var(--ink); }
   .room-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: var(--bg); border: 3px solid var(--ink); font: 700 14px var(--mono); color: var(--ink); cursor: pointer; }
   .room-close:hover { background: var(--ink); color: var(--bg); }
-  .room-body { padding: 24px 26px 8px; overflow-y: auto; }
+  .room-body { padding: 28px 30px 8px; overflow-y: auto; }
   .room-body::after { content: ''; display: block; clear: both; }
   .room-photo { float: right; width: 170px; height: 170px; margin: 4px 0 14px 22px; object-fit: cover; border: 4px solid var(--ink); box-shadow: 5px 5px 0 var(--shadow); }
   .room-lead { margin: 0 0 18px; font-size: 16px; line-height: 1.6; color: var(--text-soft); text-wrap: pretty; }
-  .room-text { margin: 0 0 16px; font-size: 16.5px; line-height: 1.7; text-wrap: pretty; }
+  .room-text { margin: 0 0 22px; font-size: 16.5px; line-height: 1.75; text-wrap: pretty; }
   .room-items { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
   .room-items li { padding: 12px 14px; background: var(--card); border: 3px solid var(--ink); border-left-width: 8px; border-left-color: var(--c); box-shadow: 3px 3px 0 var(--shadow); }
   .room-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 4px; }
