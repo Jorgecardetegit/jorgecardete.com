@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import { path, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const to = (route: Parameters<typeof path>[0]) => path(route, lang);
+---
+<Base
+  title={lang === 'es' ? 'Sobre mí' : 'About me'}
+  description={lang === 'es' ? 'Quién soy, cómo contactarme y en qué estoy trabajando ahora.' : 'Who I am, how to reach me and what I am working on now.'}
+>
+  <div class="badge">{lang === 'es' ? 'MUNDO 5 — SOBRE MÍ' : 'WORLD 5 — ABOUT ME'}</div>
+  <h1 class="hero">{lang === 'es' ? 'Sobre mí' : 'About me'}</h1>
+
+  <div class="about-top">
+    {lang === 'es' ? (
+      <div class="about-text">
+        <p>¡Hola! Soy Jorge. Bienvenido a mi rincón de la web para <a href={to('blog')}>escribir</a>, <a href={to('projects')}>enseñar proyectos</a> y contar cómo construyo <a href={to('startups')}>startups</a>. Ahora mismo trabajo como Growth Engineer en Bit2Me: después de muchos años programando, quiero aprender la otra mitad del juego, la distribución. En mi tiempo libre me gusta hacer deporte, viajar y jugar al ajedrez.</p>
+        <p>Este sitio es un espacio para expresarme y compartir lo que voy aprendiendo. Aquí no hay anuncios, ni enlaces de afiliado, ni rastreo o analítica, ni posts patrocinados, ni muros de pago.</p>
+        <p>Ojalá sirva para animar a alguien más a montarse su propio rincón en la web.</p>
+        <p>Si quieres seguir mis publicaciones, suscríbete al <a href="/rss.xml">feed RSS</a>. Hay artículos y código abierto de sobra para curiosear, así que disfruta.</p>
+      </div>
+    ) : (
+      <div class="about-text">
+        <p>Hi! I'm Jorge. Welcome to my corner of the web, where I <a href={to('blog')}>write</a>, <a href={to('projects')}>show my projects</a> and share how I build <a href={to('startups')}>startups</a>. I currently work as a Growth Engineer at Bit2Me: after many years of writing code, I want to learn the other half of the game, distribution. In my free time I enjoy sports, travelling and playing chess.</p>
+        <p>This site is a space to express myself and share what I learn along the way. There are no ads, no affiliate links, no tracking or analytics, no sponsored posts and no paywalls.</p>
+        <p>I hope it encourages someone else to build their own corner of the web.</p>
+        <p>If you want to follow what I publish, subscribe to the <a href="/rss.xml">RSS feed</a>. There are plenty of articles and open-source code to browse, so enjoy.</p>
+      </div>
+    )}
+    <div class="about-photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
+  </div>
+
+  <h2 class="about-h">{lang === 'es' ? 'Contacto' : 'Contact'}</h2>
+  <p class="about-p2">{lang === 'es' ? 'Escríbeme un email para saludar o encuéntrame en las redes.' : 'Send me an email to say hi or find me on social media.'}</p>
+  <ul class="about-list">
+    <li>Email: <a href="mailto:jorgecardete@gmail.com">jorgecardete@gmail.com</a></li>
+    <li><a href="https://www.linkedin.com/in/jorgecardetellamas/">LinkedIn</a></li>
+    <li><a href="https://x.com/JorgeCardete">X (Twitter)</a></li>
+    <li><a href="https://medium.com/@jorgecardete">Medium</a></li>
+    <li><a href="https://github.com/Jorgecardetegit">GitHub</a></li>
+  </ul>
+
+  {lang === 'es' ? (
+    <>
+      <h2 class="about-h">Lo que hago ahora</h2>
+      <p class="about-updated">Actualizado el 26 de septiembre de 2026</p>
+      <ul class="about-list">
+        <li>Trabajando como Growth Engineer en Bit2Me y aprendiendo distribución.</li>
+        <li>Aprendiendo sobre Google Ads y Meta Ads.</li>
+        <li>Ayudando a mi hermano con la tecnología y la distribución en <a href={to('startups')}>Grupo Cardete Ventures</a>.</li>
+        <li>Trabajando en otros side projects. Stay tuned.</li>
+        <li>Preparándome para una maratón y volviendo al gimnasio.</li>
+      </ul>
+    </>
+  ) : (
+    <>
+      <h2 class="about-h">What I'm doing now</h2>
+      <p class="about-updated">Updated on 26 September 2026</p>
+      <ul class="about-list">
+        <li>Working as a Growth Engineer at Bit2Me and learning distribution.</li>
+        <li>Learning about Google Ads and Meta Ads.</li>
+        <li>Helping my brother with technology and distribution at <a href={to('startups')}>Grupo Cardete Ventures</a>.</li>
+        <li>Working on other side projects. Stay tuned.</li>
+        <li>Training for a marathon and getting back to the gym.</li>
+      </ul>
+    </>
+  )}
+</Base>
