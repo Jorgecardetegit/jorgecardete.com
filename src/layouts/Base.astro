@@ -82,7 +82,6 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
         <div class="side-map">
           <div class="label-pixel">{t('sidebar.map')}</div>
           <SideMap lang={lang} pathname={Astro.url.pathname} />
-          <div class="map-hint" set:html={t('sidebar.mapHint').replace('{link}', `<a href="${path('game', lang)}">${t('sidebar.mapHintLink')}</a>`)} />
         </div>
 
         <div class="side-foot">

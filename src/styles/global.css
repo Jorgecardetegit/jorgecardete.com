@@ -41,8 +41,6 @@ a.footer-link:hover { color: var(--green); text-decoration: underline; }
 .intro { margin: 0; font-size: 15px; line-height: 1.65; color: var(--text-soft); text-wrap: pretty; }
 
 .label-pixel { font-family: var(--pixel); font-size: 10px; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.5px; }
-.map-hint { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 8px; }
-.map-hint a { text-decoration: none; }
 
 .nav { display: flex; flex-direction: column; gap: 0; border-top: 1px solid #e5dcbd; padding-top: 16px; }
 .side-map { border-top: 1px solid #e5dcbd; padding-top: 16px; }

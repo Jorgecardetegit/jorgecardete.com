@@ -215,9 +215,34 @@ const waves = [[14, 4], [70, 3], [128, 5], [4, 60], [150, 36], [150, 84], [30, 1
     </g>
   </g>
 </svg>
+<p class="map-hint">{t('sidebar.mapHint')}</p>
+<a class="map-play" href={path('game', lang)}>
+  <svg class="map-play-pad" viewBox="0 0 14 9" width="28" height="18" shape-rendering="crispEdges" aria-hidden="true">
+    <rect x="1" y="0" width="12" height="9" fill="#1f1d1a" /><rect x="0" y="1" width="14" height="7" fill="#1f1d1a" />
+    <rect x="1" y="1" width="12" height="7" fill="#f6f1e4" />
+    <rect x="3" y="3" width="1" height="3" fill="#1f1d1a" /><rect x="2" y="4" width="3" height="1" fill="#1f1d1a" />
+    <rect x="9" y="3" width="2" height="2" fill="#e8574c" /><rect x="11" y="4" width="1" height="1" fill="#f7d046" />
+  </svg>
+  <span class="map-play-text">
+    <span class="map-play-title">{t('sidebar.play')}</span>
+    <span class="map-play-sub">{t('sidebar.playSub')}</span>
+  </span>
+  <span class="map-play-arrow" aria-hidden="true"></span>
+</a>
 
 <style>
   .map { display: block; width: 100%; height: auto; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); background: #4fb8e8; }
+  .map-hint { margin: 10px 0 12px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  /* CTA al juego: botón pixel con el mismo lenguaje que los carteles del juego. */
+  .map-play { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--green); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); color: var(--bg); text-decoration: none; transition: translate .15s, box-shadow .15s; }
+  .map-play:hover, .map-play:focus-visible { color: var(--bg); translate: -2px -2px; box-shadow: 6px 6px 0 var(--shadow); }
+  .map-play:active { translate: 2px 2px; box-shadow: 2px 2px 0 var(--shadow); }
+  .map-play-pad { flex: none; }
+  .map-play-text { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .map-play-title { font-family: var(--pixel); font-size: 13px; line-height: 1.2; text-shadow: 2px 2px 0 var(--ink); }
+  .map-play-sub { font-family: var(--mono); font-size: 11.5px; font-weight: 500; color: #d9f2e6; }
+  .map-play-arrow { margin-left: auto; border: 6px solid transparent; border-right: 0; border-left: 7px solid currentColor; filter: drop-shadow(1px 1px 0 var(--ink)); animation: nudge 1.2s steps(2) infinite; }
+  @keyframes nudge { 50% { translate: 3px 0; } }
   .map-place { cursor: pointer; }
   .map-house { transition: transform .15s; }
   .map-place:hover .map-house, .map-place:focus-visible .map-house { transform: translateY(-2px); }
@@ -230,7 +255,7 @@ const waves = [[14, 4], [70, 3], [128, 5], [4, 60], [150, 36], [150, 84], [30, 1
   .wave { animation: wave 3s steps(2) infinite; }
   .wave:nth-of-type(2n) { animation-delay: -1.5s; }
   @keyframes wave { 50% { transform: translateX(2px); } }
-  @media (prefers-reduced-motion: reduce) { .wave { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .wave, .map-play-arrow { animation: none; } }
 </style>
 
 <script>
