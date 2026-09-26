@@ -15,24 +15,14 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input type="search" id="pq" placeholder="Buscar proyectos…" aria-label="Buscar proyectos" />
     </label>
-
-    <div class="pfilter-row" role="group" aria-label="Temática">
-      <span class="pfilter-label">Temática</span>
-      <button type="button" class="pchip" data-group="category" data-value="" aria-pressed="true">Todas</button>
-      {usedCategories.map(([key, c]) => (
-        <button type="button" class="pchip" data-group="category" data-value={key} aria-pressed="false" style={`--c:${c.color}`}>
-          <span class="pdot" aria-hidden="true"></span>{c.label}
-        </button>
-      ))}
-    </div>
-
-    <div class="pfilter-row" role="group" aria-label="Lenguaje">
-      <span class="pfilter-label">Lenguaje</span>
-      <button type="button" class="pchip" data-group="language" data-value="" aria-pressed="true">Todos</button>
-      {languages.map((l) => (
-        <button type="button" class="pchip" data-group="language" data-value={l} aria-pressed="false">{l}</button>
-      ))}
-    </div>
+    <select class="pselect" data-group="category" aria-label="Temática">
+      <option value="">Todas las temáticas</option>
+      {usedCategories.map(([key, c]) => <option value={key}>{c.label}</option>)}
+    </select>
+    <select class="pselect" data-group="language" aria-label="Lenguaje">
+      <option value="">Todos los lenguajes</option>
+      {languages.map((l) => <option value={l}>{l}</option>)}
+    </select>
   </div>
 
   <ul class="pgrid">
@@ -65,18 +55,18 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
 
 <script>
   const input = document.getElementById('pq') as HTMLInputElement;
-  const chips = [...document.querySelectorAll<HTMLButtonElement>('.pchip')];
+  const selects = [...document.querySelectorAll<HTMLSelectElement>('.pselect')];
   const cards = [...document.querySelectorAll<HTMLElement>('.pcard')];
   const none = document.getElementById('pnone')!;
-  const active: Record<string, string> = { category: '', language: '' };
 
   function apply() {
     const q = input.value.trim().toLowerCase();
+    const [category, language] = selects.map((s) => s.value);
     let visible = 0;
     for (const card of cards) {
       const ok =
-        (!active.category || card.dataset.category === active.category) &&
-        (!active.language || card.dataset.languages!.split('|').includes(active.language)) &&
+        (!category || card.dataset.category === category) &&
+        (!language || card.dataset.languages!.split('|').includes(language)) &&
         (!q || card.dataset.text!.includes(q));
       card.hidden = !ok;
       if (ok) visible++;
@@ -84,13 +74,6 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
     none.hidden = visible > 0;
   }
 
-  for (const chip of chips) {
-    chip.addEventListener('click', () => {
-      const group = chip.dataset.group!;
-      active[group] = chip.dataset.value!;
-      for (const c of chips) if (c.dataset.group === group) c.setAttribute('aria-pressed', String(c === chip));
-      apply();
-    });
-  }
+  for (const s of selects) s.addEventListener('change', apply);
   input.addEventListener('input', apply);
 </script>
