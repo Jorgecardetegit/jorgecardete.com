@@ -1,0 +1,284 @@
+---
+// Mapa pixel-art de la barra lateral. Cada casa es una sección; el personaje
+// está en la de la página actual y, al navegar, camina desde la anterior.
+import { path, useTranslations, type Lang, type Route } from '../i18n';
+
+interface Props { lang: Lang; pathname: string }
+const { lang, pathname } = Astro.props;
+const t = useTranslations(lang);
+
+type Place = 'home' | 'about' | 'academic' | 'blog' | 'projects' | 'startups';
+
+// Coordenadas en unidades del viewBox (160×120); la puerta queda en x + 9, y + 16.
+const houses: { route: Exclude<Place, 'home'>; x: number; y: number; roof: string; shade: string; label: string }[] = [
+  { route: 'about', x: 20, y: 14, roof: '#6b5ea8', shade: '#584c8f', label: t('nav.about') },
+  { route: 'academic', x: 71, y: 10, roof: '#b5553f', shade: '#984433', label: t('nav.academic') },
+  { route: 'blog', x: 122, y: 14, roof: '#b5623c', shade: '#984f2f', label: t('nav.blog') },
+  { route: 'projects', x: 20, y: 72, roof: '#2b9476', shade: '#217a61', label: t('nav.projects') },
+  { route: 'startups', x: 122, y: 72, roof: '#c9a227', shade: '#a8871d', label: t('nav.startups') },
+];
+
+// Red de caminos: nodos y tramos rectos entre ellos. El personaje va por el
+// camino más corto, así que entre casas vecinas no pasa por la plaza.
+const nodes: Record<string, [number, number]> = {
+  home: [80, 68], // en la plaza, delante de la fuente
+  about: [29, 33], academic: [80, 29], blog: [131, 33], projects: [29, 91], startups: [131, 91],
+  top: [80, 38], bottom: [80, 94],
+  topLeft: [29, 38], topRight: [131, 38], bottomLeft: [29, 94], bottomRight: [131, 94],
+  // Caminos laterales, pegados a las casas por dentro.
+  sideTopLeft: [44, 38], sideBottomLeft: [44, 94], sideTopRight: [116, 38], sideBottomRight: [116, 94],
+};
+const edges: [string, string][] = [
+  ['home', 'top'], ['top', 'academic'], ['home', 'bottom'],
+  ['top', 'sideTopLeft'], ['sideTopLeft', 'topLeft'], ['topLeft', 'about'],
+  ['top', 'sideTopRight'], ['sideTopRight', 'topRight'], ['topRight', 'blog'],
+  ['bottom', 'sideBottomLeft'], ['sideBottomLeft', 'bottomLeft'], ['bottomLeft', 'projects'],
+  ['bottom', 'sideBottomRight'], ['sideBottomRight', 'bottomRight'], ['bottomRight', 'startups'],
+  ['sideTopLeft', 'sideBottomLeft'], ['sideTopRight', 'sideBottomRight'],
+];
+
+const distance = (a: string, b: string) => Math.hypot(nodes[a][0] - nodes[b][0], nodes[a][1] - nodes[b][1]);
+
+/** Dijkstra sobre la red: los puntos por los que pasa el personaje de `from` a `to`. */
+function route(from: string, to: string): [number, number][] {
+  const dist: Record<string, number> = { [from]: 0 };
+  const prev: Record<string, string> = {};
+  const open = new Set(Object.keys(nodes));
+  while (open.size) {
+    const node = [...open].reduce((a, b) => ((dist[a] ?? Infinity) <= (dist[b] ?? Infinity) ? a : b));
+    open.delete(node);
+    if (node === to) break;
+    for (const [a, b] of edges) {
+      const next = a === node ? b : b === node ? a : null;
+      if (!next || !open.has(next)) continue;
+      const d = dist[node] + distance(node, next);
+      if (d < (dist[next] ?? Infinity)) {
+        dist[next] = d;
+        prev[next] = node;
+      }
+    }
+  }
+  const steps = [to];
+  while (steps[0] !== from) steps.unshift(prev[steps[0]]);
+  return steps.map((n) => nodes[n]);
+}
+
+const places: Place[] = ['home', 'about', 'academic', 'blog', 'projects', 'startups'];
+const routes = Object.fromEntries(
+  places.map((from) => [from, Object.fromEntries(places.filter((to) => to !== from).map((to) => [to, route(from, to)]))]),
+);
+
+const sections = houses.map((h) => h.route);
+const current: Place =
+  sections.find((r) => pathname.startsWith(path(r as Route, lang))) ?? 'home';
+const [heroX, heroY] = nodes[current];
+
+// Caminos de 4 unidades de ancho: cada tramo es un rectángulo.
+const segments = edges.map(([a, b]) => {
+  const [x1, y1] = nodes[a];
+  const [x2, y2] = nodes[b];
+  return [Math.min(x1, x2) - 2, Math.min(y1, y2) - 2, Math.abs(x2 - x1) + 4, Math.abs(y2 - y1) + 4];
+});
+
+const housePixels = [
+  '........kk........',
+  '.......kRRk.......',
+  '......kRRRRk......',
+  '.....kRRDDRRk.....',
+  '....kRRRRRRRRk....',
+  '...kRRDDDDDDRRk...',
+  '..kRRRRRRRRRRRRk..',
+  '.kkkkkkkkkkkkkkkk.',
+  '..kcccccccccccck..',
+  '..kcwwccccccwwck..',
+  '..kcwwcckkccwwck..',
+  '..kcccckddkcccck..',
+  '..kcccckddkcccck..',
+  '..kcccckdykcccck..',
+  '..kcccckddkcccck..',
+  '..kkkkkkkkkkkkkk..',
+];
+
+const heroFrames = {
+  a: [
+    '.kkkkk.',
+    'khhhhhk',
+    'khffffk',
+    'kffkfkk',
+    '.kfffk.',
+    'krrrrrk',
+    'kfrrrfk',
+    '.kbkbk.',
+    '.kk.kk.',
+  ],
+  b: [
+    '.kkkkk.',
+    'khhhhhk',
+    'khffffk',
+    'kffkfkk',
+    '.kfffk.',
+    'krrrrrk',
+    'kfrrrfk',
+    '..kbk..',
+    '..kkk..',
+  ],
+};
+
+const colors: Record<string, string> = {
+  k: '#1f1d1a', c: '#f6f1e4', w: '#b7d3ff', d: '#7b5434', y: '#f7d046',
+  h: '#8b5a2b', f: '#f7d3ae', r: '#b5553f', b: '#2f3b7e',
+};
+
+// Agrupa píxeles contiguos del mismo color en un solo rect por fila, como PixelIcon.
+function pixels(rows: string[], palette: Record<string, string>, dx = 0, dy = 0) {
+  const rects: { x: number; y: number; w: number; fill: string }[] = [];
+  rows.forEach((row, y) => {
+    for (let x = 0; x < row.length; ) {
+      let w = 1;
+      while (row[x + w] === row[x]) w++;
+      if (row[x] !== '.') rects.push({ x: x + dx, y: y + dy, w, fill: palette[row[x]] });
+      x += w;
+    }
+  });
+  return rects;
+}
+
+const trees = [[50, 44], [104, 44], [50, 74], [104, 74], [16, 50], [140, 50], [64, 100], [92, 100]];
+const flowers = [[40, 58, '#f48fa6'], [118, 60, '#f7d046'], [60, 30, '#ffffff'], [100, 28, '#f48fa6'], [42, 104, '#f7d046'], [120, 104, '#ffffff'], [70, 76, '#f7d046'], [92, 46, '#ffffff']];
+const waves = [[14, 4], [70, 3], [128, 5], [4, 60], [150, 36], [150, 84], [30, 114], [96, 115]];
+---
+<svg
+  class="map"
+  viewBox="0 0 160 120"
+  shape-rendering="crispEdges"
+  role="img"
+  aria-label={t('sidebar.map')}
+  data-current={current}
+  data-routes={JSON.stringify(routes)}
+>
+  <rect width="160" height="120" fill="#4fb8e8" />
+  {waves.map(([x, y]) => <rect class="wave" x={x} y={y} width="6" height="1" fill="#8fdcf5" />)}
+
+  <!-- Isla escalonada: espuma, arena y césped. -->
+  <g fill="#8fdcf5">
+    <rect x="12" y="4" width="136" height="112" /><rect x="8" y="8" width="144" height="104" /><rect x="4" y="14" width="152" height="92" />
+  </g>
+  <g fill="#ecd9ad">
+    <rect x="14" y="6" width="132" height="108" /><rect x="10" y="10" width="140" height="100" /><rect x="6" y="16" width="148" height="88" />
+  </g>
+  <g fill="#8ed05f">
+    <rect x="18" y="10" width="124" height="100" /><rect x="14" y="14" width="132" height="92" /><rect x="10" y="20" width="140" height="80" />
+  </g>
+  {Array.from({ length: 14 }, (_, i) => (
+    <rect x={16 + ((i * 37) % 124)} y={22 + ((i * 23) % 76)} width="2" height="1" fill="#6fbf5a" />
+  ))}
+
+  <!-- Caminos: borde más oscuro y arena encima. -->
+  {segments.map(([x, y, w, h]) => <rect x={x - 1} y={y - 1} width={w + 2} height={h + 2} fill="#d2b77f" />)}
+  {segments.map(([x, y, w, h]) => <rect x={x} y={y} width={w} height={h} fill="#ecd9ad" />)}
+
+  <!-- Plaza de la portada con una fuente. -->
+  <a href={path('home', lang)} class="map-place">
+    <title>{lang === 'es' ? 'Inicio' : 'Home'}</title>
+    <rect x="67" y="49" width="26" height="22" fill="#1f1d1a" />
+    <rect x="68" y="50" width="24" height="20" fill="#c9c4b5" />
+    <rect x="75" y="52" width="10" height="7" fill="#1f1d1a" />
+    <rect x="76" y="53" width="8" height="5" fill="#79a8f0" />
+    <rect x="79" y="51" width="2" height="3" fill="#b7d3ff" />
+  </a>
+
+  {trees.map(([x, y]) => (
+    <g>
+      <rect x={x + 2} y={y + 5} width="2" height="3" fill="#7b5434" />
+      <rect x={x} y={y} width="6" height="6" fill="#1f1d1a" />
+      <rect x={x + 1} y={y + 1} width="4" height="4" fill="#2b9476" />
+      <rect x={x + 1} y={y + 1} width="2" height="1" fill="#4fb892" />
+    </g>
+  ))}
+  {flowers.map(([x, y, c]) => <rect x={x} y={y} width="1" height="1" fill={c as string} />)}
+
+  {houses.map((h) => (
+    <a href={path(h.route, lang)} class="map-place" aria-current={h.route === current ? 'page' : undefined}>
+      <title>{h.label}</title>
+      <g class="map-house">
+        {pixels(housePixels, { ...colors, R: h.roof, D: h.shade }, h.x, h.y).map((r) => (
+          <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.fill} />
+        ))}
+      </g>
+    </a>
+  ))}
+
+  <g class="map-hero" transform={`translate(${heroX} ${heroY})`} aria-hidden="true">
+    <g class="map-hero-flip">
+      <g class="frame-a">{pixels(heroFrames.a, colors, -3, -9).map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.fill} />)}</g>
+      <g class="frame-b">{pixels(heroFrames.b, colors, -3, -9).map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" fill={r.fill} />)}</g>
+    </g>
+  </g>
+</svg>
+
+<style>
+  .map { display: block; width: 100%; height: auto; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); background: #4fb8e8; }
+  .map-place { cursor: pointer; }
+  .map-house { transition: transform .15s; }
+  .map-place:hover .map-house, .map-place:focus-visible .map-house { transform: translateY(-2px); }
+  .map-place:focus-visible { outline: none; }
+  .map-place:focus-visible .map-house { filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff); }
+  .map-hero { pointer-events: none; }
+  .map-hero .frame-b { display: none; }
+  .map-hero.is-walking.step .frame-a { display: none; }
+  .map-hero.is-walking.step .frame-b { display: inline; }
+  .wave { animation: wave 3s steps(2) infinite; }
+  .wave:nth-of-type(2n) { animation-delay: -1.5s; }
+  @keyframes wave { 50% { transform: translateX(2px); } }
+  @media (prefers-reduced-motion: reduce) { .wave { animation: none; } }
+</style>
+
+<script>
+  const KEY = 'jorge.dev:map-at';
+  const SPEED = 55; // unidades del viewBox por segundo
+
+  const svg = document.querySelector<SVGSVGElement>('svg.map');
+  const hero = svg?.querySelector<SVGGElement>('.map-hero');
+  const flip = svg?.querySelector<SVGGElement>('.map-hero-flip');
+
+  if (svg && hero && flip) {
+    const routes: Record<string, Record<string, number[][]>> = JSON.parse(svg.dataset.routes!);
+    const current = svg.dataset.current!;
+    let previous: string | null = null;
+    try {
+      previous = sessionStorage.getItem(KEY);
+      sessionStorage.setItem(KEY, current);
+    } catch {
+      // Sin almacenamiento el personaje simplemente aparece en su casa.
+    }
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const points = previous ? routes[previous]?.[current] : undefined;
+    if (points && !reduced) {
+      const legs = points.slice(1).map((p, i) => Math.hypot(p[0] - points[i][0], p[1] - points[i][1]));
+      const total = legs.reduce((a, b) => a + b, 0);
+      const start = performance.now();
+
+      const place = (x: number, y: number, dx: number) => {
+        hero.setAttribute('transform', `translate(${Math.round(x)} ${Math.round(y)})`);
+        if (dx) flip.setAttribute('transform', dx < 0 ? 'scale(-1 1)' : '');
+      };
+      place(points[0][0], points[0][1], 0);
+      hero.classList.add('is-walking');
+
+      const tick = (now: number) => {
+        let d = Math.min(((now - start) / 1000) * SPEED, total);
+        let i = 0;
+        while (i < legs.length - 1 && d > legs[i]) d -= legs[i++];
+        const [x1, y1] = points[i];
+        const [x2, y2] = points[i + 1];
+        const k = legs[i] ? d / legs[i] : 1;
+        place(x1 + (x2 - x1) * k, y1 + (y2 - y1) * k, x2 - x1);
+        hero.classList.toggle('step', Math.floor(now / 140) % 2 === 0);
+        if (i < legs.length - 1 || k < 1) requestAnimationFrame(tick);
+        else hero.classList.remove('is-walking', 'step');
+      };
+      requestAnimationFrame(tick);
+    }
+  }
+</script>

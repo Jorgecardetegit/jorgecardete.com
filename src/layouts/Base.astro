@@ -1,5 +1,6 @@
 ---
 import PixelIcon from '../components/PixelIcon.astro';
+import SideMap from '../components/SideMap.astro';
 import { getLang, languages, path, translatePath, useTranslations, type Lang } from '../i18n';
 import '../styles/global.css';
 
@@ -80,16 +81,7 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
 
         <div class="side-map">
           <div class="label-pixel">{t('sidebar.map')}</div>
-          <div class="map">
-            <div class="island"></div>
-            <div class="grass"></div>
-            <a class="house" href={path('about', lang)} title={t('nav.about')} style="left:19%;top:26%;"><div style="background:#6b5ea8;"></div></a>
-            <a class="house" href={path('blog', lang)} title={t('nav.blog')} style="left:58%;top:22%;"><div style="background:#b5623c;"></div></a>
-            <a class="house" href={path('projects', lang)} title={t('nav.projects')} style="left:24%;top:58%;"><div style="background:#2b9476;"></div></a>
-            <a class="house" href={path('startups', lang)} title={t('nav.startups')} style="left:63%;top:56%;"><div style="background:#c9a227;"></div></a>
-            <a class="house" href={path('academic', lang)} title={t('nav.academic')} style="left:43%;top:68%;"><div style="background:#b5553f;"></div></a>
-            <div class="plaza"></div>
-          </div>
+          <SideMap lang={lang} pathname={Astro.url.pathname} />
           <div class="map-hint" set:html={t('sidebar.mapHint').replace('{link}', `<a href="${path('game', lang)}">${t('sidebar.mapHintLink')}</a>`)} />
         </div>
 
