@@ -199,14 +199,14 @@ const featured = projects.filter((p) => p.year !== '20XX').slice(0, 6);
   /* Tarjetas */
   .cards { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); }
   .cards.cards-half { grid-template-columns: repeat(2, 1fr); }
-  .card { background: var(--c-card); border: 2px solid var(--c-card-border); border-radius: var(--radius); padding: 1rem; }
+  .card { background: var(--c-card); border: 2px solid var(--c-card-border); border-radius: var(--radius); padding: 1rem; box-shadow: none; }
   .home a.card { display: flex; flex-direction: column; gap: .4rem; color: var(--c-strong); text-decoration: none; line-height: 1.3; transition: border-color .15s; }
   .home a.card:hover { border-color: var(--c-primary); }
   .card-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-  .card-title { font-size: 1.1rem; font-weight: 600; color: var(--c-strong); }
+  .card-title { font-family: inherit; font-size: 1.1rem; font-weight: 600; margin: 0; color: var(--c-strong); }
   .home a.card-title { color: var(--c-primary); text-decoration: none; }
   .home a.card-title:hover { text-decoration: underline; text-decoration-thickness: 2px; }
-  .chip { display: flex; align-items: center; justify-content: center; padding: 3px 6px; border: 1px solid var(--c-border); border-radius: 16px; font-size: .8rem; font-weight: 500; color: var(--c-primary); }
+  .chip { font-family: inherit; display: flex; align-items: center; justify-content: center; padding: 3px 6px; border: 1px solid var(--c-border); border-radius: 16px; font-size: .8rem; font-weight: 500; line-height: 1; color: var(--c-primary); background: none; box-shadow: none; }
   .card-shelf p { margin: 0; color: var(--c-muted); font-weight: 400; line-height: 1.5; }
   .card time { display: block; margin-bottom: .25rem; font-family: var(--mono2); font-size: 13px; color: var(--c-muted); }
   .card > p { margin: .35rem 0 .5rem; font-size: .95rem; line-height: 1.5; }
