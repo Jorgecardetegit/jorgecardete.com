@@ -57,6 +57,10 @@ a.footer-link:hover { color: var(--green); text-decoration: underline; }
 .nav .nav-icon { flex: none; }
 
 .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; }
+.lang-switch { display: flex; gap: 4px; font-family: var(--mono); font-size: 12px; }
+.lang-switch a { padding: 3px 8px; border: 1.5px solid #ded4b2; border-radius: 999px; color: #6b6b72; font-weight: 500; text-decoration: none; }
+.lang-switch a:hover { color: #28282e; background: #ece4ca; }
+.lang-switch a[aria-current] { color: #f6f1e4; background: #28282e; border-color: #28282e; }
 .side-links { display: flex; align-items: center; gap: 16px; }
 .side-links a { display: inline-flex; color: #6b6b72; }
 .side-links a:hover { color: var(--terracotta); }

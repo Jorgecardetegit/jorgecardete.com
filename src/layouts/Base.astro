@@ -1,6 +1,6 @@
 ---
 import PixelIcon from '../components/PixelIcon.astro';
-import { getLang, path, useTranslations } from '../i18n';
+import { getLang, languages, path, translatePath, useTranslations, type Lang } from '../i18n';
 import '../styles/global.css';
 
 interface Props {
@@ -21,6 +21,10 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
+  code,
+  href: new URL(translatePath(Astro.url.pathname, code), Astro.site).href,
+}));
 const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${title} · tunombre.dev`;
 ---
 <!doctype html>
@@ -31,6 +35,9 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.code} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={alternates.find((a) => a.code === 'es')!.href} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
     <meta property="og:title" content={fullTitle} />
@@ -87,6 +94,13 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
         </div>
 
         <div class="side-foot">
+          <nav class="lang-switch" aria-label={t('sidebar.language')}>
+            {alternates.map((a) => (
+              <a href={a.href.replace(Astro.site!.origin, '')} hreflang={a.code} lang={a.code} aria-current={a.code === lang ? 'true' : undefined}>
+                {a.code.toUpperCase()}
+              </a>
+            ))}
+          </nav>
           <div class="side-links">
             <a href="mailto:jorgecardete@gmail.com" aria-label="Email" title="Email">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
