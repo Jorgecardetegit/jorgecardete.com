@@ -33,8 +33,8 @@ type Item = Rect & { kind: 'mushroom' | 'star'; vx: number; vy: number; rise: nu
 type Debris = { x: number; y: number; vx: number; vy: number; t: number };
 type Coin = { x: number; y: number; taken: boolean };
 type Pop = { x: number; y: number; vy: number; t: number };
-type House = { x: number; door: number; color: string; shade: string; href: string; sign: HTMLAnchorElement };
-type State = 'play' | 'enter' | 'exit';
+type House = { x: number; door: number; color: string; shade: string; href: string; sign: HTMLAnchorElement; room: HTMLDialogElement };
+type State = 'play' | 'enter' | 'room' | 'exit';
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const overlap = (a: Rect, b: Rect) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
@@ -79,7 +79,8 @@ export function startGame(root: HTMLElement) {
 
   const houses: House[] = [...root.querySelectorAll<HTMLAnchorElement>('.game-sign')].map((sign, i) => {
     const x = FIRST_HOUSE + i * SPACING;
-    return { x, door: x + HOUSE_W / 2, color: sign.dataset.color!, shade: sign.dataset.shade!, href: sign.href, sign };
+    const room = root.querySelector<HTMLDialogElement>(`dialog[data-room="${sign.dataset.room}"]`)!;
+    return { x, door: x + HOUSE_W / 2, color: sign.dataset.color!, shade: sign.dataset.shade!, href: sign.href, sign, room };
   });
   const worldW = FIRST_HOUSE + (houses.length - 1) * SPACING + HOUSE_W + 160;
 
@@ -214,8 +215,52 @@ export function startGame(root: HTMLElement) {
     state = 'enter';
     target = nearHouse;
     player.vx = 0;
-    writeStorage({ x: target.door, big });
   };
+
+  // Dentro de la casa: el modal con el adelanto de la sección. Al cerrarlo sales por la puerta.
+  function openRoom(house: House) {
+    state = 'room';
+    target = house;
+    player.alpha = 0;
+    player.x = house.door - player.w / 2;
+    player.vx = player.vy = 0;
+    keys.left = keys.right = keys.jump = false;
+    house.room.showModal();
+  }
+  function leaveRoom() {
+    if (state !== 'room') return;
+    state = 'exit';
+    target = null;
+  }
+  // Ir a la página: la misma transición de iris que antes, recordando la casa para volver.
+  function visit(house: House) {
+    writeStorage({ x: house.door, big });
+    house.room.close();
+    state = 'enter';
+    root.style.setProperty('--iris-x', `${(house.door - camX) * scale}px`);
+    root.style.setProperty('--iris-y', `${(GROUND - 15 + offsetY) * scale}px`);
+    root.classList.add('is-leaving');
+    setTimeout(() => location.assign(house.href), 480);
+  }
+  houses.forEach((house) => {
+    house.room.addEventListener('close', leaveRoom);
+    house.room.addEventListener('click', (e) => {
+      const el = e.target as HTMLElement;
+      // Clic fuera de la tarjeta (en el fondo) o en «Seguir jugando» / ✕.
+      if (el === house.room || el.closest('[data-close]')) house.room.close();
+    });
+    house.room.querySelector<HTMLAnchorElement>('.room-go')!.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      e.preventDefault();
+      visit(house);
+    });
+    // Los carteles abren la casa directamente; sin JS siguen siendo enlaces normales.
+    house.sign.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      e.preventDefault();
+      if (state === 'play' || state === 'exit') openRoom(house);
+    });
+  });
   const pressJump = () => {
     if (state === 'play') jumpBuffer = 6;
   };
@@ -226,8 +271,8 @@ export function startGame(root: HTMLElement) {
   const ENTER = ['ArrowUp', 'KeyW', 'ArrowDown', 'KeyS', 'KeyE', 'Enter'];
 
   window.addEventListener('keydown', (e) => {
-    // Enter sobre un cartel enfocado sigue el enlace de forma nativa.
-    if (e.target instanceof HTMLAnchorElement || e.target instanceof HTMLButtonElement) return;
+    // Con una casa abierta el teclado es del modal; Enter sobre un cartel lo abre de forma nativa.
+    if (state === 'room' || e.target instanceof HTMLAnchorElement || e.target instanceof HTMLButtonElement) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const code = e.code;
     if (![...LEFT, ...RIGHT, ...JUMP, ...ENTER].includes(code)) return;
@@ -277,6 +322,7 @@ export function startGame(root: HTMLElement) {
   window.addEventListener('pageshow', (e) => {
     if (!e.persisted) return;
     root.classList.remove('is-leaving');
+    houses.forEach((h) => h.room.open && h.room.close());
     state = 'exit';
     target = null;
     player.alpha = 0;
@@ -395,13 +441,7 @@ export function startGame(root: HTMLElement) {
       } else if (player.alpha > 0) {
         player.x = goal;
         player.alpha = Math.max(0, player.alpha - 0.06);
-        if (player.alpha === 0) {
-          const href = target.href;
-          root.style.setProperty('--iris-x', `${(player.x + player.w / 2 - camX) * scale}px`);
-          root.style.setProperty('--iris-y', `${(player.y + player.h / 2 + offsetY) * scale}px`);
-          root.classList.add('is-leaving');
-          setTimeout(() => location.assign(href), 480);
-        }
+        if (player.alpha === 0) openRoom(target);
       }
     } else if (state === 'exit') {
       player.alpha = Math.min(1, player.alpha + 0.05);

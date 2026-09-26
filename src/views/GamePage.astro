@@ -1,7 +1,9 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PixelIcon from '../components/PixelIcon.astro';
-import { path, useTranslations, type Lang } from '../i18n';
+import { projects } from '../data/projects';
+import { dateFormat, l, path, postPath, useTranslations, type Lang } from '../i18n';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -15,6 +17,53 @@ const houses = [
   { route: 'startups', icon: 'startups', label: t('nav.startups'), color: '#c9a227', shade: '#a8871d' },
   { route: 'academic', icon: 'academico', label: t('nav.academic'), color: '#b5553f', shade: '#984433' },
 ] as const;
+
+// Lo que se ve al entrar en cada casa: un adelanto de la sección y el enlace a la página.
+type Item = { meta: string; title: string; text?: string; href?: string };
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const fmt = dateFormat(lang, { day: 'numeric', month: 'short', year: 'numeric' });
+const es = lang === 'es';
+
+const rooms: Record<(typeof houses)[number]['route'], { lead: string; items: Item[]; photo?: boolean }> = {
+  about: {
+    photo: true,
+    lead: es
+      ? 'Soy Jorge: programador y Growth Engineer. Me gusta construir cosas, entender cómo funcionan y aprender por el camino.'
+      : "I'm Jorge: a software engineer and Growth Engineer. I like building things, understanding how they work and learning along the way.",
+    items: [
+      { meta: es ? '2026–hoy' : '2026–now', title: es ? 'Growth Engineer en Bit2Me' : 'Growth Engineer at Bit2Me' },
+      { meta: es ? '2024–hoy' : '2024–now', title: es ? 'Fundador de Zapic y CTO de Grupo Cardete Ventures' : 'Founder of Zapic and CTO of Grupo Cardete Ventures' },
+      { meta: es ? '2023–hoy' : '2023–now', title: es ? 'Fundador de The Deep Hub, 570+ artículos de ML' : 'Founder of The Deep Hub, 570+ ML articles' },
+    ],
+  },
+  blog: {
+    lead: es ? `${posts.length} artículos sobre IA, visión por computador y programación. Los últimos:` : `${posts.length} articles on AI, computer vision and programming. The latest:`,
+    items: posts.slice(0, 3).map((p) => ({ meta: fmt.format(p.data.date), title: p.data.title, text: p.data.description, href: postPath(p.id, lang) })),
+  },
+  projects: {
+    lead: es ? `${projects.length} proyectos, de hackathons a IA en producción. Algunos recientes:` : `${projects.length} projects, from hackathons to AI in production. Some recent ones:`,
+    items: projects.slice(0, 3).map((p) => ({ meta: p.soon ? (es ? 'Próximamente' : 'Coming soon') : p.year, title: l(p.name, lang), text: l(p.desc, lang) })),
+  },
+  startups: {
+    lead: es ? 'Cosas que he fundado o ayudado a construir desde el principio.' : 'Things I founded or helped build from day one.',
+    items: [
+      { meta: es ? 'Cofundador y CTO' : 'Co-founder & CTO', title: 'Grupo Cardete Ventures' },
+      { meta: es ? 'Cofundador' : 'Co-founder', title: 'Zapic' },
+      { meta: 'Founding engineer', title: 'Fractal' },
+      { meta: es ? 'Fundador' : 'Founder', title: 'The Deep Hub' },
+    ],
+  },
+  academic: {
+    lead: es ? 'Publicaciones revisadas por pares en las que soy coautor.' : "Peer-reviewed publications I've co-authored.",
+    items: [
+      {
+        meta: 'Leukemia · Nature Portfolio · 2025',
+        title: 'How well do different chatbots respond to multiple myeloma treatment guidelines?',
+        href: 'https://doi.org/10.1038/s41375-025-02604-8',
+      },
+    ],
+  },
+};
 ---
 <Base title={t('game.title')} description={t('game.description')} sidebar={false}>
   <div class="game" id="game">
@@ -28,8 +77,8 @@ const houses = [
       </div>
       <nav aria-label={t('nav.label')}>
         {houses.map((h) => (
-          <a class="game-sign" href={path(h.route, lang)} data-color={h.color} data-shade={h.shade} style={`--c:${h.color}`}>
-            <PixelIcon name={h.icon} size={18} />
+          <a class="game-sign" href={path(h.route, lang)} data-room={h.route} data-color={h.color} data-shade={h.shade} style={`--c:${h.color}`}>
+            <span class="sign-icon"><PixelIcon name={h.icon} size={30} /></span>
             <span>{h.label}</span>
           </a>
         ))}
@@ -55,6 +104,38 @@ const houses = [
       </div>
     </div>
 
+    {houses.map((h, i) => (
+      <dialog class="room" data-room={h.route} aria-labelledby={`room-${h.route}`} style={`--c:${h.color}`}>
+        <div class="room-head">
+          <span class="room-icon"><PixelIcon name={h.icon} size={40} /></span>
+          <div>
+            <div class="room-badge">{es ? 'CASA' : 'HOUSE'} {i + 1} — {h.label.toUpperCase()}</div>
+            <h2 id={`room-${h.route}`}>{h.label}</h2>
+          </div>
+          <button type="button" class="room-close" data-close aria-label={t('game.keepPlaying')}>✕</button>
+        </div>
+        <div class="room-body">
+          <div class="room-intro">
+            {rooms[h.route].photo && <img class="room-photo" src="/jorge.jpg" alt="Jorge Cardete" width="88" height="88" loading="lazy" />}
+            <p class="room-lead">{rooms[h.route].lead}</p>
+          </div>
+          <ul class="room-items">
+            {rooms[h.route].items.map((item) => (
+              <li>
+                <div class="room-meta">{item.meta}</div>
+                <div class="room-title">{item.href ? <a href={item.href}>{item.title}</a> : item.title}</div>
+                {item.text && <p>{item.text}</p>}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="room-foot">
+          <button type="button" class="room-back" data-close>{t('game.keepPlaying')}</button>
+          <a class="room-go" href={path(h.route, lang)}>{t('game.visit').replace('{section}', h.label)}</a>
+        </div>
+      </dialog>
+    ))}
+
     <div class="game-iris" aria-hidden="true"></div>
     <noscript>
       <style is:inline>
@@ -68,11 +149,12 @@ const houses = [
 
 <style>
   :global(body:has(.game)) { overflow: hidden; }
-  .game { position: fixed; inset: 0; z-index: 10; overflow: hidden; background: #cdecf6; user-select: none; -webkit-user-select: none; touch-action: none; }
+  /* clip y no hidden: enfocar un cartel fuera de pantalla no debe desplazar la capa. */
+  .game { position: fixed; inset: 0; z-index: 10; overflow: clip; background: #cdecf6; user-select: none; -webkit-user-select: none; touch-action: none; }
   .game-canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0; transition: opacity .3s; }
   .game.is-ready .game-canvas { opacity: 1; }
 
-  .game-layer { position: absolute; inset: 0; pointer-events: none; }
+  .game-layer { position: absolute; inset: 0; overflow: clip; pointer-events: none; }
   .game-board, .game-sign, .game-prompt { position: absolute; left: 0; top: 0; pointer-events: auto; will-change: transform; }
   .game:not(.is-ready) .game-layer > *, .game:not(.is-ready) .game-sign { visibility: hidden; }
 
@@ -88,9 +170,12 @@ const houses = [
     .game-board p { font-size: 10.5px; }
   }
 
-  .game-sign { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--card); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--shadow); font-family: var(--pixel); font-size: clamp(8px, 1.1vw, 11px); color: var(--ink); text-decoration: none; white-space: nowrap; }
-  .game-sign::after { content: ''; position: absolute; left: 50%; bottom: -9px; width: 4px; height: 6px; margin-left: -2px; background: var(--ink); }
-  .game-sign:hover, .game-sign.is-near { background: var(--c); color: var(--bg); }
+  /* Carteles grandes con el color de su casa, como un rótulo de tienda. */
+  .game-sign { display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; background: var(--c); border: 4px solid var(--ink); box-shadow: 5px 5px 0 var(--shadow); font-family: var(--pixel); font-size: clamp(11px, 1.5vw, 16px); color: var(--bg); text-shadow: 2px 2px 0 var(--ink); text-decoration: none; white-space: nowrap; transition: transform .15s; }
+  .game-sign:hover { color: var(--bg); transform: scale(1.06); }
+  .sign-icon { display: grid; place-items: center; padding: 4px; background: var(--bg); border: 3px solid var(--ink); }
+  .sign-icon :global(svg) { width: clamp(22px, 2.6vw, 30px); height: auto; }
+  .game-sign::after { content: ''; position: absolute; left: 50%; bottom: -12px; width: 6px; height: 8px; margin-left: -3px; background: var(--ink); }
   .game-sign.is-near { animation: bob .6s ease-in-out infinite alternate; }
   .game-sign:focus-visible { outline: 3px solid var(--bg); outline-offset: 2px; }
   @keyframes bob { to { margin-top: -4px; } }
@@ -120,7 +205,42 @@ const houses = [
   /* Transición de "iris" al entrar en una casa. */
   .game-iris { position: absolute; left: var(--iris-x, 50%); top: var(--iris-y, 50%); width: 300vmax; height: 300vmax; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 300vmax var(--ink); pointer-events: none; opacity: 0; }
   .game.is-leaving .game-iris { opacity: 1; width: 0; height: 0; transition: width .45s ease-in, height .45s ease-in; }
+  /* Interior de la casa: un modal con el estilo de las tarjetas de la web. */
+  .room { width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; background: var(--bg); color: var(--ink); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--shadow); overflow: hidden; flex-direction: column; }
+  .room[open] { display: flex; animation: pop .22s ease-out; }
+  .room::backdrop { background: rgba(31, 29, 26, 0.55); }
+  @keyframes pop { from { transform: translateY(14px) scale(.97); opacity: 0; } }
+  .room-head { position: relative; display: flex; align-items: center; gap: 14px; padding: 16px 52px 16px 18px; background: var(--c); border-bottom: 4px solid var(--ink); }
+  .room-icon { flex: none; display: grid; place-items: center; padding: 5px; background: var(--bg); border: 3px solid var(--ink); }
+  .room-badge { font-family: var(--pixel); font-size: 9px; line-height: 1.6; color: var(--bg); text-shadow: 1px 1px 0 var(--ink); }
+  .room-head h2 { margin: 2px 0 0; font-family: var(--display); font-weight: 800; font-size: 30px; letter-spacing: -0.8px; color: var(--bg); text-shadow: 2px 2px 0 var(--ink); }
+  .room-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: var(--bg); border: 3px solid var(--ink); font: 700 14px var(--mono); color: var(--ink); cursor: pointer; }
+  .room-close:hover { background: var(--ink); color: var(--bg); }
+  .room-body { padding: 20px 20px 4px; overflow-y: auto; }
+  .room-intro { display: flex; gap: 16px; align-items: center; margin-bottom: 18px; }
+  .room-photo { flex: none; width: 88px; height: 88px; object-fit: cover; border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--shadow); }
+  .room-lead { margin: 0; font-size: 16px; line-height: 1.6; color: var(--text-soft); text-wrap: pretty; }
+  .room-items { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .room-items li { padding: 12px 14px; background: var(--card); border: 3px solid var(--ink); border-left-width: 8px; border-left-color: var(--c); box-shadow: 3px 3px 0 var(--shadow); }
+  .room-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .room-title { font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.3; }
+  .room-title a { color: var(--ink); text-decoration: none; }
+  .room-title a:hover { color: var(--green); text-decoration: underline; }
+  .room-items p { margin: 6px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .room-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px 18px; border-top: 1px solid var(--line); }
+  .room-back { padding: 10px 14px; background: transparent; border: 3px solid var(--ink); font-family: var(--pixel); font-size: 10px; color: var(--ink); cursor: pointer; }
+  .room-back:hover { background: var(--card); }
+  .room-go { margin-left: auto; padding: 12px 16px; background: var(--c); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); font-family: var(--pixel); font-size: 11px; color: var(--bg); text-shadow: 1px 1px 0 var(--ink); text-decoration: none; transition: transform .15s, box-shadow .15s; }
+  .room-go { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .room-go::after { content: ''; border: 5px solid transparent; border-right: 0; border-left: 6px solid currentColor; filter: drop-shadow(1px 1px 0 var(--ink)); }
+  @media (max-width: 480px) {
+    .room-foot > * { flex: 1 1 100%; text-align: center; }
+    .room-head h2 { font-size: 24px; }
+  }
+  .room-go:hover { color: var(--bg); transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--shadow); }
+
   @media (prefers-reduced-motion: reduce) {
+    .room[open] { animation: none; }
     .game.is-leaving .game-iris { transition: none; }
     .game-sign.is-near { animation: none; }
   }
