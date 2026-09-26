@@ -1,0 +1,314 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { projectLinks, projects } from '../data/projects';
+import { dateFormat, l, path, postPath, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const to = (route: Parameters<typeof path>[0]) => path(route, lang);
+const post = (slug: string) => postPath(slug, lang);
+
+const allPosts = (await getCollection('blog')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const latest = allPosts.slice(0, 4);
+const countTag = (tag: string) => allPosts.filter((p) => p.data.tags.includes(tag)).length;
+const fmt = dateFormat(lang, { day: 'numeric', month: 'short', year: 'numeric' });
+
+const eras = {
+  es: [
+    { years: '2022–2023', html: `Primeros pasos: community manager en FTT DAO y <a href="${to('projects')}">data analyst en Medtronic</a>, con Python, Power BI y un OCR para pliegos de licitación.` },
+    { years: '2023–hoy', html: `Fundo <a href="https://medium.com/thedeephub">The Deep Hub</a>, una publicación de machine learning en Medium: <a href="${to('blog')}">570+ artículos</a> y ~100 autores.` },
+    { years: '2024–2025', html: `Data scientist en Axpe Consulting (BBVA, Cosentino, Sabadell) y AI engineer en <a href="${to('startups')}">xFractal</a>, con Rust y agentes de IA en Solana.` },
+    { years: '2024–hoy', html: `Fundador: CTO de <a href="${to('startups')}">Grupo Cardete Ventures</a> y creador de <a href="${to('startups')}">Zapic</a>, asistentes de IA para redes sociales.` },
+    { years: '2026–hoy', html: 'Growth Engineer en Bit2Me: experimentos de adquisición, activación y retención, y la infraestructura técnica detrás.' },
+  ],
+  en: [
+    { years: '2022–2023', html: `First steps: community manager at FTT DAO and <a href="${to('projects')}">data analyst at Medtronic</a>, with Python, Power BI and an OCR for tender documents.` },
+    { years: '2023–now', html: `Founded <a href="https://medium.com/thedeephub">The Deep Hub</a>, a machine learning publication on Medium: <a href="${to('blog')}">570+ articles</a> and ~100 authors.` },
+    { years: '2024–2025', html: `Data scientist at Axpe Consulting (BBVA, Cosentino, Sabadell) and AI engineer at <a href="${to('startups')}">xFractal</a>, working with Rust and AI agents on Solana.` },
+    { years: '2024–now', html: `Founder: CTO of <a href="${to('startups')}">Grupo Cardete Ventures</a> and creator of <a href="${to('startups')}">Zapic</a>, AI assistants for social media.` },
+    { years: '2026–now', html: 'Growth Engineer at Bit2Me: experiments across acquisition, activation and retention, plus the technical infrastructure behind them.' },
+  ],
+}[lang];
+
+const shelves = [
+  {
+    tag: 'computer-vision',
+    title: { es: 'Visión artificial', en: 'Computer vision' },
+    desc: {
+      es: 'Mi tema favorito. De cómo se forma una imagen a detectar objetos con YOLO, pasando por la interpolación, HOG, Haar cascades y ConvNeXt.',
+      en: 'My favourite topic. From how an image is formed to detecting objects with YOLO, through interpolation, HOG, Haar cascades and ConvNeXt.',
+    },
+  },
+  {
+    tag: 'machine-learning',
+    title: { es: 'Machine learning', en: 'Machine learning' },
+    desc: {
+      es: 'Conceptos que me costó entender y quise explicar bien: teacher forcing, state space models, IA explicable y qué hay antes de las CNN.',
+      en: 'Concepts that took me a while to understand and I wanted to explain well: teacher forcing, state space models, explainable AI and what came before CNNs.',
+    },
+  },
+  {
+    tag: 'deep-learning',
+    title: { es: 'Deep learning', en: 'Deep learning' },
+    desc: {
+      es: 'Redes neuronales por dentro: una guía completa de CNNs, ConvNeXt y las tres formas de construir modelos en TensorFlow.',
+      en: 'Neural networks from the inside: a complete guide to CNNs, ConvNeXt and the three ways to build models in TensorFlow.',
+    },
+  },
+  {
+    tag: 'python',
+    title: { es: 'Python y herramientas', en: 'Python and tools' },
+    desc: {
+      es: 'El lado práctico: por qué Python es lento, interfaces con Tkinter, scraping para crear datasets y un bot de Twitter con OpenAI.',
+      en: 'The practical side: why Python is slow, Tkinter interfaces, scraping to build datasets and a Twitter bot with OpenAI.',
+    },
+  },
+].map((s) => ({ ...s, count: countTag(s.tag) }));
+
+const series = [
+  {
+    icon: '🧭', url: post('antes-de-las-cnn-parte-1'),
+    title: { es: '¿Qué había antes de las CNN?', en: 'What came before CNNs?' },
+    desc: {
+      es: 'Dos partes sobre la visión artificial clásica: histogramas de gradientes orientados (HOG) y Haar cascades.',
+      en: 'Two parts on classic computer vision: histograms of oriented gradients (HOG) and Haar cascades.',
+    },
+  },
+  {
+    icon: '🅿️', url: post('parking-detector-parte-1'),
+    title: { es: 'Detector de plazas de parking', en: 'Parking space detector' },
+    desc: {
+      es: 'Un proyecto de principio a fin: entrenar el modelo de visión artificial y desplegarlo con Docker, Flask y Azure.',
+      en: 'An end-to-end project: training the computer vision model and deploying it with Docker, Flask and Azure.',
+    },
+  },
+  {
+    icon: '🧠', url: post('como-se-crean-las-imagenes'),
+    title: { es: 'Visión artificial desde cero', en: 'Computer vision from scratch' },
+    desc: {
+      es: 'Un camino ordenado: cómo se crean las imágenes, interpolación, CNNs, ConvNeXt y YOLO.',
+      en: 'A guided path: how images are created, interpolation, CNNs, ConvNeXt and YOLO.',
+    },
+  },
+  {
+    icon: '📚', url: 'https://medium.com/thedeephub',
+    title: { es: 'The Deep Hub', en: 'The Deep Hub' },
+    desc: {
+      es: 'La publicación de data science y machine learning que fundé en Medium, con 570+ artículos de ~100 autores.',
+      en: 'The data science and machine learning publication I founded on Medium, with 570+ articles from ~100 authors.',
+    },
+  },
+];
+
+const featured = projects.slice(0, 6);
+
+const text = {
+  es: {
+    title: 'Inicio', hello: '¡Hola, soy Jorge!', tagline: 'Programador, Growth Engineer y fundador de startups.',
+    timeline: 'Un breve recorrido', also: 'También', hobbies: ': deportista, viajero y jugador de ajedrez.',
+    bubble: '¿Prefieres el pueblo pixelado?', bubbleLink: 'Entra al mapa',
+    latest: 'Último', allPosts: 'Todos los posts',
+    shelves: 'Estanterías', allTopics: 'Todos los temas', shelvesDesc: 'Caminos escogidos a mano entre todo lo que he escrito.',
+    series: 'Series', seriesDesc: 'Algunas cosas que escribo tienen varias partes o siguen un orden.',
+    projects: 'Proyectos', allProjects: 'Todos los proyectos', projectsDesc: 'Cosas que he construido por el camino.',
+  },
+  en: {
+    title: 'Home', hello: "Hey, I'm Jorge!", tagline: 'Software engineer, Growth Engineer and startup founder.',
+    timeline: 'A brief timeline', also: 'Also', hobbies: ': athlete, traveller and chess player.',
+    bubble: 'Prefer the pixel village?', bubbleLink: 'Enter the map',
+    latest: 'Latest', allPosts: 'All posts',
+    shelves: 'Shelves', allTopics: 'All topics', shelvesDesc: "Hand-picked paths through everything I've written.",
+    series: 'Series', seriesDesc: 'Some things I write have several parts or follow an order.',
+    projects: 'Projects', allProjects: 'All projects', projectsDesc: 'Things I have built along the way.',
+  },
+}[lang];
+---
+<Base title={text.title}>
+  <div class="home">
+    <header class="hero-index">
+      <div class="hero-wrapper">
+        <div>
+          <h1>{text.hello}</h1>
+          <p class="hero-description hero-tagline">{text.tagline}</p>
+          <h2 class="heading-small">{text.timeline}</h2>
+          <ul class="hero-eras">
+            {eras.map((e) => (
+              <li><span class="era-dates">{e.years}</span><span set:html={e.html} /></li>
+            ))}
+          </ul>
+          <p class="hero-description"><a href={to('about')}>{text.also}</a>{text.hobbies}</p>
+        </div>
+        <div class="hero-image-container">
+          <img src="/jorge.jpg" class="hero-image" alt="Jorge Cardete" />
+          <aside class="hero-bubble">{text.bubble} <a href="/quest/">{text.bubbleLink}</a>.</aside>
+        </div>
+      </div>
+    </header>
+
+    <section class="section-index">
+      <div class="heading-row">
+        <h2>{text.latest}</h2>
+        <a class="button" href={to('blog')}>{text.allPosts}</a>
+      </div>
+      <div class="posts">
+        {latest.map((entry) => (
+          <a class="post" href={post(entry.id)}>
+            <div class="post-thumbnail" aria-hidden="true">{entry.data.icon}</div>
+            <div class="post-info">
+              <div class="post-title">{entry.data.title}</div>
+              <time datetime={entry.data.date.toISOString()}>{fmt.format(entry.data.date)}</time>
+            </div>
+            <div class="post-tags">
+              {entry.data.tags.map((t) => <span class="tag">{t}</span>)}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-index">
+      <div class="heading-row">
+        <h2>{text.shelves}</h2>
+        <a class="button" href={to('blog')}>{text.allTopics}</a>
+      </div>
+      <p class="description">{text.shelvesDesc}</p>
+      <div class="cards cards-half">
+        {shelves.map((s) => (
+          <a class="card card-shelf" href={`${to('blog')}?tema=${s.tag}`}>
+            <div class="card-head">
+              <div class="card-title">{l(s.title, lang)}</div>
+              <span class="chip">{s.count}</span>
+            </div>
+            <p>{l(s.desc, lang)}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-index">
+      <div class="heading-row">
+        <h2>{text.series}</h2>
+      </div>
+      <p class="description">{text.seriesDesc}</p>
+      <div class="posts">
+        {series.map((s) => (
+          <a class="post" href={s.url}>
+            <div class="post-thumbnail" aria-hidden="true">{s.icon}</div>
+            <div class="post-info">
+              <div class="post-title">{l(s.title, lang)}</div>
+              <p class="post-description">{l(s.desc, lang)}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-index">
+      <div class="heading-row">
+        <h2>{text.projects}</h2>
+        <a class="button" href={to('projects')}>{text.allProjects}</a>
+      </div>
+      <p class="description">{text.projectsDesc}</p>
+      <div class="cards">
+        {featured.map((p) => (
+          <div class="card">
+            <time>{p.year}</time>
+            {p.links.length > 0 ? <a class="card-title" href={projectLinks(p, lang)[0].url}>{l(p.name, lang)}</a> : <span class="card-title">{l(p.name, lang)}</span>}
+            <p>{l(p.desc, lang)}</p>
+            {p.links.length > 0 && (
+              <div class="card-links">
+                {projectLinks(p, lang).map((link) => <a href={link.url}>{link.label}</a>)}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .home {
+    --c-text: #28282e;
+    --c-strong: #1d1d22;
+    --c-muted: #5a5a61;
+    --c-border: #e5dcbd;
+    --c-card: #f1ead5;
+    --c-card-border: #ded4b2;
+    --c-hover: #ece4ca;
+    --c-primary: var(--green);
+    --radius: 8px;
+    --mono2: 'Google Sans Code', var(--mono);
+    color: var(--c-text);
+    max-width: 900px;
+  }
+  .home a { font-weight: 600; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--c-primary) 45%, transparent); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .home a:hover { color: var(--c-primary); text-decoration-color: var(--c-primary); }
+  .home h1, .home h2 { font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--c-strong); }
+
+  /* Hero */
+  .hero-index { border-bottom: 1px solid var(--c-border); margin: 0 0 3rem; padding-bottom: 2rem; }
+  .hero-wrapper { display: flex; gap: 3rem; align-items: flex-start; }
+  .hero-index h1 { font-size: 3rem; font-weight: 700; margin: 0 0 .5rem; line-height: 1.1; }
+  .hero-description { font-size: 1.2rem; margin: 0 0 1.75rem; max-width: 600px; line-height: 1.5; }
+  .hero-tagline { font-size: 1.3rem; line-height: 1.3; color: var(--c-text); }
+  .heading-small { font-size: 1.3rem; margin: 0 0 1.25rem; }
+  .hero-eras { list-style: none; margin: 0 0 1.25rem; padding: 0; max-width: 600px; font-size: 1.1rem; line-height: 1.5; }
+  .hero-eras li { display: flex; gap: .75rem; align-items: baseline; margin-bottom: 1rem; }
+  .hero-eras li > span:last-child { color: var(--c-strong); }
+  .era-dates { flex: none; width: 90px; color: var(--c-muted); font-family: var(--mono2); font-size: .8rem; }
+  .hero-image-container { position: relative; flex: none; margin-top: 4rem; }
+  .hero-image-container::before { content: ''; position: absolute; left: 0; top: 1rem; width: 200px; height: 200px; border-radius: 50%; background: var(--c-primary); }
+  .hero-image { position: relative; z-index: 1; display: block; width: 210px; height: 210px; object-fit: cover; border-radius: 50%; border: 3px solid var(--c-strong); margin-left: 16px; }
+  .hero-bubble { position: relative; z-index: 1; max-width: 250px; margin-top: 1.25rem; padding: .6rem .9rem; background: var(--c-card); border: 1px solid var(--c-card-border); border-radius: var(--radius); font-size: .9rem; line-height: 1.5; text-align: center; }
+  .hero-bubble::before { content: ''; position: absolute; top: -7px; left: 50%; width: 12px; height: 12px; background: var(--c-card); border-left: 1px solid var(--c-card-border); border-top: 1px solid var(--c-card-border); transform: translateX(-50%) rotate(45deg); }
+
+  /* Secciones */
+  .section-index { border-bottom: 1px solid var(--c-border); margin-bottom: 1.5rem; padding-bottom: 1.5rem; }
+  .section-index:last-child { border-bottom: 0; }
+  .heading-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .heading-row + .posts { margin-top: 1rem; }
+  .heading-row h2 { margin: 0; font-size: 2rem; font-weight: 700; }
+  .description { margin: 0 0 1.25rem; color: var(--c-muted); font-size: 1.05rem; max-width: 65ch; }
+  .home a.button { display: inline-flex; align-items: center; padding: .4rem .65rem; font-size: 13px; font-weight: 600; line-height: 1.2; color: var(--c-text); background: var(--c-hover); border: 1.5px solid #c6ba93; border-radius: var(--radius); text-decoration: none; white-space: nowrap; }
+  .home a.button:hover { background: var(--c-border); color: var(--c-text); }
+
+  /* Listas de posts */
+  .posts { display: flex; flex-direction: column; gap: .1rem; }
+  .home a.post { display: flex; align-items: flex-start; gap: 1rem; margin-inline: -.625rem; padding: .5rem .625rem; border-radius: var(--radius); color: var(--c-strong); text-decoration: none; }
+  .home a.post:hover { background: var(--c-hover); }
+  .post-thumbnail { flex: none; width: 32px; display: flex; justify-content: center; font-size: 22px; line-height: 1.1; }
+  .post-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .2rem; }
+  .post-title { font-size: 1.1rem; font-weight: 600; line-height: 1.25; }
+  .home a.post:hover .post-title { text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .post-info time { font-family: var(--mono2); font-size: .85rem; font-weight: 400; color: var(--c-muted); }
+  .post-description { margin: 0; color: var(--c-muted); font-weight: 400; line-height: 1.5; }
+  .post-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .35rem; max-width: 260px; }
+  .tag { display: inline-flex; align-items: center; padding: .25rem .5rem; border: 1.5px solid var(--c-border); border-radius: var(--radius); font-family: var(--mono2); font-size: .8rem; font-weight: 500; line-height: 1; color: var(--c-text); background: transparent; }
+  .tag::before { content: '#'; color: var(--c-primary); }
+
+  /* Tarjetas */
+  .cards { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); }
+  .cards.cards-half { grid-template-columns: repeat(2, 1fr); }
+  .card { background: var(--c-card); border: 2px solid var(--c-card-border); border-radius: var(--radius); padding: 1rem; box-shadow: none; }
+  .home a.card { display: flex; flex-direction: column; gap: .4rem; color: var(--c-strong); text-decoration: none; line-height: 1.3; transition: border-color .15s; }
+  .home a.card:hover { border-color: var(--c-primary); }
+  .card-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .card-title { font-family: inherit; font-size: 1.1rem; font-weight: 600; margin: 0; color: var(--c-strong); }
+  .home a.card-title { color: var(--c-primary); text-decoration: none; }
+  .home a.card-title:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+  .chip { font-family: inherit; display: flex; align-items: center; justify-content: center; padding: 3px 6px; border: 1px solid var(--c-border); border-radius: 16px; font-size: .8rem; font-weight: 500; line-height: 1; color: var(--c-primary); background: none; box-shadow: none; }
+  .card-shelf p { margin: 0; color: var(--c-muted); font-weight: 400; line-height: 1.5; }
+  .card time { display: block; margin-bottom: .25rem; font-family: var(--mono2); font-size: 13px; color: var(--c-muted); }
+  .card > p { margin: .35rem 0 .5rem; font-size: .95rem; line-height: 1.5; }
+  .card-links { display: flex; gap: 1.25rem; }
+  .card-links a { font-size: .9rem; color: var(--c-primary); text-underline-offset: 3px; }
+
+  @media (max-width: 860px) {
+    .hero-wrapper { flex-direction: column; gap: 1rem; }
+    .hero-image-container { margin-top: 0; }
+    .cards, .cards.cards-half { grid-template-columns: 1fr; }
+    .post-tags { display: none; }
+  }
+</style>
