@@ -17,7 +17,7 @@
 }
 html, body { margin: 0; padding: 0; background: var(--bg); }
 * { box-sizing: border-box; }
-body { color: var(--ink); font-family: 'Karla', system-ui, sans-serif; }
+body { color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Google Sans Flex", Helvetica, Arial, sans-serif; }
 a { color: var(--green); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 a:hover { color: var(--terracotta); }
 
