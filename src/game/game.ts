@@ -39,11 +39,14 @@ type State = 'play' | 'enter' | 'room' | 'exit';
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const overlap = (a: Rect, b: Rect) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
-type Saved = { x?: number; big?: boolean };
+type Saved = { x?: number };
 
-function readStorage(): Saved {
+/** La casa de la que se vuelve, una sola vez: después se borra y la siguiente partida empieza de cero. */
+function takeStorage(): Saved {
   try {
-    return JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '{}');
+    const value = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '{}');
+    sessionStorage.removeItem(STORAGE_KEY);
+    return value;
   } catch {
     return {};
   }
@@ -137,8 +140,7 @@ export function startGame(root: HTMLElement) {
   const BOARD_LEFT = 12;
 
   // Estado.
-  const stored = readStorage();
-  const saved = stored.x;
+  const saved = takeStorage().x;
   const player = { w: PW, h: PH, x: typeof saved === 'number' ? clamp(saved - PW / 2, 0, worldW - PW) : 36, y: GROUND - PH, vx: 0, vy: 0, facing: 1, alpha: 1 };
   let onGround = true;
   let coyote = 0;
@@ -171,10 +173,6 @@ export function startGame(root: HTMLElement) {
     player.y -= PH;
     player.w = PW * 2;
     player.h = PH * 2;
-  }
-  if (stored.big) {
-    grow();
-    growTime = 0;
   }
 
   // Tamaño lógico del canvas: 200 px de alto como mínimo y al menos 200 de ancho.
@@ -234,7 +232,7 @@ export function startGame(root: HTMLElement) {
   }
   // Ir a la página: la misma transición de iris que antes, recordando la casa para volver.
   function visit(house: House) {
-    writeStorage({ x: house.door, big });
+    writeStorage({ x: house.door });
     house.room.close();
     state = 'enter';
     root.style.setProperty('--iris-x', `${(house.door - camX) * scale}px`);
