@@ -110,7 +110,8 @@ section { margin-bottom: 64px; }
 .about-top { display: flex; flex-wrap: wrap; gap: 32px 44px; align-items: flex-start; margin-bottom: 48px; }
 .about-text { flex: 1 1 360px; min-width: 280px; max-width: 640px; }
 .about-text p { margin: 0 0 18px; font-size: 17px; line-height: 1.75; text-wrap: pretty; }
-.about-photo { flex: 0 1 300px; width: 300px; aspect-ratio: 2/3; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.about-photo { flex: 0 1 300px; width: 300px; aspect-ratio: 1/1; overflow: hidden; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.about-photo img { width: 100%; height: 100%; object-fit: cover; }
 .about-h { margin: 0 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--line); font-family: var(--display); font-weight: 800; font-size: 28px; letter-spacing: -0.6px; }
 .about-p2 { margin: 0 0 14px; font-size: 16.5px; line-height: 1.7; }
 .about-updated { margin: 0 0 12px; font-style: italic; color: var(--text-soft); }

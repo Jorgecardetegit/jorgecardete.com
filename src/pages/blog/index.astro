@@ -16,7 +16,7 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
 <Base title="Blog" description="Guías, tutoriales y notas sobre diseño, código y vida.">
   <div class="panel">
     <header class="head">
-      <div class="photo" aria-hidden="true">Tu foto</div>
+      <div class="photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
       <div class="intro-block">
         <div class="badge">MUNDO 2 — BLOG</div>
         <h1 class="big">Blog</h1>
@@ -53,7 +53,8 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
 <style>
   .panel { padding: 0 }
   .head { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; margin-bottom: 48px; }
-  .photo { flex: none; width: 205px; height: 205px; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .photo { flex: none; width: 205px; height: 205px; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); overflow: hidden; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
   .intro-block { flex: 1 1 320px; min-width: 260px; }
   .big { margin: 0 0 20px; font-family: var(--display); font-weight: 800; font-size: clamp(56px, 9vw, 96px); line-height: 0.95; letter-spacing: -3px; color: var(--ink); text-shadow: 3px 3px 0 var(--gold), 6px 6px 0 var(--terracotta); }
   .role { margin: 0; font-size: 19px; line-height: 1.55; color: var(--text-soft); }
@@ -70,7 +71,8 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
   .cell:hover, .cell:focus-visible { background: #e9e2d0; color: var(--ink); }
   .cell:hover .ttl { color: var(--green); }
   .cat { font-family: var(--pixel); font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; line-height: 1.5; }
-  .when { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .when { font-family: var(--mono); font-size: 12px; color: var(--muted); overflow: hidden; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
   .ttl { margin: auto 0; padding: 12px 0; text-align: center; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.3; letter-spacing: -0.3px; text-wrap: balance; }
   .none { padding: 32px 0; color: var(--muted); font-family: var(--mono); font-size: 14px; }
   .back { text-align: center; margin: 20px 0 28px; font-family: var(--mono); font-size: 12px; }
