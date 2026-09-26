@@ -57,8 +57,8 @@ a.footer-link:hover { color: var(--green); text-decoration: underline; }
 .nav .nav-icon { flex: none; }
 
 .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; }
-.side-links { display: flex; gap: 18px; }
-.side-links a { display: inline-flex; color: var(--ink); }
+.side-links { display: flex; align-items: center; gap: 16px; }
+.side-links a { display: inline-flex; color: #6b6b72; }
 .side-links a:hover { color: var(--terracotta); }
 .side-note { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 
