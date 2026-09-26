@@ -103,9 +103,22 @@ const fullTitle = title === 'Inicio' ? 'tunombre.dev' : `${title} · tunombre.de
         </div>
       </aside>
 
-      <main class="main">
-        <slot />
-      </main>
+      <div class="main-col">
+        <main class="main">
+          <slot />
+        </main>
+        <footer class="footer">
+          <nav class="footer-menu">
+            <a class="footer-link" href="mailto:jorgecardete@gmail.com"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>Email</a>
+            <a class="footer-link" href="/rss.xml"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>RSS</a>
+            <a class="footer-link" href="https://www.linkedin.com/in/jorgecardetellamas/">LinkedIn</a>
+            <a class="footer-link" href="https://x.com/JorgeCardete">X</a>
+            <a class="footer-link" href="https://medium.com/@jorgecardete">Medium</a>
+            <a class="footer-link" href="https://github.com/Jorgecardetegit">GitHub</a>
+          </nav>
+          <div class="footer-made-by">Hecho con <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> por Jorge Cardete</div>
+        </footer>
+      </div>
     </div>
     ) : (
     <div class="wide">
