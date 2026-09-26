@@ -3,19 +3,47 @@ import Base from '../layouts/Base.astro';
 import { categories, projects } from '../data/projects';
 
 const usedCategories = Object.entries(categories).filter(([key]) => projects.some((p) => p.category === key));
+const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
 ---
 <Base title="Proyectos" description={`Proyectos: ${projects.map((p) => p.name).join(', ')}.`}>
   <div class="badge">MUNDO 3 — PROYECTOS</div>
   <h1 class="hero">Proyectos</h1>
   <p class="lead">Cosas que he construido, organizado o puesto en marcha.</p>
 
-  <ul class="legend" aria-label="Categorías">
-    {usedCategories.map(([, c]) => <li style={`--c:${c.color}`}>{c.label}</li>)}
-  </ul>
+  <div class="pfilters">
+    <label class="psearch">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" id="pq" placeholder="Buscar proyectos…" aria-label="Buscar proyectos" />
+    </label>
+
+    <div class="pfilter-row" role="group" aria-label="Temática">
+      <span class="pfilter-label">Temática</span>
+      <button type="button" class="pchip" data-group="category" data-value="" aria-pressed="true">Todas</button>
+      {usedCategories.map(([key, c]) => (
+        <button type="button" class="pchip" data-group="category" data-value={key} aria-pressed="false" style={`--c:${c.color}`}>
+          <span class="pdot" aria-hidden="true"></span>{c.label}
+        </button>
+      ))}
+    </div>
+
+    <div class="pfilter-row" role="group" aria-label="Lenguaje">
+      <span class="pfilter-label">Lenguaje</span>
+      <button type="button" class="pchip" data-group="language" data-value="" aria-pressed="true">Todos</button>
+      {languages.map((l) => (
+        <button type="button" class="pchip" data-group="language" data-value={l} aria-pressed="false">{l}</button>
+      ))}
+    </div>
+  </div>
 
   <ul class="pgrid">
     {projects.map((p) => (
-      <li class="pcard" style={`--c:${categories[p.category].color}`}>
+      <li
+        class="pcard"
+        style={`--c:${categories[p.category].color}`}
+        data-category={p.category}
+        data-languages={p.languages.join('|')}
+        data-text={[p.name, p.desc, ...p.tags, ...p.languages].join(' ').toLowerCase()}
+      >
         <div class="pcard-top">
           <time class="pcard-year">{p.year}</time>
         </div>
@@ -32,4 +60,37 @@ const usedCategories = Object.entries(categories).filter(([key]) => projects.som
       </li>
     ))}
   </ul>
+  <p class="pnone" id="pnone" hidden>Ningún proyecto coincide con esos filtros.</p>
 </Base>
+
+<script>
+  const input = document.getElementById('pq') as HTMLInputElement;
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('.pchip')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.pcard')];
+  const none = document.getElementById('pnone')!;
+  const active: Record<string, string> = { category: '', language: '' };
+
+  function apply() {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+    for (const card of cards) {
+      const ok =
+        (!active.category || card.dataset.category === active.category) &&
+        (!active.language || card.dataset.languages!.split('|').includes(active.language)) &&
+        (!q || card.dataset.text!.includes(q));
+      card.hidden = !ok;
+      if (ok) visible++;
+    }
+    none.hidden = visible > 0;
+  }
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => {
+      const group = chip.dataset.group!;
+      active[group] = chip.dataset.value!;
+      for (const c of chips) if (c.dataset.group === group) c.setAttribute('aria-pressed', String(c === chip));
+      apply();
+    });
+  }
+  input.addEventListener('input', apply);
+</script>
