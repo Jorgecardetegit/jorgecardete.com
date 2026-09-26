@@ -22,6 +22,7 @@ const JUMP_V = -5.9;
 const JUMP_CUT = -2;
 const STAR_SPEED = 3.4;
 const STAR_TIME = 600;
+const LIVES = 3;
 
 const INK = '#1f1d1a';
 const CREAM = '#f6f1e4';
@@ -35,7 +36,7 @@ type Fireball = Rect & { vx: number; t: number };
 type Coin = { x: number; y: number; taken: boolean };
 type Pop = { x: number; y: number; vy: number; t: number };
 type House = { x: number; door: number; color: string; shade: string; href: string; sign: HTMLAnchorElement; room: HTMLDialogElement };
-type State = 'play' | 'enter' | 'room' | 'exit';
+type State = 'play' | 'enter' | 'room' | 'exit' | 'dead';
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const overlap = (a: Rect, b: Rect) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
@@ -169,6 +170,9 @@ export function startGame(root: HTMLElement) {
   let growTime = 0;
   let starTime = 0;
   let invuln = 0;
+  let lives = LIVES;
+  let deadTime = 0;
+  const hearts = [...root.querySelectorAll<HTMLElement>('.game-heart')];
   let flagDrop = 0;
   let won = false;
   const fireballs: Fireball[] = [];
@@ -199,13 +203,25 @@ export function startGame(root: HTMLElement) {
     toastTimer = window.setTimeout(() => (toast.hidden = true), 2600);
   }
 
-  // Un golpe: grande vuelve a pequeño; pequeño sale despedido hacia atrás.
+  // Un golpe quita un corazón: grande vuelve a pequeño; pequeño sale despedido hacia atrás.
+  // Sin corazones, el personaje muere y la partida empieza de cero.
   function hurtPlayer(fromX: number) {
     if (invuln > 0 || starTime > 0 || state !== 'play') return;
+    lives--;
+    if (lives <= 0) return die();
     invuln = 100;
     if (big) return shrink();
     player.vx = player.x + player.w / 2 < fromX ? -3 : 3;
     player.vy = -3.5;
+  }
+
+  function die() {
+    state = 'dead';
+    deadTime = 0;
+    player.vx = 0;
+    player.vy = -6;
+    keys.left = keys.right = keys.jump = false;
+    say(root.dataset.gameOver!);
   }
 
   function hitBoss() {
@@ -556,6 +572,20 @@ export function startGame(root: HTMLElement) {
     } else if (state === 'exit') {
       player.alpha = Math.min(1, player.alpha + 0.05);
       if (player.alpha === 1) state = 'play';
+    } else if (state === 'dead') {
+      // Como en Mario: se queda quieto un instante, salta y cae fuera de la pantalla.
+      deadTime++;
+      if (deadTime > 24) {
+        player.vy = Math.min(player.vy + GRAVITY, MAX_FALL);
+        player.y += player.vy;
+      }
+      if (deadTime === 120) {
+        root.style.setProperty('--iris-x', `${(player.x + player.w / 2 - camX) * scale}px`);
+        root.style.setProperty('--iris-y', `${(GROUND - 20 + offsetY) * scale}px`);
+        root.classList.add('is-leaving');
+        // Empezar de cero es literalmente eso: recargar el pueblo.
+        setTimeout(() => location.reload(), 520);
+      }
     }
 
     walkTime = onGround && Math.abs(player.vx) > 0.2 ? walkTime + Math.abs(player.vx) : 0;
@@ -845,7 +875,7 @@ export function startGame(root: HTMLElement) {
 
   function drawPlayer() {
     let frame: Frame = 'stand';
-    if (!onGround && state === 'play') frame = 'jump';
+    if ((!onGround && state === 'play') || state === 'dead') frame = 'jump';
     else if (walkTime > 0) frame = Math.floor(walkTime / 6) % 2 ? 'walkA' : 'walkB';
     else if (state === 'enter') frame = Math.floor(tick / 6) % 2 ? 'walkA' : 'walkB';
     // Con la estrella cambia de ropa cada pocos frames y deja estela.
@@ -926,6 +956,7 @@ export function startGame(root: HTMLElement) {
     root.classList.toggle('can-enter', !!nearHouse);
     if (nearHouse) place(prompt, player.x + player.w / 2, player.y - 6);
     coinsLabel.textContent = String(collected).padStart(2, '0');
+    hearts.forEach((heart, i) => heart.classList.toggle('is-lost', i >= lives));
   }
 
   // Bucle a paso fijo de 60 Hz, independiente de la tasa de refresco.

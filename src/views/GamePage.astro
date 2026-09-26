@@ -81,6 +81,7 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
     id="game"
     data-boss-hint={es ? '¡Un jefe! Sáltale en la cabeza tres veces' : 'A boss! Jump on its head three times'}
     data-boss-down={es ? '¡Jefe derrotado! El camino a la bandera está libre' : 'Boss defeated! The way to the flag is open'}
+    data-game-over={es ? '¡El jefe te ha derrotado! Vuelves al principio' : 'The boss got you! Back to the start'}
   >
     <canvas class="game-canvas" aria-hidden="true"></canvas>
 
@@ -103,8 +104,18 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
 
     <header class="game-hud">
       <a class="game-exit" href={path('home', lang)}>{t('game.exit')}</a>
+      <div class="game-stats">
+      <div class="game-lives" role="img" aria-label={es ? 'Vidas' : 'Lives'}>
+        {[0, 1, 2].map(() => (
+          <svg class="game-heart" viewBox="0 0 7 6" width="21" height="18" shape-rendering="crispEdges" aria-hidden="true">
+            <path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" fill="#1f1d1a" />
+            <path d="M1 1h2v1h1V1h2v2H5v1H4v1H3V4H2V3H1z" class="heart-fill" />
+          </svg>
+        ))}
+      </div>
       <div class="game-coins" aria-label={t('game.coins')}>
         <span class="coin-icon" aria-hidden="true"></span>× <span class="game-coins-count">00</span>
+      </div>
       </div>
     </header>
 
@@ -271,6 +282,12 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .game-exit::before { content: ''; border: 5px solid transparent; border-left: 0; border-right: 6px solid currentColor; }
   .game-exit:hover { background: var(--ink); color: var(--bg); }
   .game-coins { display: flex; align-items: center; gap: 6px; }
+  .game-stats { display: flex; align-items: center; gap: 10px; }
+  .game-lives { display: flex; gap: 4px; padding: 6px 10px; background: var(--card); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--shadow); }
+  .heart-fill { fill: #e8574c; transition: fill .2s; }
+  .game-heart.is-lost .heart-fill { fill: #c9c4b5; }
+  .game-heart.is-lost { animation: heart-out .4s steps(4); }
+  @keyframes heart-out { 50% { scale: 1.4; } }
   .coin-icon { width: 10px; height: 12px; background: #f7d046; border: 2px solid var(--ink); border-radius: 50%; }
 
   .game-pad { display: none; position: absolute; left: 0; right: 0; bottom: 0; justify-content: space-between; align-items: flex-end; padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); pointer-events: none; }
