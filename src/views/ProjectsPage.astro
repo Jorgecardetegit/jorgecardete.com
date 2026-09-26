@@ -46,15 +46,16 @@ const text = {
       >
         <div class="pcard-top">
           {p.soon ? <span class="pcard-soon">{text.soon}</span> : <time class="pcard-year">{p.year}</time>}
+          {p.languages.length > 0 && <span class="pcard-langs">{p.languages.join(' · ')}</span>}
         </div>
         <h2 class="pcard-name">{l(p.name, lang)}</h2>
         <p class="pcard-desc">{l(p.desc, lang)}</p>
-        <div class="tags">
-          {p.tags.map((t) => <span class="tag">#{t}</span>)}
+        <div class="ptags">
+          {p.tags.map((t) => <span class="ptag">{t}</span>)}
         </div>
         {p.links.length > 0 && (
           <div class="pcard-links">
-            {projectLinks(p, lang).map((link) => <a href={link.url}>{link.label}</a>)}
+            {projectLinks(p, lang).map((link) => <a href={link.url}>{link.label} <span aria-hidden="true">↗</span></a>)}
           </div>
         )}
       </li>
