@@ -140,6 +140,7 @@ section { margin-bottom: 64px; }
 .pcard:hover { background: #ebe2cb; border-color: var(--ink); border-top-color: var(--green); }
 .pcard-top { display: flex; justify-content: space-between; align-items: center; }
 .pcard-year { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.pcard-soon { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--green); border: 1.5px solid var(--green); border-radius: 999px; padding: 2px 9px; }
 .pcard-name { margin: 0; font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -0.4px; }
 .pcard-desc { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--text-soft); }
 .pcard .tags { margin-top: 2px; }

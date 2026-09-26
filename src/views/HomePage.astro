@@ -213,7 +213,7 @@ const text = {
       <div class="cards">
         {featured.map((p) => (
           <div class="card">
-            <time>{p.year}</time>
+            <time>{p.soon ? (lang === 'es' ? 'Próximamente' : 'Coming soon') : p.year}</time>
             {p.links.length > 0 ? <a class="card-title" href={projectLinks(p, lang)[0].url}>{l(p.name, lang)}</a> : <span class="card-title">{l(p.name, lang)}</span>}
             <p>{l(p.desc, lang)}</p>
             {p.links.length > 0 && (

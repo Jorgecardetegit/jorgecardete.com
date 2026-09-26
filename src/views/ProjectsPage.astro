@@ -11,12 +11,12 @@ const text = {
   es: {
     title: 'Proyectos', badge: 'MUNDO 3 — PROYECTOS', lead: 'Cosas que he construido, organizado o puesto en marcha.',
     search: `Buscar entre ${projects.length} proyectos…`, searchLabel: 'Buscar proyectos',
-    language: 'Lenguaje', all: 'Todos', none: 'Ningún proyecto coincide con esos filtros.',
+    language: 'Lenguaje', all: 'Todos', soon: 'Próximamente', none: 'Ningún proyecto coincide con esos filtros.',
   },
   en: {
     title: 'Projects', badge: 'WORLD 3 — PROJECTS', lead: 'Things I have built, organised or launched.',
     search: `Search ${projects.length} projects…`, searchLabel: 'Search projects',
-    language: 'Language', all: 'All', none: 'No projects match those filters.',
+    language: 'Language', all: 'All', soon: 'Coming soon', none: 'No projects match those filters.',
   },
 }[lang];
 ---
@@ -45,7 +45,7 @@ const text = {
         data-text={[l(p.name, lang), l(p.desc, lang), ...p.tags, ...p.languages].join(' ').toLowerCase()}
       >
         <div class="pcard-top">
-          <time class="pcard-year">{p.year}</time>
+          {p.soon ? <span class="pcard-soon">{text.soon}</span> : <time class="pcard-year">{p.year}</time>}
         </div>
         <h2 class="pcard-name">{l(p.name, lang)}</h2>
         <p class="pcard-desc">{l(p.desc, lang)}</p>

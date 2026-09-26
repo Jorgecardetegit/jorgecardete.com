@@ -25,6 +25,8 @@ type Link = { label: keyof typeof linkLabels } & ({ url: string } | { post: stri
 type Project = {
   name: Localized;
   year: string;
+  /** Aún en desarrollo: la tarjeta muestra «Próximamente» en lugar del año. */
+  soon?: boolean;
   languages: string[];
   tags: string[];
   desc: Localized;
@@ -39,8 +41,6 @@ export const projectLinks = (p: Project, lang: Lang) =>
   }));
 
 const same = (text: string): Localized => ({ es: text, en: text });
-const placeholder = { es: 'Descripción del proyecto en una frase.', en: 'One-sentence project description.' };
-const placeholderLinks: Link[] = [{ label: 'code', url: '#' }, { label: 'demo', url: '#' }];
 
 export const projects: Project[] = [
   {
@@ -123,6 +123,22 @@ export const projects: Project[] = [
     ],
     category: 'backend',
   },
-  { name: same('Every System Is Broken'), year: '20XX', languages: [], tags: ['seguridad', 'hacking'], desc: placeholder, links: placeholderLinks, category: 'seguridad' },
-  { name: same('Gather Simulator'), year: '20XX', languages: [], tags: ['simulacion'], desc: placeholder, links: placeholderLinks, category: 'web' },
+  {
+    name: same('Every System Is Broken'),
+    year: '', soon: true, languages: [], tags: ['perps', 'hyperliquid', 'trading'],
+    desc: {
+      es: 'Un sistema de trading de perpetuos con Hyperliquid por detrás.',
+      en: 'A perpetual futures trading system powered by Hyperliquid.',
+    },
+    links: [], category: 'backend',
+  },
+  {
+    name: same('Gather Simulator'),
+    year: '', soon: true, languages: [], tags: ['simulation', 'startups'],
+    desc: {
+      es: 'Un Gather simulado para emprendedores.',
+      en: 'A simulated Gather for entrepreneurs.',
+    },
+    links: [], category: 'web',
+  },
 ];
