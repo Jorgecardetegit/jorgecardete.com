@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { projects } from '../data/projects';
+import { projectLinks, projects } from '../data/projects';
 
 const allPosts = (await getCollection('blog')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const latest = allPosts.slice(0, 4);
@@ -122,11 +122,11 @@ const featured = projects.slice(0, 6);
         {featured.map((p) => (
           <div class="card">
             <time>{p.year}</time>
-            {p.links.length > 0 ? <a class="card-title" href={p.links[0].url}>{p.name}</a> : <span class="card-title">{p.name}</span>}
-            <p>{p.desc}</p>
+            {p.links.length > 0 ? <a class="card-title" href={projectLinks(p, 'es')[0].url}>{p.name.es}</a> : <span class="card-title">{p.name.es}</span>}
+            <p>{p.desc.es}</p>
             {p.links.length > 0 && (
               <div class="card-links">
-                {p.links.map((l) => <a href={l.url}>{l.label}</a>)}
+                {projectLinks(p, 'es').map((link) => <a href={link.url}>{link.label}</a>)}
               </div>
             )}
           </div>

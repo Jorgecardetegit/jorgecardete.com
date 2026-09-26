@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+import { categories, projectLinks, projects } from '../data/projects';
+import { l, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
+const text = {
+  es: {
+    title: 'Proyectos', badge: 'MUNDO 3 — PROYECTOS', lead: 'Cosas que he construido, organizado o puesto en marcha.',
+    search: `Buscar entre ${projects.length} proyectos…`, searchLabel: 'Buscar proyectos',
+    language: 'Lenguaje', all: 'Todos', none: 'Ningún proyecto coincide con esos filtros.',
+  },
+  en: {
+    title: 'Projects', badge: 'WORLD 3 — PROJECTS', lead: 'Things I have built, organised or launched.',
+    search: `Search ${projects.length} projects…`, searchLabel: 'Search projects',
+    language: 'Language', all: 'All', none: 'No projects match those filters.',
+  },
+}[lang];
+---
+<Base title={text.title} description={`${text.title}: ${projects.map((p) => l(p.name, lang)).join(', ')}.`}>
+  <div class="badge">{text.badge}</div>
+  <h1 class="hero">{text.title}</h1>
+  <p class="lead">{text.lead}</p>
+
+  <div class="pfilters">
+    <input type="search" class="psearch" id="pq" placeholder={text.search} aria-label={text.searchLabel} />
+  </div>
+
+  <div class="pfilter-row" role="group" aria-label={text.language}>
+    <span class="pfilter-label">{text.language}</span>
+    <button type="button" class="pchip" data-value="" aria-pressed="true">{text.all}</button>
+    {languages.map((l) => (
+      <button type="button" class="pchip" data-value={l} aria-pressed="false">{l}</button>
+    ))}
+  </div>
+
+  <ul class="pgrid">
+    {projects.map((p) => (
+      <li
+        class="pcard"
+        style={`--c:${categories[p.category].color}`}
+        data-languages={p.languages.join('|')}
+        data-text={[l(p.name, lang), l(p.desc, lang), ...p.tags, ...p.languages].join(' ').toLowerCase()}
+      >
+        <div class="pcard-top">
+          <time class="pcard-year">{p.year}</time>
+        </div>
+        <h2 class="pcard-name">{l(p.name, lang)}</h2>
+        <p class="pcard-desc">{l(p.desc, lang)}</p>
+        <div class="tags">
+          {p.tags.map((t) => <span class="tag">#{t}</span>)}
+        </div>
+        {p.links.length > 0 && (
+          <div class="pcard-links">
+            {projectLinks(p, lang).map((link) => <a href={link.url}>{link.label}</a>)}
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
+  <p class="pnone" id="pnone" hidden>{text.none}</p>
+</Base>
+
+<script>
+  const input = document.getElementById('pq') as HTMLInputElement;
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('.pchip')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.pcard')];
+  const none = document.getElementById('pnone')!;
+  let language = '';
+
+  function apply() {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+    for (const card of cards) {
+      const ok =
+        (!language || card.dataset.languages!.split('|').includes(language)) &&
+        (!q || card.dataset.text!.includes(q));
+      card.hidden = !ok;
+      if (ok) visible++;
+    }
+    none.hidden = visible > 0;
+  }
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => {
+      language = chip.dataset.value!;
+      for (const c of chips) c.setAttribute('aria-pressed', String(c === chip));
+      apply();
+    });
+  }
+  input.addEventListener('input', apply);
+</script>
