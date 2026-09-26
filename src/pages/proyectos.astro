@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { projects } from '../data/projects';
 ---
-<Base title="Proyectos" description="Proyectos: Every System Is Broken, Colisseum, Hackspain, UFV Labs, UFV Parking, Cell Vision, OCR Parser y Gather Simulator.">
+<Base title="Proyectos" description={`Proyectos: ${projects.map((p) => p.name).join(', ')}.`}>
   <div class="badge">MUNDO 3 — PROYECTOS</div>
   <h1 class="hero">Proyectos</h1>
   <p class="lead">Cosas que he construido, organizado o puesto en marcha.</p>
