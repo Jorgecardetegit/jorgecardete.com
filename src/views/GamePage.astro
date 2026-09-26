@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PixelIcon from '../components/PixelIcon.astro';
-import { projects } from '../data/projects';
+import { papers, me } from '../data/papers';
+import { projectLinks, projects } from '../data/projects';
+import { startups } from '../data/startups';
 import { dateFormat, l, path, postPath, useTranslations, type Lang } from '../i18n';
 import { topics, type Topic } from '../i18n/topics';
 
@@ -19,8 +21,7 @@ const houses = [
   { route: 'academic', icon: 'academico', label: t('nav.academic'), color: '#b5553f', shade: '#984433' },
 ] as const;
 
-// Lo que se ve al entrar en cada casa: un adelanto de la sección y el enlace a la página.
-type Item = { meta: string; title: string; text?: string; href?: string };
+// Al entrar en cada casa se ve la sección en miniatura, con el mismo marcado que su página.
 // Mismo orden que /blog: primero los fijados, luego por fecha.
 const posts = (await getCollection('blog')).sort(
   (a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity) || b.data.date.getTime() - a.data.date.getTime(),
@@ -46,36 +47,14 @@ const aboutText = es
       'In my free time I enjoy sports, travelling and playing chess. Right now I’m training to run the <a href="https://www.zurichmaratobarcelona.es/">Barcelona Marathon</a> 🏃',
     ];
 
-const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraphs?: string[]; items: Item[]; photo?: boolean }> = {
-  about: { photo: true, paragraphs: aboutText, items: [] },
-  // El blog se pinta aparte: una versión en miniatura del índice, con buscador y filtros.
-  blog: { items: [] },
-  projects: {
-    lead: es ? `${projects.length} proyectos, de hackathons a IA en producción. Algunos recientes:` : `${projects.length} projects, from hackathons to AI in production. Some recent ones:`,
-    items: projects.slice(0, 3).map((p) => ({ meta: p.soon ? (es ? 'Próximamente' : 'Coming soon') : p.year, title: l(p.name, lang), text: l(p.desc, lang) })),
-  },
-  startups: {
-    lead: es ? 'Cosas que he fundado o ayudado a construir desde el principio.' : 'Things I founded or helped build from day one.',
-    items: [
-      { meta: es ? 'Cofundador y CTO' : 'Co-founder & CTO', title: 'Grupo Cardete Ventures' },
-      { meta: es ? 'Cofundador' : 'Co-founder', title: 'Zapic' },
-      { meta: 'Founding engineer', title: 'Fractal' },
-      { meta: es ? 'Fundador' : 'Founder', title: 'The Deep Hub' },
-    ],
-  },
-  academic: {
-    lead: es ? 'Publicaciones revisadas por pares en las que soy coautor.' : "Peer-reviewed publications I've co-authored.",
-    items: [
-      {
-        meta: 'Leukemia · Nature Portfolio · 2025',
-        title: 'How well do different chatbots respond to multiple myeloma treatment guidelines?',
-        href: 'https://doi.org/10.1038/s41375-025-02604-8',
-      },
-    ],
-  },
+const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
+const leads = {
+  startups: es ? 'Cosas que he fundado o ayudado a construir desde el principio.' : 'Things I founded or helped build from day one.',
+  academic: es ? 'Publicaciones revisadas por pares en las que soy coautor.' : "Peer-reviewed publications I've co-authored.",
 };
 ---
 <Base title={t('game.title')} description={t('game.description')} sidebar={false}>
+  <link slot="head" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,400&display=swap" />
   <div
     class="game"
     id="game"
@@ -143,16 +122,20 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
           <button type="button" class="room-close" data-close aria-label={t('game.keepPlaying')}>✕</button>
         </div>
         <div class="room-body">
-          {rooms[h.route].photo && <img class="room-photo" src="/jorge.jpg" alt="Jorge Cardete" width="170" height="170" loading="lazy" />}
-          {rooms[h.route].lead && <p class="room-lead">{rooms[h.route].lead}</p>}
-          {rooms[h.route].paragraphs?.map((html) => <p class="room-text" set:html={html} />)}
+          {h.route === 'about' && (
+            <>
+              <img class="room-photo" src="/jorge.jpg" alt="Jorge Cardete" width="170" height="170" loading="lazy" />
+              {aboutText.map((html) => <p class="room-text" set:html={html} />)}
+            </>
+          )}
+
           {h.route === 'blog' && (
-            <div class="mini-blog">
+            <div class="mini-list mini-blog">
               <input type="search" class="psearch" placeholder={es ? `Buscar entre ${posts.length} posts…` : `Search ${posts.length} posts…`} aria-label={es ? 'Buscar posts' : 'Search posts'} />
               <div class="pfilter-row" role="group" aria-label={es ? 'Temáticas' : 'Topics'}>
-                <button type="button" class="pchip" data-topic="" aria-pressed="true">{es ? 'Todos' : 'All'}</button>
+                <button type="button" class="pchip" data-value="" aria-pressed="true">{es ? 'Todos' : 'All'}</button>
                 {blogTopics.map((key) => (
-                  <button type="button" class="pchip" data-topic={key} aria-pressed="false">
+                  <button type="button" class="pchip" data-value={key} aria-pressed="false">
                     <span class="dot" style={`--c:${topics[key].color}`} aria-hidden="true"></span>{l(topics[key].label, lang)}
                   </button>
                 ))}
@@ -163,7 +146,7 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
                     class="mcard"
                     href={postPath(post.id, lang)}
                     style={`--c:${topics[post.data.topic].color}`}
-                    data-topic={post.data.topic}
+                    data-tags={post.data.topic}
                     data-text={[post.data.title, post.data.description, ...post.data.tags].join(' ').toLowerCase()}
                   >
                     <div class="mcover">
@@ -180,15 +163,86 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
               <p class="mini-none" hidden>{es ? 'No hay posts que coincidan.' : 'No posts match.'}</p>
             </div>
           )}
-          {rooms[h.route].items.length > 0 && <ul class="room-items">
-            {rooms[h.route].items.map((item) => (
-              <li>
-                <div class="room-meta">{item.meta}</div>
-                <div class="room-title">{item.href ? <a href={item.href}>{item.title}</a> : item.title}</div>
-                {item.text && <p>{item.text}</p>}
-              </li>
-            ))}
-          </ul>}
+
+          {h.route === 'projects' && (
+            <div class="mini-list mini-projects">
+              <input type="search" class="psearch" placeholder={es ? `Buscar entre ${projects.length} proyectos…` : `Search ${projects.length} projects…`} aria-label={es ? 'Buscar proyectos' : 'Search projects'} />
+              <div class="pfilter-row" role="group" aria-label={es ? 'Lenguaje' : 'Language'}>
+                <button type="button" class="pchip" data-value="" aria-pressed="true">{es ? 'Todos' : 'All'}</button>
+                {languages.map((language) => <button type="button" class="pchip" data-value={language} aria-pressed="false">{language}</button>)}
+              </div>
+              <ul class="pgrid">
+                {projects.map((p) => (
+                  <li
+                    class="pcard"
+                    data-tags={p.languages.join('|')}
+                    data-text={[l(p.name, lang), l(p.desc, lang), ...p.tags, ...p.languages].join(' ').toLowerCase()}
+                  >
+                    <div class="pcard-top">
+                      {p.soon ? <span class="pcard-soon">{es ? 'Próximamente' : 'Coming soon'}</span> : <time class="pcard-year">{p.year}</time>}
+                    </div>
+                    <h3 class="pcard-name">{l(p.name, lang)}</h3>
+                    <p class="pcard-desc">{l(p.desc, lang)}</p>
+                    <div class="ptags">{p.tags.map((tag) => <span class="ptag">{tag}</span>)}</div>
+                    {p.links.length > 0 && (
+                      <div class="pcard-links">
+                        {projectLinks(p, lang).map((link) => <a href={link.url}>{link.label} <span aria-hidden="true">↗</span></a>)}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <p class="mini-none" hidden>{es ? 'Ningún proyecto coincide con esos filtros.' : 'No projects match those filters.'}</p>
+            </div>
+          )}
+
+          {h.route === 'startups' && (
+            <div class="mini-startups">
+              <p class="room-lead">{leads.startups}</p>
+              <ul class="startups">
+                {startups.map((st) => (
+                  <li class="startup">
+                    <div class="startup-body">
+                      <h3 class="startup-name"><a href={st.url}>{st.name}</a></h3>
+                      <div class="startup-role">{l(st.role, lang)}</div>
+                      <p class="startup-desc">{l(st.desc, lang)}</p>
+                      <a class="startup-url" href={st.url}>{st.label} <span aria-hidden="true">↗</span></a>
+                    </div>
+                    <a class="startup-img" href={st.url} aria-label={st.name} style={`--c:${st.color}`}><span>{st.name[0]}</span></a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {h.route === 'academic' && (
+            <div class="mini-academic">
+              <p class="room-lead">{leads.academic}</p>
+              <ol class="papers">
+                {papers.map((p) => (
+                  <li class="paper">
+                    <time class="paper-year" datetime={p.date.toISOString().slice(0, 10)}>{p.date.getFullYear()}</time>
+                    <div class="paper-body">
+                      <div class="paper-meta">
+                        <span class="paper-journal">{p.journal}</span>
+                        <span class="paper-dot">·</span>
+                        <span>{p.publisher}</span>
+                      </div>
+                      <h3 class="paper-title"><a href={`https://doi.org/${p.doi}`}>{p.title}</a></h3>
+                      <p class="paper-authors">
+                        {p.authors.map((a, i) => <>{i > 0 && ', '}{a === me ? <strong>{a}</strong> : a}</>)}
+                      </p>
+                      <div class="paper-links">
+                        <a href={`https://doi.org/${p.doi}`}>{es ? 'Leer artículo' : 'Read paper'} ↗</a>
+                        <span class="paper-doi">DOI {p.doi}</span>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <p class="mini-none">{es ? 'Más publicaciones próximamente.' : 'More coming soon.'}</p>
+            </div>
+          )}
         </div>
         <div class="room-foot">
           <button type="button" class="room-back" data-close>{t('game.keepPlaying')}</button>
@@ -308,6 +362,9 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   /* Interior de la casa: un modal con el estilo de las tarjetas de la web. */
   .room { width: min(820px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 0; background: var(--bg); color: var(--ink); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--shadow); overflow: hidden; flex-direction: column; }
   .room[open] { display: flex; animation: pop .22s ease-out; }
+  /* Todas las casas miden lo mismo (lo que ocupa «Sobre mí»); el contenido largo hace scroll. */
+  .room:not([data-room='win']) { height: min(640px, calc(100dvh - 40px)); }
+  .room-body { flex: 1; min-height: 0; }
   .room::backdrop { background: rgba(31, 29, 26, 0.55); }
   @keyframes pop { from { transform: translateY(14px) scale(.97); opacity: 0; } }
   .room-head { position: relative; display: flex; align-items: center; gap: 14px; padding: 16px 52px 16px 18px; background: var(--c); border-bottom: 4px solid var(--ink); }
@@ -321,17 +378,10 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .room-photo { float: right; width: 170px; height: 170px; margin: 4px 0 14px 22px; object-fit: cover; border: 4px solid var(--ink); box-shadow: 5px 5px 0 var(--shadow); }
   .room-lead { margin: 0 0 18px; font-size: 16px; line-height: 1.6; color: var(--text-soft); text-wrap: pretty; }
   .room-text { margin: 0 0 22px; font-size: 16.5px; line-height: 1.75; text-wrap: pretty; }
-  .room-items { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-  .room-items li { padding: 12px 14px; background: var(--card); border: 3px solid var(--ink); border-left-width: 8px; border-left-color: var(--c); box-shadow: 3px 3px 0 var(--shadow); }
-  .room-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-  .room-title { font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.3; }
-  .room-title a { color: var(--ink); text-decoration: none; }
-  .room-title a:hover { color: var(--green); text-decoration: underline; }
-  .room-items p { margin: 6px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   /* El blog en miniatura: mismas tarjetas que /blog, más pequeñas. */
-  .mini-blog .psearch { max-width: none; margin-bottom: 12px; }
-  .mini-blog .pfilter-row { margin-bottom: 18px; }
-  .mini-blog .pchip { display: inline-flex; align-items: center; font-size: 13px; padding: 5px 11px; }
+  .mini-list .psearch { max-width: none; margin-bottom: 12px; }
+  .mini-list .pfilter-row { margin-bottom: 18px; }
+  .mini-list .pchip { display: inline-flex; align-items: center; font-size: 13px; padding: 5px 11px; }
   .mini-blog .dot { width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--c); }
   .mini-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-bottom: 18px; }
   .mcard { display: flex; flex-direction: column; overflow: hidden; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); color: var(--ink); font-weight: 400; text-decoration: none; transition: translate .15s, box-shadow .15s; }
@@ -346,6 +396,20 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .mdate { margin-top: auto; padding-top: 4px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
   .mini-none { margin: 0 0 18px; font-family: var(--mono); font-size: 13px; color: var(--muted); }
 
+  /* Proyectos, startups y papers: las tarjetas globales de sus páginas, algo más compactas. */
+  .mini-projects .pgrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .mini-projects .pcard { padding: 14px 16px 12px; gap: 8px; }
+  .mini-projects .pcard-name { font-size: 17px; }
+  .mini-projects .pcard-desc { font-size: 13.5px; }
+  .mini-startups .startups { gap: 16px; margin-bottom: 18px; }
+  .mini-startups .startup { padding: 14px 16px 12px; gap: 14px 22px; }
+  .mini-startups .startup-name { font-size: 18px; }
+  .mini-startups .startup-desc { font-size: 14px; }
+  .mini-startups .startup-img { width: 150px; }
+  .mini-startups .startup-img span { font-size: 26px; }
+  .mini-academic .papers { margin-bottom: 16px; }
+  .mini-academic .paper-title { font-size: 22px; }
+
   .room-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px 18px; border-top: 1px solid var(--line); }
   .room-back { padding: 10px 14px; background: transparent; border: 3px solid var(--ink); font-family: var(--pixel); font-size: 10px; color: var(--ink); cursor: pointer; }
   .room-back:hover { background: var(--card); }
@@ -354,8 +418,9 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .room-go::after { content: ''; border: 5px solid transparent; border-right: 0; border-left: 6px solid currentColor; filter: drop-shadow(1px 1px 0 var(--ink)); }
   @media (max-width: 480px) {
     .mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .mini-blog .pfilter-row { flex-wrap: nowrap; overflow-x: auto; margin-inline: -18px; padding: 0 18px 4px; scrollbar-width: none; }
-    .mini-blog .pchip { flex: none; }
+    .mini-list .pfilter-row { flex-wrap: nowrap; overflow-x: auto; margin-inline: -18px; padding: 0 18px 4px; scrollbar-width: none; }
+    .mini-list .pchip { flex: none; }
+    .mini-startups .startup-img { width: 100%; }
     .mtitle { font-size: 13px; }
     .room-photo { width: 104px; height: 104px; margin-left: 14px; }
     .room-body { padding: 18px 18px 4px; }
@@ -376,25 +441,25 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
 <script>
   import { startGame } from '../game/game';
 
-  // Filtros del blog en miniatura: temática + texto, como en /blog.
-  document.querySelectorAll<HTMLElement>('.mini-blog').forEach((blog) => {
-    const input = blog.querySelector<HTMLInputElement>('.psearch')!;
-    const chips = [...blog.querySelectorAll<HTMLButtonElement>('.pchip')];
-    const cards = [...blog.querySelectorAll<HTMLElement>('.mcard')];
-    const none = blog.querySelector<HTMLElement>('.mini-none')!;
-    let topic = '';
+  // Filtros de las secciones en miniatura (blog y proyectos): un chip + texto, como en sus páginas.
+  document.querySelectorAll<HTMLElement>('.mini-list').forEach((list) => {
+    const input = list.querySelector<HTMLInputElement>('.psearch')!;
+    const chips = [...list.querySelectorAll<HTMLButtonElement>('.pchip')];
+    const cards = [...list.querySelectorAll<HTMLElement>('[data-tags]')];
+    const none = list.querySelector<HTMLElement>('.mini-none')!;
+    let value = '';
     const apply = () => {
       const q = input.value.trim().toLowerCase();
       let visible = 0;
       for (const card of cards) {
-        card.hidden = !((!topic || card.dataset.topic === topic) && (!q || card.dataset.text!.includes(q)));
+        card.hidden = !((!value || card.dataset.tags!.split('|').includes(value)) && (!q || card.dataset.text!.includes(q)));
         if (!card.hidden) visible++;
       }
       none.hidden = visible > 0;
     };
     for (const chip of chips) {
       chip.addEventListener('click', () => {
-        topic = chip.dataset.topic!;
+        value = chip.dataset.value!;
         for (const c of chips) c.setAttribute('aria-pressed', String(c === chip));
         apply();
       });
