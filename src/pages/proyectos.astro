@@ -1,18 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-
-const desc = 'Descripción del proyecto en una frase.';
-const links = [{ label: 'Código', url: '#' }, { label: 'Demo', url: '#' }];
-const projects = [
-  { name: 'Every System Is Broken', year: '20XX', tags: ['seguridad', 'hacking'], desc, links, color: '#b5553f' },
-  { name: 'Colisseum', year: '20XX', tags: ['hackathon'], desc, links, color: '#2b9476' },
-  { name: 'Hackspain', year: '20XX', tags: ['hackathon', 'comunidad'], desc, links, color: '#6b5ea8' },
-  { name: 'UFV Labs', year: '20XX', tags: ['universidad', 'laboratorio'], desc, links, color: '#c9a227' },
-  { name: 'UFV Parking', year: '20XX', tags: ['computer-vision', 'ufv'], desc, links, color: '#b5623c' },
-  { name: 'Cell Vision', year: '20XX', tags: ['computer-vision', 'ml'], desc, links, color: '#2b9476' },
-  { name: 'OCR Parser', year: '20XX', tags: ['ocr', 'ml', 'parsing'], desc, links, color: '#6b5ea8' },
-  { name: 'Gather Simulator', year: '20XX', tags: ['simulacion'], desc, links, color: '#c9a227' },
-];
+import { projects } from '../data/projects';
 ---
 <Base title="Proyectos" description="Proyectos: Every System Is Broken, Colisseum, Hackspain, UFV Labs, UFV Parking, Cell Vision, OCR Parser y Gather Simulator.">
   <div class="badge">MUNDO 3 — PROYECTOS</div>
