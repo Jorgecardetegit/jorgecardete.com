@@ -46,7 +46,6 @@ const text = {
       >
         <div class="pcard-top">
           {p.soon ? <span class="pcard-soon">{text.soon}</span> : <time class="pcard-year">{p.year}</time>}
-          {p.languages.length > 0 && <span class="pcard-langs">{p.languages.join(' · ')}</span>}
         </div>
         <h2 class="pcard-name">{l(p.name, lang)}</h2>
         <p class="pcard-desc">{l(p.desc, lang)}</p>
