@@ -5,6 +5,7 @@ const palette: Record<string, string> = {
   f: '#f7d3ae',
   r: '#b5553f',
   b: '#2f3b7e',
+  m: '#e8574c',
   y: '#f7d046',
   Y: '#c9a227',
   w: '#ffffff',
@@ -65,6 +66,36 @@ const coin = [
   '..kkkk..',
 ];
 
+const mushroom = [
+  '....kkkk....',
+  '..kkmmwwkk..',
+  '.kmmmmwwwmk.',
+  '.kwwmmmmmmk.',
+  'kwwwmmmmwwwk',
+  'kmmmmmmmwwwk',
+  'kmmmmmmmmmmk',
+  '.kkkkkkkkkk.',
+  '..kffffffk..',
+  '..kfkffkfk..',
+  '..kffffffk..',
+  '...kkkkkk...',
+];
+
+const star = [
+  '.....kk.....',
+  '....kyyk....',
+  '....kyyk....',
+  'kkkkyyyykkkk',
+  'kyyyykykyyyk',
+  '.kyyyyyyyyk.',
+  '..kyyyyyyk..',
+  '..kyyyyyyk..',
+  '.kyyykkyyyk.',
+  '.kyyk..kyyk.',
+  'kyyk....kyyk',
+  'kkk......kkk',
+];
+
 const question = [
   '.kkkk.',
   'kk..kk',
@@ -102,14 +133,21 @@ function mirror(src: HTMLCanvasElement): HTMLCanvasElement {
   return canvas;
 }
 
-export function playerSprites() {
-  const frames = {} as Record<Frame, { right: HTMLCanvasElement; left: HTMLCanvasElement }>;
+export type PlayerSprites = Record<Frame, { right: HTMLCanvasElement; left: HTMLCanvasElement }>;
+
+/** El personaje con camiseta y pantalón cambiados; sin argumentos, los colores normales. */
+export function playerSprites(shirt = palette.r, pants = palette.b): PlayerSprites {
+  const colors = { ...palette, r: shirt, b: pants };
+  const frames = {} as PlayerSprites;
   for (const frame of Object.keys(legs) as Frame[]) {
-    const right = paint([...head, ...body, ...legs[frame]]);
+    const right = paint([...head, ...body, ...legs[frame]], colors);
     frames[frame] = { right, left: mirror(right) };
   }
   return frames;
 }
+
+export const mushroomSprite = () => paint(mushroom);
+export const starSprite = () => paint(star);
 
 export const coinSprite = () => paint(coin);
 export const questionSprite = () => paint(question);

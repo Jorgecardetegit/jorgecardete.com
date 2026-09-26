@@ -1,4 +1,4 @@
-import { coinSprite, groundTiles, playerSprites, questionSprite, type Frame } from './sprites';
+import { coinSprite, groundTiles, mushroomSprite, playerSprites, questionSprite, starSprite, type Frame } from './sprites';
 
 // Coordenadas del mundo en píxeles "lógicos"; el canvas se escala con image-rendering: pixelated.
 const WORLD_H = 200;
@@ -18,15 +18,19 @@ const ACCEL = 0.22;
 const AIR_ACCEL = 0.16;
 const MAX_SPEED = 1.8;
 const FRICTION = 0.78;
-const JUMP_V = -5.3;
+const JUMP_V = -5.9;
 const JUMP_CUT = -2;
+const STAR_SPEED = 3.4;
+const STAR_TIME = 600;
 
 const INK = '#1f1d1a';
 const CREAM = '#f6f1e4';
 const STORAGE_KEY = 'jorge.dev:game';
 
 type Rect = { x: number; y: number; w: number; h: number };
-type Block = Rect & { kind: 'brick' | 'question' | 'stone'; used: boolean; bump: number };
+type Block = Rect & { kind: 'brick' | 'question' | 'stone'; used: boolean; bump: number; item: Item['kind'] | 'coin' };
+type Item = Rect & { kind: 'mushroom' | 'star'; vx: number; vy: number; rise: number };
+type Debris = { x: number; y: number; vx: number; vy: number; t: number };
 type Coin = { x: number; y: number; taken: boolean };
 type Pop = { x: number; y: number; vy: number; t: number };
 type House = { x: number; door: number; color: string; shade: string; href: string; sign: HTMLAnchorElement };
@@ -35,7 +39,9 @@ type State = 'play' | 'enter' | 'exit';
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const overlap = (a: Rect, b: Rect) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
-function readStorage(): { x?: number } {
+type Saved = { x?: number; big?: boolean };
+
+function readStorage(): Saved {
   try {
     return JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '{}');
   } catch {
@@ -43,7 +49,7 @@ function readStorage(): { x?: number } {
   }
 }
 
-function writeStorage(value: { x: number }) {
+function writeStorage(value: Saved) {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(value));
   } catch {
@@ -57,9 +63,16 @@ export function startGame(root: HTMLElement) {
   const board = root.querySelector<HTMLElement>('.game-board')!;
   const prompt = root.querySelector<HTMLElement>('.game-prompt')!;
   const coinsLabel = root.querySelector<HTMLElement>('.game-coins-count')!;
-  const iris = root.querySelector<HTMLElement>('.game-iris')!;
 
-  const sprites = playerSprites();
+  // Con la estrella la ropa va cambiando de color, como en Mario.
+  const looks = [
+    playerSprites(),
+    playerSprites('#f7d046', '#2b9476'),
+    playerSprites('#6b5ea8', '#e8574c'),
+    playerSprites('#2b9476', '#f7d046'),
+  ];
+  const mushroomImg = mushroomSprite();
+  const starImg = starSprite();
   const coinImg = coinSprite();
   const questionImg = questionSprite();
   const tiles = groundTiles();
@@ -73,19 +86,20 @@ export function startGame(root: HTMLElement) {
   // Entre cada par de casas, una formación distinta de bloques y monedas.
   const blocks: Block[] = [];
   const coins: Coin[] = [];
-  const block = (x: number, y: number, kind: Block['kind'] = 'brick') =>
-    blocks.push({ x, y, w: TILE, h: TILE, kind, used: false, bump: 0 });
+  const block = (x: number, y: number, kind: Block['kind'] = 'brick', item: Block['item'] = 'coin') =>
+    blocks.push({ x, y, w: TILE, h: TILE, kind, used: false, bump: 0, item });
   const coin = (x: number, y: number) => coins.push({ x, y, taken: false });
 
   houses.slice(0, -1).forEach((house, i) => {
     const mid = house.x + HOUSE_W + (SPACING - HOUSE_W) / 2;
     switch (i % 4) {
+      // Las plataformas bajas dejan 36 px por debajo: cabe el personaje grande (32).
       case 0:
-        block(mid - 24, GROUND - 44);
-        block(mid - 8, GROUND - 44, 'question');
-        block(mid + 8, GROUND - 44);
-        coin(mid - 20, GROUND - 68);
-        coin(mid + 12, GROUND - 68);
+        block(mid - 24, GROUND - 52);
+        block(mid - 8, GROUND - 52, 'question', 'mushroom');
+        block(mid + 8, GROUND - 52);
+        coin(mid - 20, GROUND - 80);
+        coin(mid + 12, GROUND - 80);
         break;
       case 1:
         block(mid - 24, GROUND - 16, 'stone');
@@ -94,7 +108,7 @@ export function startGame(root: HTMLElement) {
         block(mid + 8, GROUND - 16, 'stone');
         block(mid + 8, GROUND - 32, 'stone');
         block(mid + 8, GROUND - 48, 'stone');
-        block(mid + 8, GROUND - 104, 'question');
+        block(mid + 8, GROUND - 104, 'question', 'star');
         coin(mid - 20, GROUND - 40);
         coin(mid - 4, GROUND - 56);
         break;
@@ -106,11 +120,11 @@ export function startGame(root: HTMLElement) {
         coin(mid + 28, GROUND - 28);
         break;
       case 3:
-        block(mid - 40, GROUND - 40);
-        block(mid - 24, GROUND - 40);
-        block(mid + 8, GROUND - 80);
-        block(mid + 24, GROUND - 80, 'question');
-        coin(mid + 12, GROUND - 100);
+        block(mid - 40, GROUND - 52);
+        block(mid - 24, GROUND - 52);
+        block(mid + 8, GROUND - 96);
+        block(mid + 24, GROUND - 96, 'question');
+        coin(mid + 12, GROUND - 116);
         break;
     }
   });
@@ -119,10 +133,11 @@ export function startGame(root: HTMLElement) {
   const trees = [140, worldW - 110];
   const bushes = houses.flatMap((h) => [h.x - 26, h.x + HOUSE_W + 6]);
   const flag = worldW - 50;
-  const BOARD_X = 84;
+  const BOARD_LEFT = 12;
 
   // Estado.
-  const saved = readStorage().x;
+  const stored = readStorage();
+  const saved = stored.x;
   const player = { w: PW, h: PH, x: typeof saved === 'number' ? clamp(saved - PW / 2, 0, worldW - PW) : 36, y: GROUND - PH, vx: 0, vy: 0, facing: 1, alpha: 1 };
   let onGround = true;
   let coyote = 0;
@@ -137,8 +152,29 @@ export function startGame(root: HTMLElement) {
   let camX = clamp(player.x - 120, 0, worldW);
   let tick = 0;
   const pops: Pop[] = [];
+  const items: Item[] = [];
+  const debris: Debris[] = [];
+  const trail: { x: number; y: number; img: HTMLCanvasElement }[] = [];
+  let big = false;
+  let growTime = 0;
+  let starTime = 0;
 
   const keys = { left: false, right: false, jump: false };
+
+  // Con el champiñón mide el doble: 24×32 en vez de 12×16, con los pies en el mismo sitio.
+  function grow() {
+    if (big) return;
+    big = true;
+    growTime = 40;
+    player.x = clamp(player.x - PW / 2, 0, worldW - PW * 2);
+    player.y -= PH;
+    player.w = PW * 2;
+    player.h = PH * 2;
+  }
+  if (stored.big) {
+    grow();
+    growTime = 0;
+  }
 
   // Tamaño lógico del canvas: 200 px de alto como mínimo y al menos 200 de ancho.
   // En táctil se reserva sitio abajo para que los botones queden sobre la tierra, no sobre el personaje.
@@ -178,7 +214,7 @@ export function startGame(root: HTMLElement) {
     state = 'enter';
     target = nearHouse;
     player.vx = 0;
-    writeStorage({ x: target.door });
+    writeStorage({ x: target.door, big });
   };
   const pressJump = () => {
     if (state === 'play') jumpBuffer = 6;
@@ -249,10 +285,10 @@ export function startGame(root: HTMLElement) {
 
   // Física.
   function moveX() {
-    player.x = clamp(player.x + player.vx, 0, worldW - PW);
+    player.x = clamp(player.x + player.vx, 0, worldW - player.w);
     for (const b of blocks) {
       if (!overlap(player, b)) continue;
-      player.x = player.vx > 0 ? b.x - PW : b.x + b.w;
+      player.x = player.vx > 0 ? b.x - player.w : b.x + b.w;
       player.vx = 0;
     }
   }
@@ -261,15 +297,15 @@ export function startGame(root: HTMLElement) {
     player.vy = Math.min(player.vy + GRAVITY, MAX_FALL);
     player.y += player.vy;
     onGround = false;
-    if (player.y + PH >= GROUND) {
-      player.y = GROUND - PH;
+    if (player.y + player.h >= GROUND) {
+      player.y = GROUND - player.h;
       player.vy = 0;
       onGround = true;
     }
     for (const b of blocks) {
       if (!overlap(player, b)) continue;
       if (player.vy > 0) {
-        player.y = b.y - PH;
+        player.y = b.y - player.h;
         player.vy = 0;
         onGround = true;
       } else if (player.vy < 0) {
@@ -282,18 +318,62 @@ export function startGame(root: HTMLElement) {
 
   function hit(b: Block) {
     b.bump = 8;
+    if (b.kind === 'brick' && big) return smash(b);
     if (b.kind !== 'question' || b.used) return;
     b.used = true;
-    pops.push({ x: b.x + 4, y: b.y - 8, vy: -3.2, t: 0 });
-    collected++;
+    if (b.item === 'coin') {
+      pops.push({ x: b.x + 4, y: b.y - 8, vy: -3.2, t: 0 });
+      collected++;
+    } else {
+      items.push({ kind: b.item, x: b.x + 2, y: b.y, w: 12, h: 12, vx: 0, vy: 0, rise: 12 });
+    }
+  }
+
+  // Grande, un cabezazo rompe el ladrillo en cuatro trozos.
+  function smash(b: Block) {
+    blocks.splice(blocks.indexOf(b), 1);
+    for (const [dx, dy, vx] of [[0, 0, -1], [8, 0, 1], [0, 8, -0.7], [8, 8, 0.7]]) {
+      debris.push({ x: b.x + dx, y: b.y + dy, vx, vy: dy ? -3 : -4.5, t: 0 });
+    }
+  }
+
+  function moveItem(it: Item) {
+    if (it.rise > 0) {
+      it.y -= 1;
+      if (--it.rise === 0) it.vx = it.kind === 'star' ? 1 : 0.6;
+      return;
+    }
+    it.x += it.vx;
+    if (it.x < 0 || it.x + it.w > worldW || blocks.some((b) => overlap(it, b))) {
+      it.x -= it.vx;
+      it.vx = -it.vx;
+    }
+    it.vy = Math.min(it.vy + GRAVITY * 0.8, MAX_FALL);
+    it.y += it.vy;
+    let landed = it.y + it.h >= GROUND;
+    if (landed) it.y = GROUND - it.h;
+    for (const b of blocks) {
+      if (!overlap(it, b)) continue;
+      if (it.vy > 0) {
+        it.y = b.y - it.h;
+        landed = true;
+      } else {
+        it.y = b.y + b.h;
+        it.vy = 0;
+      }
+    }
+    // La estrella va botando; el champiñón camina.
+    if (landed) it.vy = it.kind === 'star' ? -4 : 0;
   }
 
   function step() {
     tick++;
     if (state === 'play') {
       const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+      const boost = starTime > 0 ? 1.6 : 1;
+      const top = starTime > 0 ? STAR_SPEED : MAX_SPEED;
       if (dir) {
-        player.vx = clamp(player.vx + dir * (onGround ? ACCEL : AIR_ACCEL), -MAX_SPEED, MAX_SPEED);
+        player.vx = clamp(player.vx + dir * (onGround ? ACCEL : AIR_ACCEL) * boost, -top, top);
         player.facing = dir;
       } else if (onGround) {
         player.vx *= FRICTION;
@@ -309,7 +389,7 @@ export function startGame(root: HTMLElement) {
       moveX();
       moveY();
     } else if (state === 'enter' && target) {
-      const goal = target.door - PW / 2;
+      const goal = target.door - player.w / 2;
       if (Math.abs(player.x - goal) > 1) {
         player.x += Math.sign(goal - player.x);
       } else if (player.alpha > 0) {
@@ -317,8 +397,8 @@ export function startGame(root: HTMLElement) {
         player.alpha = Math.max(0, player.alpha - 0.06);
         if (player.alpha === 0) {
           const href = target.href;
-          root.style.setProperty('--iris-x', `${(player.x + PW / 2 - camX) * scale}px`);
-          root.style.setProperty('--iris-y', `${(player.y + PH / 2 + offsetY) * scale}px`);
+          root.style.setProperty('--iris-x', `${(player.x + player.w / 2 - camX) * scale}px`);
+          root.style.setProperty('--iris-y', `${(player.y + player.h / 2 + offsetY) * scale}px`);
           root.classList.add('is-leaving');
           setTimeout(() => location.assign(href), 480);
         }
@@ -331,6 +411,22 @@ export function startGame(root: HTMLElement) {
     walkTime = onGround && Math.abs(player.vx) > 0.2 ? walkTime + Math.abs(player.vx) : 0;
 
     for (const b of blocks) b.bump = Math.max(0, b.bump - 1);
+    for (const it of [...items]) {
+      moveItem(it);
+      if (it.rise > 0 || !overlap(player, it) || state !== 'play') continue;
+      items.splice(items.indexOf(it), 1);
+      if (it.kind === 'mushroom') grow();
+      else starTime = STAR_TIME;
+    }
+    for (const d of debris) {
+      d.t++;
+      d.x += d.vx;
+      d.y += d.vy;
+      d.vy += GRAVITY;
+    }
+    while (debris.length && debris[0].t > 60) debris.shift();
+    growTime = Math.max(0, growTime - 1);
+    starTime = Math.max(0, starTime - 1);
     for (const c of coins) {
       if (!c.taken && overlap(player, { x: c.x, y: c.y, w: 8, h: 8 })) {
         c.taken = true;
@@ -344,7 +440,7 @@ export function startGame(root: HTMLElement) {
     }
     while (pops.length && pops[0].t > 26) pops.shift();
 
-    const center = player.x + PW / 2;
+    const center = player.x + player.w / 2;
     nearHouse =
       state === 'play' && onGround ? houses.find((h) => Math.abs(center - h.door) < 10) ?? null : null;
 
@@ -408,7 +504,7 @@ export function startGame(root: HTMLElement) {
     const x = h.x;
     const top = GROUND - WALL_H;
     const cx = x + HOUSE_W / 2;
-    const open = target === h || (state === 'exit' && Math.abs(player.x + PW / 2 - h.door) < 2);
+    const open = target === h || (state === 'exit' && Math.abs(player.x + player.w / 2 - h.door) < 2);
 
     // Chimenea (el tejado la tapa por abajo).
     rect(x + 56, top - 30, 12, 24, INK);
@@ -500,14 +596,36 @@ export function startGame(root: HTMLElement) {
     rect(flag - 5, GROUND - 5, 12, 5, '#a4a4b0');
   }
 
+  function drawItem(it: Item) {
+    ctx.drawImage(it.kind === 'star' ? starImg : mushroomImg, Math.round(it.x), Math.round(it.y));
+  }
+
   function drawPlayer() {
     let frame: Frame = 'stand';
     if (!onGround && state === 'play') frame = 'jump';
     else if (walkTime > 0) frame = Math.floor(walkTime / 6) % 2 ? 'walkA' : 'walkB';
     else if (state === 'enter') frame = Math.floor(tick / 6) % 2 ? 'walkA' : 'walkB';
-    const img = player.facing > 0 ? sprites[frame].right : sprites[frame].left;
+    // Con la estrella cambia de ropa cada pocos frames y deja estela.
+    const look = starTime > 0 ? looks[1 + (Math.floor(tick / 4) % 3)] : looks[0];
+    const img = player.facing > 0 ? look[frame].right : look[frame].left;
+    // Al crecer parpadea entre los dos tamaños, como en Mario.
+    const drawBig = big && !(growTime > 0 && Math.floor(growTime / 5) % 2);
+    const w = drawBig ? PW * 2 : PW;
+    const h = drawBig ? PH * 2 : PH;
+    const x = Math.round(player.x + (player.w - w) / 2);
+    const y = Math.round(player.y + player.h - h);
+    if (starTime > 0 && tick % 3 === 0) {
+      trail.push({ x, y, img });
+      if (trail.length > 4) trail.shift();
+    } else if (starTime === 0) {
+      trail.length = 0;
+    }
+    trail.forEach((t, i) => {
+      ctx.globalAlpha = 0.12 * (i + 1) * player.alpha;
+      ctx.drawImage(t.img, t.x, t.y, w, h);
+    });
     ctx.globalAlpha = player.alpha;
-    ctx.drawImage(img, Math.round(player.x), Math.round(player.y));
+    ctx.drawImage(img, x, y, w, h);
     ctx.globalAlpha = 1;
   }
 
@@ -529,9 +647,10 @@ export function startGame(root: HTMLElement) {
       for (let y = GROUND + TILE; y < WORLD_H + reserve; y += TILE) ctx.drawImage(tiles.dirt, x, y);
     }
 
-    // Poste del cartel de bienvenida.
-    rect(BOARD_X - 3, GROUND - 34, 6, 34, INK);
-    rect(BOARD_X - 2, GROUND - 34, 4, 34, '#7b5434');
+    // Poste del cartel de bienvenida, centrado bajo el cartel sea cual sea su ancho.
+    const boardX = Math.round(BOARD_LEFT + board.offsetWidth / scale / 2);
+    rect(boardX - 3, GROUND - 34, 6, 34, INK);
+    rect(boardX - 2, GROUND - 34, 4, 34, '#7b5434');
 
     trees.forEach(drawTree);
     bushes.forEach(drawBush);
@@ -540,23 +659,26 @@ export function startGame(root: HTMLElement) {
     blocks.forEach(drawBlock);
     for (const c of coins) if (!c.taken) drawCoin(c.x, c.y + Math.round(Math.sin(tick / 15 + c.x) * 1.5));
     for (const p of pops) drawCoin(p.x, p.y);
+    items.forEach(drawItem);
+    for (const d of debris) {
+      rect(Math.round(d.x), Math.round(d.y), 6, 6, INK);
+      rect(Math.round(d.x) + 1, Math.round(d.y) + 1, 4, 4, '#b5623c');
+    }
     drawPlayer();
     ctx.restore();
 
     // Capa HTML (carteles y aviso) alineada con el mundo.
-    const place = (el: HTMLElement, wx: number, wy: number, minX = -Infinity) => {
-      const x = Math.max((wx - camX) * scale, minX);
-      el.style.transform = `translate(${x}px, ${(wy + offsetY) * scale}px) translate(-50%, -100%)`;
+    const place = (el: HTMLElement, wx: number, wy: number) => {
+      el.style.transform = `translate(${(wx - camX) * scale}px, ${(wy + offsetY) * scale}px) translate(-50%, -100%)`;
     };
-    // El cartel de bienvenida no se sale por la izquierda aunque sea más ancho que su poste.
-    place(board, BOARD_X, GROUND - 30, board.offsetWidth / 2 + 12);
+    place(board, boardX, GROUND - 30);
     for (const h of houses) {
       place(h.sign, h.door, GROUND - WALL_H - ROOF_H - 10);
       h.sign.classList.toggle('is-near', h === nearHouse);
     }
     prompt.hidden = !nearHouse;
     root.classList.toggle('can-enter', !!nearHouse);
-    if (nearHouse) place(prompt, player.x + PW / 2, player.y - 6);
+    if (nearHouse) place(prompt, player.x + player.w / 2, player.y - 6);
     coinsLabel.textContent = String(collected).padStart(2, '0');
   }
 
@@ -573,7 +695,7 @@ export function startGame(root: HTMLElement) {
     render();
     requestAnimationFrame(frame);
   }
-  camX = worldW <= W ? (worldW - W) / 2 : clamp(player.x + PW / 2 - W / 2, 0, worldW - W);
+  camX = worldW <= W ? (worldW - W) / 2 : clamp(player.x + player.w / 2 - W / 2, 0, worldW - W);
   root.classList.add('is-ready');
   requestAnimationFrame(frame);
 }
