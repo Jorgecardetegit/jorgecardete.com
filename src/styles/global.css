@@ -24,8 +24,8 @@ a:hover { color: var(--terracotta); }
 .shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(32px, 12vw, 220px); }
 .sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
 .main-col { flex: 999 1 520px; min-width: 320px; max-width: 1140px; display: flex; flex-direction: column; }
-.main { flex: 1; padding: 56px 24px 80px 40px; }
-.footer { margin: 0 24px 0 40px; padding: 1.5rem 0 2rem; border-top: 1px solid #e5dcbd; display: flex; flex-direction: column; gap: 1rem; font-size: 14px; color: #5a5a61; }
+.main { flex: 1; padding: 56px 40px 80px 88px; }
+.footer { margin: 0 40px 0 88px; padding: 1.5rem 0 2rem; border-top: 1px solid #e5dcbd; display: flex; flex-direction: column; gap: 1rem; font-size: 14px; color: #5a5a61; }
 .footer-menu { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
 a.footer-link { display: inline-flex; align-items: center; gap: .375rem; color: #5a5a61; font-weight: 500; text-decoration: none; white-space: nowrap; }
 a.footer-link:hover { color: var(--green); text-decoration: underline; }
