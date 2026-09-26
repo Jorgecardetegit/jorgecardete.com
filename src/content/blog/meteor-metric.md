@@ -4,6 +4,7 @@ description: "An upgrade in the evaluation of machine translation"
 date: 2024-02-07
 tags: [nlp, metrics, machine-learning]
 icon: "📏"
+cover: "/blog/covers/meteor-metric.jpg"
 ---
 
 *An upgrade in the evaluation of machine translation. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/the-meteor-metric-an-nlp-classic-42552cb6ce69).*

@@ -4,6 +4,7 @@ description: "Explore the novel paradigm that will guide AI in the ethical direc
 date: 2023-11-09
 tags: [llm, alignment, papers]
 icon: "📜"
+cover: "/blog/covers/constitutional-ai.jpg"
 ---
 
 *Explore the novel paradigm that will guide AI in the ethical direction. Publicado originalmente en [LatinXinAI](https://medium.com/latinxinai/paper-review-constitutional-ai-harmlessness-from-ai-feedback-09da589301b0).*

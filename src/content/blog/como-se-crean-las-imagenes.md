@@ -4,6 +4,7 @@ description: "A quick introduction to pixels and color channels"
 date: 2023-12-25
 tags: [computer-vision, image-processing]
 icon: "🎨"
+cover: "/blog/covers/como-se-crean-las-imagenes.jpg"
 ---
 
 *A quick introduction to pixels and color channels. Publicado originalmente en [Long. Sweet. Valuable.](https://medium.com/long-sweet-valuable/but-how-are-images-created-2186a759d7a8).*

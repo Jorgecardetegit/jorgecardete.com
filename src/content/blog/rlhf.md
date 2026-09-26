@@ -4,6 +4,7 @@ description: "Embarking on a journey where machines learn not just from data, bu
 date: 2023-11-10
 tags: [llm, reinforcement-learning, alignment]
 icon: "🧑‍⚖️"
+cover: "/blog/covers/rlhf.jpg"
 ---
 
 *Embarking on a journey where machines learn not just from data, but from the wisdom of human experience. Publicado originalmente en [LatinXinAI](https://medium.com/latinxinai/reinforcement-learning-from-human-feedback-rlhf-9d1d74040c1e).*

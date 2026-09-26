@@ -5,6 +5,7 @@ date: 2024-03-12
 tags: [computer-vision, object-detection, yolo]
 icon: "🎯"
 order: 6
+cover: "/blog/covers/yolo-introduccion.jpg"
 ---
 
 *Exploring the fundamentals of Object Detection. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/yolo-you-only-look-once-a-brief-introduction-2dea897ae9bd).*

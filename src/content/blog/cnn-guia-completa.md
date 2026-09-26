@@ -5,6 +5,7 @@ date: 2024-02-07
 tags: [deep-learning, cnn, machine-learning]
 icon: "🧠"
 order: 1
+cover: "/blog/covers/cnn-guia-completa.jpg"
 ---
 
 *Exploring the power of CNNs in image analysis. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/convolutional-neural-networks-a-comprehensive-guide-5cc0b5eae175).*

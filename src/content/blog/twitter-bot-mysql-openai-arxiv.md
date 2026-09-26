@@ -4,6 +4,7 @@ description: "Stay updated on the latest Machine Learning developments"
 date: 2024-03-26
 tags: [python, openai, mysql, bots]
 icon: "🤖"
+cover: "/blog/covers/twitter-bot-mysql-openai-arxiv.jpg"
 ---
 
 *Stay updated on the latest Machine Learning developments. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/building-a-twitter-bot-with-mysql-openai-and-arxiv-api-a08cba47e097).*

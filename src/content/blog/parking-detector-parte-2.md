@@ -4,6 +4,7 @@ description: "Hosting the Machine Learning model"
 date: 2024-03-10
 tags: [docker, azure, flask, mlops]
 icon: "🅿️"
+cover: "/blog/covers/parking-detector-parte-2.jpg"
 ---
 
 *Hosting the Machine Learning model. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/building-a-parking-space-detector-with-computer-vision-part-2-1f4bcea9bf9c).*

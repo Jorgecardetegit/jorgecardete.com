@@ -4,6 +4,7 @@ description: "Explainable artificial intelligence (XAI) for exploring spatial va
 date: 2023-12-20
 tags: [xai, healthcare, machine-learning]
 icon: "🩺"
+cover: "/blog/covers/explainable-ai-cancer.jpg"
 ---
 
 *Explainable artificial intelligence (XAI) for exploring spatial variability of lung and bronchus. Publicado originalmente en [Short. Sweet. Valuable.](https://short.sweet.pub/explainable-ai-a-new-ally-in-the-fight-against-cancer-3812e5eb8fdc).*

@@ -4,6 +4,7 @@ description: "Scraping Glassdoor with Python and Scrapfly"
 date: 2024-02-03
 tags: [python, web-scraping, datasets]
 icon: "🕸️"
+cover: "/blog/covers/dataset-web-scraping.jpg"
 ---
 
 *Scraping Glassdoor with Python and Scrapfly. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/how-to-create-your-dataset-with-web-scraping-1a268dbc3302).*

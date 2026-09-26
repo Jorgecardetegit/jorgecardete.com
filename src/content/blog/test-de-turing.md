@@ -4,6 +4,7 @@ description: "A simple idea and a profound impact on Artificial Intelligence"
 date: 2023-12-18
 tags: [ai, history]
 icon: "🧪"
+cover: "/blog/covers/test-de-turing.jpg"
 ---
 
 *A simple idea and a profound impact on Artificial Intelligence. Publicado originalmente en [Short. Sweet. Valuable.](https://medium.com/short-sweet-valuable/the-turing-test-5a99e543576a).*

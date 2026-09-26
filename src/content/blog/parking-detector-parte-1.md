@@ -4,6 +4,7 @@ description: "Creating the Machine Learning model"
 date: 2024-03-06
 tags: [computer-vision, cnn, tensorflow]
 icon: "🅿️"
+cover: "/blog/covers/parking-detector-parte-1.jpg"
 ---
 
 *Creating the Machine Learning model. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/building-a-car-park-slot-classifier-with-computer-vision-part-1-4d843320bc3a).*

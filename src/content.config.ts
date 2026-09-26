@@ -10,6 +10,8 @@ const blog = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
     icon: z.string().default('💾'),
+    // Imagen de portada en /public (p. ej. /blog/covers/<slug>.jpg).
+    cover: z.string().optional(),
     // Posición fija al principio del listado del blog; el resto va por fecha.
     order: z.number().optional(),
   }),
