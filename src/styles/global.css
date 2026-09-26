@@ -121,9 +121,8 @@ section { margin-bottom: 64px; }
 .paper-btn:hover { color: var(--ink); background: var(--card); transform: translate(-1px, -1px); }
 .paper-doi { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 .pfilters { display: flex; flex-wrap: wrap; gap: 10px; margin: -16px 0 14px; }
-.psearch { flex: 1 1 260px; max-width: 420px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #fffdf8; border: 1.5px solid #ded4b2; border-radius: 10px; color: #6b6b72; transition: border-color .15s, box-shadow .15s; }
-.psearch input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font: inherit; font-size: 15px; color: var(--ink); }
-.psearch:focus-within { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(43, 148, 118, 0.15); }
+.psearch { width: 100%; max-width: 420px; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--bg); border: 3px solid var(--ink); border-radius: 3px; padding: 10px 12px; outline: none; }
+.psearch:focus { box-shadow: 3px 3px 0 var(--shadow); }
 .pfilter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 32px; }
 .pfilter-label { margin-right: 4px; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); }
 .pchip { padding: 6px 12px; font: inherit; font-size: 14px; font-weight: 500; color: #28282e; background: transparent; border: 1.5px solid #ded4b2; border-radius: 999px; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
