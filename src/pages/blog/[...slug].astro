@@ -8,7 +8,8 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
 <Base title={post.data.title} description={post.data.description} type="article">
@@ -17,7 +18,47 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
     <p class="post-date" style="margin-bottom:32px;">
       <time datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
     </p>
-    <div class="prose"><Content /></div>
+
+    <div class="post-body">
+      <div class="prose"><Content /></div>
+
+      {toc.length > 1 && (
+        <aside class="toc" aria-label="Índice del artículo">
+          <div class="label-pixel">ÍNDICE</div>
+          <nav>
+            <ol>
+              {toc.map((h) => (
+                <li class={`toc-${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>
+              ))}
+            </ol>
+          </nav>
+        </aside>
+      )}
+    </div>
+
     <p style="margin-top:48px;"><a href="/blog/">← Volver al blog</a></p>
   </article>
 </Base>
+
+{toc.length > 1 && (
+  <script>
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')];
+    const byId = new Map(links.map((a) => [a.getAttribute('href')!.slice(1), a]));
+    const targets = [...byId.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const setActive = (id: string) => {
+      for (const a of links) a.classList.toggle('active', a === byId.get(id));
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length > 0) setActive(visible[0].target.id);
+      },
+      { rootMargin: '-15% 0px -70% 0px' }
+    );
+    for (const el of targets) observer.observe(el);
+  </script>
+)}
