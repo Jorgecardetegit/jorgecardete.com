@@ -123,9 +123,7 @@ section { margin-bottom: 64px; }
 .pfilters { display: flex; flex-wrap: wrap; gap: 10px; margin: -16px 0 14px; }
 .psearch { flex: 1 1 260px; max-width: 420px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #fffdf8; border: 1.5px solid #ded4b2; border-radius: 10px; color: #6b6b72; transition: border-color .15s, box-shadow .15s; }
 .psearch input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font: inherit; font-size: 15px; color: var(--ink); }
-.pselect { appearance: none; padding: 10px 38px 10px 14px; font: inherit; font-size: 15px; color: #28282e; background: #fffdf8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b72' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; border: 1.5px solid #ded4b2; border-radius: 10px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
-.pselect:hover { border-color: #c6ba93; }
-.psearch:focus-within, .pselect:focus-visible { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(43, 148, 118, 0.15); }
+.psearch:focus-within { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(43, 148, 118, 0.15); }
 .pfilter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 32px; }
 .pfilter-label { margin-right: 4px; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); }
 .pchip { padding: 6px 12px; font: inherit; font-size: 14px; font-weight: 500; color: #28282e; background: transparent; border: 1.5px solid #ded4b2; border-radius: 999px; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }

@@ -2,7 +2,6 @@
 import Base from '../layouts/Base.astro';
 import { categories, projects } from '../data/projects';
 
-const usedCategories = Object.entries(categories).filter(([key]) => projects.some((p) => p.category === key));
 const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
 ---
 <Base title="Proyectos" description={`Proyectos: ${projects.map((p) => p.name).join(', ')}.`}>
@@ -15,10 +14,6 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input type="search" id="pq" placeholder="Buscar proyectos…" aria-label="Buscar proyectos" />
     </label>
-    <select class="pselect" aria-label="Temática">
-      <option value="">Todas las temáticas</option>
-      {usedCategories.map(([key, c]) => <option value={key}>{c.label}</option>)}
-    </select>
   </div>
 
   <div class="pfilter-row" role="group" aria-label="Lenguaje">
@@ -34,7 +29,6 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
       <li
         class="pcard"
         style={`--c:${categories[p.category].color}`}
-        data-category={p.category}
         data-languages={p.languages.join('|')}
         data-text={[p.name, p.desc, ...p.tags, ...p.languages].join(' ').toLowerCase()}
       >
@@ -59,7 +53,6 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
 
 <script>
   const input = document.getElementById('pq') as HTMLInputElement;
-  const select = document.querySelector<HTMLSelectElement>('.pselect')!;
   const chips = [...document.querySelectorAll<HTMLButtonElement>('.pchip')];
   const cards = [...document.querySelectorAll<HTMLElement>('.pcard')];
   const none = document.getElementById('pnone')!;
@@ -67,11 +60,9 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
 
   function apply() {
     const q = input.value.trim().toLowerCase();
-    const category = select.value;
     let visible = 0;
     for (const card of cards) {
       const ok =
-        (!category || card.dataset.category === category) &&
         (!language || card.dataset.languages!.split('|').includes(language)) &&
         (!q || card.dataset.text!.includes(q));
       card.hidden = !ok;
@@ -87,6 +78,5 @@ const languages = [...new Set(projects.flatMap((p) => p.languages))].sort();
       apply();
     });
   }
-  select.addEventListener('change', apply);
   input.addEventListener('input', apply);
 </script>
