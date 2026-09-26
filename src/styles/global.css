@@ -18,7 +18,7 @@
 html, body { margin: 0; padding: 0; background: var(--bg); }
 * { box-sizing: border-box; }
 body { color: var(--ink); font-family: 'Karla', system-ui, sans-serif; }
-a { color: var(--green); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a { color: var(--green); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 a:hover { color: var(--terracotta); }
 
 .shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(32px, 12vw, 220px); }
