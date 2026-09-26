@@ -123,7 +123,7 @@ export function startGame(root: HTMLElement) {
 
   // Estado.
   const saved = readStorage().x;
-  const player = { x: typeof saved === 'number' ? clamp(saved - PW / 2, 0, worldW - PW) : 36, y: GROUND - PH, vx: 0, vy: 0, facing: 1, alpha: 1 };
+  const player = { w: PW, h: PH, x: typeof saved === 'number' ? clamp(saved - PW / 2, 0, worldW - PW) : 36, y: GROUND - PH, vx: 0, vy: 0, facing: 1, alpha: 1 };
   let onGround = true;
   let coyote = 0;
   let jumpBuffer = 0;
