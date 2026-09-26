@@ -18,9 +18,11 @@ import { projects } from '../data/projects';
         <div class="tags">
           {p.tags.map((t) => <span class="tag">#{t}</span>)}
         </div>
-        <div class="pcard-links">
-          {p.links.map((l) => <a href={l.url}>{l.label}</a>)}
-        </div>
+        {p.links.length > 0 && (
+          <div class="pcard-links">
+            {p.links.map((l) => <a href={l.url}>{l.label}</a>)}
+          </div>
+        )}
       </li>
     ))}
   </ul>
