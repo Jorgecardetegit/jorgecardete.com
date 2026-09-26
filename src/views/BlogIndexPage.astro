@@ -1,0 +1,140 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { dateFormat, postPath, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity) || b.data.date.getTime() - a.data.date.getTime()
+);
+
+const tagCounts = new Map<string, number>();
+for (const post of posts) for (const t of post.data.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+const topics = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
+
+const palette = ['#b5623c', '#2b9476', '#6b5ea8', '#9a7b12', '#b5553f'];
+const color = (tag: string) => palette[[...tag].reduce((n, c) => n + c.charCodeAt(0), 0) % palette.length];
+
+const fmt = dateFormat(lang, { day: 'numeric', month: 'long', year: 'numeric' });
+const text = {
+  es: {
+    description: 'Artículos sobre visión artificial, machine learning, Python y lo que voy aprendiendo.',
+    badge: 'MUNDO 2 — BLOG', role: 'Visión artificial, machine learning y lo que voy aprendiendo',
+    filters: 'Filtrar posts', all: 'Todos los posts', search: 'Buscar',
+    placeholder: `Buscar entre ${posts.length} posts…`, searchLabel: 'Buscar posts', none: 'No hay posts que coincidan.', note: 'nota',
+  },
+  en: {
+    description: 'Articles on computer vision, machine learning, Python and whatever I am learning.',
+    badge: 'WORLD 2 — BLOG', role: 'Computer vision, machine learning and whatever I am learning',
+    filters: 'Filter posts', all: 'All posts', search: 'Search',
+    placeholder: `Search ${posts.length} posts…`, searchLabel: 'Search posts', none: 'No posts match.', note: 'note',
+  },
+}[lang];
+---
+<Base title="Blog" description={text.description}>
+  <div class="panel">
+    <header class="head">
+      <div class="photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
+      <div class="intro-block">
+        <div class="badge">{text.badge}</div>
+        <h1 class="big">Blog</h1>
+        <p class="role">{text.role}</p>
+      </div>
+      <nav class="filters" aria-label={text.filters}>
+        <button type="button" class="f" data-topic="" aria-pressed="true">{text.all}</button>
+        {topics.map((t) => <button type="button" class="f" data-topic={t} aria-pressed="false">{t}</button>)}
+        <button type="button" class="f" id="toggle-search" aria-expanded="false">{text.search}</button>
+      </nav>
+    </header>
+
+    <div class="search-row" id="search-row" hidden>
+      <input type="search" id="q" placeholder={text.placeholder} aria-label={text.searchLabel} />
+    </div>
+
+    <div class="grid" id="grid">
+      {posts.map((post) => {
+        const main = post.data.tags[0];
+        return (
+          <a class="cell" href={postPath(post.id, lang)} data-title={post.data.title.toLowerCase()} data-tags={post.data.tags.join(',')}>
+            <span class="cat" style={`color:${color(main ?? '')}`}>{main ?? text.note}</span>
+            <time class="when" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+            <span class="ttl">{post.data.title}</span>
+          </a>
+        );
+      })}
+    </div>
+    <p class="none" id="none" hidden>{text.none}</p>
+  </div>
+</Base>
+
+<style>
+  .panel { padding: 0 }
+  .head { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; margin-bottom: 48px; }
+  .photo { flex: none; width: 205px; height: 205px; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted); overflow: hidden; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .intro-block { flex: 1 1 320px; min-width: 260px; }
+  .big { margin: 0 0 20px; font-family: var(--display); font-weight: 800; font-size: clamp(56px, 9vw, 96px); line-height: 0.95; letter-spacing: -3px; color: var(--ink); text-shadow: 3px 3px 0 var(--gold), 6px 6px 0 var(--terracotta); }
+  .role { margin: 0; font-size: 19px; line-height: 1.55; color: var(--text-soft); }
+  .filters { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 10px; }
+  .f { font-family: var(--mono); font-size: 13px; color: var(--ink); background: none; border: 0; border-radius: 3px; padding: 3px 8px; cursor: pointer; }
+  .f:hover { background: rgba(43, 148, 118, 0.12); }
+  .f[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
+  .search-row { margin: -24px 0 32px; }
+  .search-row input { width: 100%; max-width: 420px; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--bg); border: 3px solid var(--ink); border-radius: 3px; padding: 10px 12px; outline: none; }
+  .search-row input:focus { box-shadow: 3px 3px 0 var(--shadow); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); border-top: 3px solid var(--ink); border-left: 3px solid var(--ink); }
+  .cell { display: flex; flex-direction: column; min-height: 236px; padding: 22px; border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink); color: var(--ink); text-decoration: none; background: var(--bg); }
+  .cell[hidden] { display: none; }
+  .cell:hover, .cell:focus-visible { background: #e9e2d0; color: var(--ink); }
+  .cell:hover .ttl { color: var(--green); }
+  .cat { font-family: var(--pixel); font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; line-height: 1.5; }
+  .when { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .ttl { margin: auto 0; padding: 12px 0; text-align: center; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.3; letter-spacing: -0.3px; text-wrap: balance; }
+  .none { padding: 32px 0; color: var(--muted); font-family: var(--mono); font-size: 14px; }
+</style>
+
+<script>
+  const input = document.getElementById('q') as HTMLInputElement;
+  const row = document.getElementById('search-row')!;
+  const toggle = document.getElementById('toggle-search')!;
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('.f[data-topic]')];
+  const cells = [...document.querySelectorAll<HTMLElement>('.cell')];
+  const none = document.getElementById('none')!;
+  let topic = '';
+
+  function apply() {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+    for (const c of cells) {
+      const okQ = !q || c.dataset.title!.includes(q) || c.dataset.tags!.includes(q);
+      const okT = !topic || c.dataset.tags!.split(',').includes(topic);
+      c.hidden = !(okQ && okT);
+      if (!c.hidden) visible++;
+    }
+    none.hidden = visible > 0;
+  }
+
+  input.addEventListener('input', apply);
+  toggle.addEventListener('click', () => {
+    row.hidden = !row.hidden;
+    toggle.setAttribute('aria-expanded', String(!row.hidden));
+    if (!row.hidden) input.focus();
+    else { input.value = ''; apply(); }
+  });
+  const fromUrl = new URLSearchParams(location.search).get('tema');
+  if (fromUrl) {
+    topic = fromUrl;
+    buttons.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.topic === topic)));
+    apply();
+  }
+
+  for (const b of buttons) {
+    b.addEventListener('click', () => {
+      topic = b.dataset.topic!;
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
+    });
+  }
+</script>

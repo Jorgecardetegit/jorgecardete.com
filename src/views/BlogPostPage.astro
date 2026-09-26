@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { dateFormat, path, type Lang } from '../i18n';
+
+interface Props { post: CollectionEntry<'blog'>; lang: Lang }
+const { post, lang } = Astro.props;
+const { Content, headings } = await render(post);
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+const fmt = dateFormat(lang, { day: 'numeric', month: 'long', year: 'numeric' });
+const text = {
+  es: { tocLabel: 'Índice del artículo', toc: 'ÍNDICE', back: '← Volver al blog' },
+  en: { tocLabel: 'Table of contents', toc: 'CONTENTS', back: '← Back to the blog' },
+}[lang];
+---
+<Base title={post.data.title} description={post.data.description} type="article">
+  <article>
+    <h1 class="hero" style="font-size:clamp(32px,4.5vw,46px);">{post.data.title}</h1>
+    <p class="post-date" style="margin-bottom:32px;">
+      <time datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+    </p>
+
+    <div class="post-body">
+      <div class="prose"><Content /></div>
+
+      {toc.length > 1 && (
+        <aside class="toc" aria-label={text.tocLabel}>
+          <div class="label-pixel">{text.toc}</div>
+          <nav>
+            <ol>
+              {toc.map((h) => (
+                <li class={`toc-${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>
+              ))}
+            </ol>
+          </nav>
+        </aside>
+      )}
+    </div>
+
+    <p style="margin-top:48px;"><a href={path('blog', lang)}>{text.back}</a></p>
+  </article>
+</Base>
+
+{toc.length > 1 && (
+  <script>
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')];
+    const byId = new Map(links.map((a) => [a.getAttribute('href')!.slice(1), a]));
+    const targets = [...byId.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const setActive = (id: string) => {
+      for (const a of links) a.classList.toggle('active', a === byId.get(id));
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length > 0) setActive(visible[0].target.id);
+      },
+      { rootMargin: '-15% 0px -70% 0px' }
+    );
+    for (const el of targets) observer.observe(el);
+  </script>
+)}
