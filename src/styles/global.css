@@ -4,7 +4,7 @@
   --ink: #1f1d1a;
   --muted: #6f675c;
   --text-soft: #50493f;
-  --green: #3f6f52;
+  --green: #2b9476;
   --terracotta: #b5623c;
   --gold: #c9a227;
   --purple: #6b5ea8;
@@ -46,7 +46,7 @@ a:hover { color: var(--terracotta); }
 .nav { display: flex; flex-direction: column; gap: 0; border-top: 1px solid #e5dcbd; padding-top: 16px; }
 .side-map { border-top: 1px solid #e5dcbd; padding-top: 16px; }
 .nav a { font-family: -apple-system, BlinkMacSystemFont, "Google Sans Flex", Helvetica, Arial, sans-serif; display: flex; align-items: center; gap: 10px; padding: 5px 8px; border-radius: 7px; text-decoration: none; color: #28282e; font-size: 16px; font-weight: 500; }
-.nav a:hover { background: rgba(63, 111, 82, 0.10); color: #28282e; }
+.nav a:hover { background: rgba(43, 148, 118, 0.10); color: #28282e; }
 .nav .nav-icon { flex: none; }
 
 .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; }

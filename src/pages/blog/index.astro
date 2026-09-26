@@ -8,7 +8,7 @@ const tagCounts = new Map<string, number>();
 for (const post of posts) for (const t of post.data.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
 const topics = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
 
-const palette = ['#b5623c', '#3f6f52', '#6b5ea8', '#9a7b12', '#b5553f'];
+const palette = ['#b5623c', '#2b9476', '#6b5ea8', '#9a7b12', '#b5553f'];
 const color = (tag: string) => palette[[...tag].reduce((n, c) => n + c.charCodeAt(0), 0) % palette.length];
 
 const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -60,7 +60,7 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
   .role { margin: 0; font-size: 19px; line-height: 1.55; color: var(--text-soft); }
   .filters { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 10px; }
   .f { font-family: var(--mono); font-size: 13px; color: var(--ink); background: none; border: 0; border-radius: 3px; padding: 3px 8px; cursor: pointer; }
-  .f:hover { background: rgba(63, 111, 82, 0.12); }
+  .f:hover { background: rgba(43, 148, 118, 0.12); }
   .f[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
   .search-row { margin: -24px 0 32px; }
   .search-row input { width: 100%; max-width: 420px; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--bg); border: 3px solid var(--ink); border-radius: 3px; padding: 10px 12px; outline: none; }
