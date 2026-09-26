@@ -46,7 +46,7 @@ a:hover { color: var(--terracotta); }
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav a { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 9px; text-decoration: none; color: var(--ink); font-size: 16px; font-weight: 500; }
 .nav a:hover { background: rgba(63, 111, 82, 0.10); color: var(--ink); }
-.nav .tri { width: 20px; height: 16px; clip-path: polygon(0 100%, 50% 0, 100% 100%); flex: none; }
+.nav .nav-icon { flex: none; }
 
 .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; }
 .side-links { display: flex; gap: 18px; }

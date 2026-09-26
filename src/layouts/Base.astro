@@ -1,4 +1,5 @@
 ---
+import PixelIcon from '../components/PixelIcon.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -59,11 +60,11 @@ const fullTitle = title === 'Inicio' ? 'tunombre.dev' : `${title} · tunombre.de
         <p class="intro">Soy <a href="/sobre-mi/">Jorge</a>, programador y Growth Engineer. Esto es mi jardín digital: notas, proyectos y cosas a medio terminar.</p>
 
         <nav class="nav" aria-label="Principal">
-          <a href="/blog/"><span class="tri" style="background:#b5623c;"></span>Blog</a>
-          <a href="/proyectos/"><span class="tri" style="background:#3f6f52;"></span>Proyectos</a>
-          <a href="/startups/"><span class="tri" style="background:#c9a227;"></span>Startups</a>
-          <a href="/academico/"><span class="tri" style="background:#b5553f;"></span>Académico</a>
-          <a href="/sobre-mi/"><span class="tri" style="background:#6b5ea8;"></span>Sobre mí</a>
+          <a href="/blog/"><PixelIcon name="blog" />Blog</a>
+          <a href="/proyectos/"><PixelIcon name="proyectos" />Proyectos</a>
+          <a href="/startups/"><PixelIcon name="startups" />Startups</a>
+          <a href="/academico/"><PixelIcon name="academico" />Académico</a>
+          <a href="/sobre-mi/"><PixelIcon name="sobre-mi" />Sobre mí</a>
         </nav>
 
         <div>
