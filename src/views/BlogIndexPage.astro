@@ -19,13 +19,13 @@ const text = {
   es: {
     description: 'Artículos sobre visión artificial, machine learning, Python y lo que voy aprendiendo.',
     badge: 'MUNDO 2 — BLOG', role: 'Visión artificial, machine learning y lo que voy aprendiendo',
-    filters: 'Temáticas', all: 'Todos',
+    filters: 'Temáticas', all: 'Todos', group: 'Agrupar por tema',
     placeholder: `Buscar entre ${posts.length} posts…`, searchLabel: 'Buscar posts', none: 'No hay posts que coincidan.',
   },
   en: {
     description: 'Articles on computer vision, machine learning, Python and whatever I am learning.',
     badge: 'WORLD 2 — BLOG', role: 'Computer vision, machine learning and whatever I am learning',
-    filters: 'Topics', all: 'All',
+    filters: 'Topics', all: 'All', group: 'Group by topic',
     placeholder: `Search ${posts.length} posts…`, searchLabel: 'Search posts', none: 'No posts match.',
   },
 }[lang];
@@ -49,32 +49,43 @@ const text = {
           <span class="dot" style={`--c:${s.color}`} aria-hidden="true"></span>{l(s.label, lang)}
         </button>
       ))}
+      <button type="button" class="group-toggle" id="group" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        {text.group}
+      </button>
     </div>
   </div>
 
+  <div class="bgrid" id="flat">
+    {posts.map((post) => {
+      const topic = topics[post.data.topic];
+      return (
+        <a
+          class="bcard"
+          href={postPath(post.id, lang)}
+          style={`--c:${topic.color}`}
+          data-topic={post.data.topic}
+          data-text={[post.data.title, post.data.description, ...post.data.tags].join(' ').toLowerCase()}
+          data-tags={post.data.tags.join(',')}
+        >
+          <div class="bcover">
+            {post.data.cover ? <img src={post.data.cover} alt="" loading="lazy" decoding="async" /> : <span aria-hidden="true">{post.data.icon}</span>}
+          </div>
+          <div class="bbody">
+            <span class="btopic">{l(topic.label, lang)}</span>
+            <h3 class="btitle">{post.data.title}</h3>
+            <p class="bdesc">{post.data.description}</p>
+            <time class="bdate" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+
   {sections.map((s) => (
-    <section class="topic" data-topic={s.key} style={`--c:${s.color}`}>
+    <section class="topic" data-topic={s.key} style={`--c:${s.color}`} hidden>
       <h2 class="topic-title">{l(s.label, lang)} <span class="topic-count">{s.posts.length}</span></h2>
-      <div class="bgrid">
-        {s.posts.map((post) => (
-          <a
-            class="bcard"
-            href={postPath(post.id, lang)}
-            data-text={[post.data.title, post.data.description, ...post.data.tags].join(' ').toLowerCase()}
-            data-tags={post.data.tags.join(',')}
-          >
-            <div class="bcover">
-              {post.data.cover ? <img src={post.data.cover} alt="" loading="lazy" decoding="async" /> : <span aria-hidden="true">{post.data.icon}</span>}
-            </div>
-            <div class="bbody">
-              <span class="btopic">{l(s.label, lang)}</span>
-              <h3 class="btitle">{post.data.title}</h3>
-              <p class="bdesc">{post.data.description}</p>
-              <time class="bdate" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
-            </div>
-          </a>
-        ))}
-      </div>
+      <div class="bgrid"></div>
     </section>
   ))}
   <p class="none" id="none" hidden>{text.none}</p>
@@ -93,6 +104,11 @@ const text = {
   .pchip { display: inline-flex; align-items: center; }
   .pchip[aria-pressed='true'] .dot { box-shadow: 0 0 0 2px var(--bg); }
 
+  .group-toggle { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; padding: 6px 12px; font: inherit; font-size: 14px; font-weight: 500; color: #28282e; background: transparent; border: 1.5px dashed #c6ba93; border-radius: 999px; cursor: pointer; }
+  .group-toggle:hover { background: #ece4ca; }
+  .group-toggle[aria-pressed='true'] { background: #28282e; border: 1.5px solid #28282e; color: #f6f1e4; }
+  #flat { margin-bottom: 56px; }
+  #flat[hidden] { display: none; }
   .topic { margin-bottom: 56px; }
   .topic[hidden] { display: none; }
   .topic-title { display: flex; align-items: center; gap: 10px; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 3px solid var(--c); font-family: var(--display); font-weight: 800; font-size: 28px; letter-spacing: -0.6px; }
@@ -117,27 +133,43 @@ const text = {
 <script>
   const input = document.getElementById('q') as HTMLInputElement;
   const chips = [...document.querySelectorAll<HTMLButtonElement>('.pchip[data-topic]')];
+  const groupBtn = document.getElementById('group')!;
+  const flat = document.getElementById('flat')!;
   const sections = [...document.querySelectorAll<HTMLElement>('.topic')];
+  const cards = [...flat.querySelectorAll<HTMLElement>('.bcard')];
   const none = document.getElementById('none')!;
   const topicKeys = new Set(sections.map((s) => s.dataset.topic!));
   let topic = '';
   let tag = '';
+  let grouped = false;
 
   function apply() {
     const q = input.value.trim().toLowerCase();
     let visible = 0;
+    for (const card of cards) {
+      const ok =
+        (!topic || card.dataset.topic === topic) &&
+        (!q || card.dataset.text!.includes(q)) &&
+        (!tag || card.dataset.tags!.split(',').includes(tag));
+      card.hidden = !ok;
+      if (ok) visible++;
+    }
+    flat.hidden = grouped;
     for (const section of sections) {
-      let inSection = 0;
-      const topicOk = !topic || section.dataset.topic === topic;
-      for (const card of section.querySelectorAll<HTMLElement>('.bcard')) {
-        const ok = topicOk && (!q || card.dataset.text!.includes(q)) && (!tag || card.dataset.tags!.split(',').includes(tag));
-        card.hidden = !ok;
-        if (ok) inSection++;
-      }
-      section.hidden = inSection === 0;
-      visible += inSection;
+      section.hidden = !grouped || !section.querySelector('.bcard:not([hidden])');
     }
     none.hidden = visible > 0;
+  }
+
+  // Las tarjetas son las mismas en las dos vistas: se mueven entre la lista y las secciones.
+  function setGrouped(value: boolean) {
+    grouped = value;
+    groupBtn.setAttribute('aria-pressed', String(value));
+    for (const card of cards) {
+      const target = value ? sections.find((s) => s.dataset.topic === card.dataset.topic)!.querySelector('.bgrid')! : flat;
+      target.appendChild(card);
+    }
+    apply();
   }
 
   function selectTopic(value: string) {
@@ -152,6 +184,7 @@ const text = {
       apply();
     });
   }
+  groupBtn.addEventListener('click', () => setGrouped(!grouped));
   input.addEventListener('input', apply);
 
   // ?tema= admite una temática (vision, ml…) o una etiqueta (computer-vision, python…).
