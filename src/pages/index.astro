@@ -30,8 +30,7 @@ const series = [
   { icon: '📚', title: 'The Deep Hub', url: 'https://medium.com/thedeephub', desc: 'La publicación de data science y machine learning que fundé en Medium, con 570+ artículos de ~100 autores.' },
 ];
 
-// En portada solo salen los proyectos que ya tienen datos reales.
-const featured = projects.filter((p) => p.year !== '20XX').slice(0, 6);
+const featured = projects.slice(0, 6);
 ---
 <Base title="Inicio">
   <div class="home">
