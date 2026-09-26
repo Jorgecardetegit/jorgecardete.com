@@ -2,7 +2,7 @@
 title: "Gentle introduction to State Space Models"
 description: "A brief guide to the foundation of dynamic system analysis"
 date: 2024-03-15
-tags: [machine-learning, time-series-analysis, dynamic-systems]
+tags: [machine-learning]
 icon: "📈"
 ---
 
