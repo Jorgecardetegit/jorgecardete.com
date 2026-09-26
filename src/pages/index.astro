@@ -176,24 +176,25 @@ const featured = projects.filter((p) => p.year !== '20XX').slice(0, 6);
   /* Secciones */
   .section-index { border-bottom: 1px solid var(--c-border); margin-bottom: 1.5rem; padding-bottom: 1.5rem; }
   .section-index:last-child { border-bottom: 0; }
-  .heading-row { display: flex; align-items: center; gap: 1rem; margin-bottom: .75rem; }
+  .heading-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .heading-row + .posts { margin-top: 1.75rem; }
   .heading-row h2 { margin: 0; font-size: 2rem; font-weight: 700; }
   .description { margin: 0 0 1.25rem; color: var(--c-muted); font-size: 1.05rem; max-width: 65ch; }
   .home a.button { display: inline-flex; align-items: center; padding: .4rem .65rem; font-size: 13px; font-weight: 600; line-height: 1.2; color: var(--c-text); background: var(--c-hover); border: 1.5px solid #c6ba93; border-radius: var(--radius); text-decoration: none; white-space: nowrap; }
   .home a.button:hover { background: var(--c-border); color: var(--c-text); }
 
   /* Listas de posts */
-  .posts { display: flex; flex-direction: column; }
-  .home a.post { display: flex; align-items: flex-start; gap: 1rem; margin-inline: -.625rem; padding: .5rem .625rem; border-radius: var(--radius); color: var(--c-strong); text-decoration: none; }
+  .posts { display: flex; flex-direction: column; gap: .35rem; }
+  .home a.post { display: flex; align-items: flex-start; gap: 1rem; margin-inline: -.625rem; padding: .55rem .625rem; border-radius: var(--radius); color: var(--c-strong); text-decoration: none; }
   .home a.post:hover { background: var(--c-hover); }
   .post-thumbnail { flex: none; width: 32px; display: flex; justify-content: center; font-size: 22px; line-height: 1.1; }
-  .post-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .15rem; }
+  .post-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .3rem; }
   .post-title { font-size: 1.1rem; font-weight: 600; line-height: 1.25; }
   .home a.post:hover .post-title { text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 1px; text-underline-offset: 4px; }
   .post-info time { font-family: var(--mono2); font-size: .85rem; font-weight: 400; color: var(--c-muted); }
   .post-description { margin: 0; color: var(--c-muted); font-weight: 400; line-height: 1.5; }
-  .post-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .3rem; max-width: 240px; }
-  .tag { display: inline-flex; align-items: center; padding: .25rem .5rem; border: 1.5px solid var(--c-border); border-radius: var(--radius); font-family: var(--mono2); font-size: .75rem; font-weight: 500; line-height: 1; color: var(--c-text); }
+  .post-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .35rem; max-width: 260px; }
+  .tag { display: inline-flex; align-items: center; padding: .25rem .5rem; border: 1.5px solid var(--c-border); border-radius: var(--radius); font-family: var(--mono2); font-size: .8rem; font-weight: 500; line-height: 1; color: var(--c-text); background: #fffdf8; }
   .tag::before { content: '#'; color: var(--c-primary); }
 
   /* Tarjetas */
