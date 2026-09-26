@@ -136,8 +136,8 @@ section { margin-bottom: 64px; }
 .pcard[hidden] { display: none; }
 .pnone { margin: 8px 0 0; color: var(--muted); font-family: var(--mono); font-size: 14px; }
 .pgrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-.pcard { position: relative; display: flex; flex-direction: column; gap: 10px; background: var(--card); border: 1px solid rgba(31,29,26,0.18); border-top: 6px solid var(--c); border-radius: 6px; padding: 18px 22px 20px; transition: border-color .15s, background .15s; }
-.pcard:hover { background: #ebe2cb; border-color: var(--ink); border-top-color: var(--c); }
+.pcard { position: relative; display: flex; flex-direction: column; gap: 10px; background: var(--card); border: 1px solid rgba(31,29,26,0.18); border-top: 6px solid var(--green); border-radius: 6px; padding: 18px 22px 20px; transition: border-color .15s, background .15s; }
+.pcard:hover { background: #ebe2cb; border-color: var(--ink); border-top-color: var(--green); }
 .pcard-top { display: flex; justify-content: space-between; align-items: center; }
 .pcard-year { font-family: var(--mono); font-size: 13px; color: var(--muted); }
 .pcard-name { margin: 0; font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -0.4px; }

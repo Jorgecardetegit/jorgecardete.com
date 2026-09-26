@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { categories, projectLinks, projects } from '../data/projects';
+import { projectLinks, projects } from '../data/projects';
 import { l, type Lang } from '../i18n';
 
 interface Props { lang: Lang }
@@ -41,7 +41,6 @@ const text = {
     {projects.map((p) => (
       <li
         class="pcard"
-        style={`--c:${categories[p.category].color}`}
         data-languages={p.languages.join('|')}
         data-text={[l(p.name, lang), l(p.desc, lang), ...p.tags, ...p.languages].join(' ').toLowerCase()}
       >
