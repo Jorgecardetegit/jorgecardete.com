@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import PixelIcon from '../components/PixelIcon.astro';
 import { projects } from '../data/projects';
 import { dateFormat, l, path, postPath, useTranslations, type Lang } from '../i18n';
+import { topics, type Topic } from '../i18n/topics';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -20,7 +21,11 @@ const houses = [
 
 // Lo que se ve al entrar en cada casa: un adelanto de la sección y el enlace a la página.
 type Item = { meta: string; title: string; text?: string; href?: string };
-const posts = (await getCollection('blog')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+// Mismo orden que /blog: primero los fijados, luego por fecha.
+const posts = (await getCollection('blog')).sort(
+  (a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity) || b.data.date.getTime() - a.data.date.getTime(),
+);
+const blogTopics = (Object.keys(topics) as Topic[]).filter((key) => posts.some((p) => p.data.topic === key));
 const fmt = dateFormat(lang, { day: 'numeric', month: 'short', year: 'numeric' });
 const es = lang === 'es';
 
@@ -43,10 +48,8 @@ const aboutText = es
 
 const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraphs?: string[]; items: Item[]; photo?: boolean }> = {
   about: { photo: true, paragraphs: aboutText, items: [] },
-  blog: {
-    lead: es ? `${posts.length} artículos sobre IA, visión por computador y programación. Los últimos:` : `${posts.length} articles on AI, computer vision and programming. The latest:`,
-    items: posts.slice(0, 3).map((p) => ({ meta: fmt.format(p.data.date), title: p.data.title, text: p.data.description, href: postPath(p.id, lang) })),
-  },
+  // El blog se pinta aparte: una versión en miniatura del índice, con buscador y filtros.
+  blog: { items: [] },
   projects: {
     lead: es ? `${projects.length} proyectos, de hackathons a IA en producción. Algunos recientes:` : `${projects.length} projects, from hackathons to AI in production. Some recent ones:`,
     items: projects.slice(0, 3).map((p) => ({ meta: p.soon ? (es ? 'Próximamente' : 'Coming soon') : p.year, title: l(p.name, lang), text: l(p.desc, lang) })),
@@ -125,6 +128,40 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
           {rooms[h.route].photo && <img class="room-photo" src="/jorge.jpg" alt="Jorge Cardete" width="170" height="170" loading="lazy" />}
           {rooms[h.route].lead && <p class="room-lead">{rooms[h.route].lead}</p>}
           {rooms[h.route].paragraphs?.map((html) => <p class="room-text" set:html={html} />)}
+          {h.route === 'blog' && (
+            <div class="mini-blog">
+              <input type="search" class="psearch" placeholder={es ? `Buscar entre ${posts.length} posts…` : `Search ${posts.length} posts…`} aria-label={es ? 'Buscar posts' : 'Search posts'} />
+              <div class="pfilter-row" role="group" aria-label={es ? 'Temáticas' : 'Topics'}>
+                <button type="button" class="pchip" data-topic="" aria-pressed="true">{es ? 'Todos' : 'All'}</button>
+                {blogTopics.map((key) => (
+                  <button type="button" class="pchip" data-topic={key} aria-pressed="false">
+                    <span class="dot" style={`--c:${topics[key].color}`} aria-hidden="true"></span>{l(topics[key].label, lang)}
+                  </button>
+                ))}
+              </div>
+              <div class="mini-grid">
+                {posts.map((post) => (
+                  <a
+                    class="mcard"
+                    href={postPath(post.id, lang)}
+                    style={`--c:${topics[post.data.topic].color}`}
+                    data-topic={post.data.topic}
+                    data-text={[post.data.title, post.data.description, ...post.data.tags].join(' ').toLowerCase()}
+                  >
+                    <div class="mcover">
+                      {post.data.cover ? <img src={post.data.cover} alt="" loading="lazy" decoding="async" /> : <span aria-hidden="true">{post.data.icon}</span>}
+                    </div>
+                    <div class="mbody">
+                      <span class="mtopic">{l(topics[post.data.topic].label, lang)}</span>
+                      <span class="mtitle">{post.data.title}</span>
+                      <time class="mdate" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+                    </div>
+                  </a>
+                ))}
+              </div>
+              <p class="mini-none" hidden>{es ? 'No hay posts que coincidan.' : 'No posts match.'}</p>
+            </div>
+          )}
           {rooms[h.route].items.length > 0 && <ul class="room-items">
             {rooms[h.route].items.map((item) => (
               <li>
@@ -235,6 +272,24 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .room-title a { color: var(--ink); text-decoration: none; }
   .room-title a:hover { color: var(--green); text-decoration: underline; }
   .room-items p { margin: 6px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  /* El blog en miniatura: mismas tarjetas que /blog, más pequeñas. */
+  .mini-blog .psearch { max-width: none; margin-bottom: 12px; }
+  .mini-blog .pfilter-row { margin-bottom: 18px; }
+  .mini-blog .pchip { display: inline-flex; align-items: center; font-size: 13px; padding: 5px 11px; }
+  .mini-blog .dot { width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--c); }
+  .mini-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .mcard { display: flex; flex-direction: column; overflow: hidden; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); color: var(--ink); font-weight: 400; text-decoration: none; transition: translate .15s, box-shadow .15s; }
+  .mcard[hidden] { display: none; }
+  .mcard:hover, .mcard:focus-visible { translate: -2px -2px; box-shadow: 5px 5px 0 var(--shadow); color: var(--ink); }
+  .mcard:hover .mtitle { color: var(--green); }
+  .mcover { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-bottom: 3px solid var(--ink); background: #e9e2d0; display: grid; place-items: center; font-size: 28px; }
+  .mcover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .mbody { flex: 1; display: flex; flex-direction: column; gap: 5px; padding: 10px 12px 12px; }
+  .mtopic { font-family: var(--pixel); font-size: 7px; line-height: 1.5; text-transform: uppercase; color: var(--c); }
+  .mtitle { font-family: var(--display); font-weight: 700; font-size: 14.5px; line-height: 1.25; text-wrap: balance; transition: color .15s; }
+  .mdate { margin-top: auto; padding-top: 4px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .mini-none { margin: 0 0 18px; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
   .room-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px 18px; border-top: 1px solid var(--line); }
   .room-back { padding: 10px 14px; background: transparent; border: 3px solid var(--ink); font-family: var(--pixel); font-size: 10px; color: var(--ink); cursor: pointer; }
   .room-back:hover { background: var(--card); }
@@ -242,6 +297,10 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   .room-go { display: flex; align-items: center; justify-content: center; gap: 10px; }
   .room-go::after { content: ''; border: 5px solid transparent; border-right: 0; border-left: 6px solid currentColor; filter: drop-shadow(1px 1px 0 var(--ink)); }
   @media (max-width: 480px) {
+    .mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .mini-blog .pfilter-row { flex-wrap: nowrap; overflow-x: auto; margin-inline: -18px; padding: 0 18px 4px; scrollbar-width: none; }
+    .mini-blog .pchip { flex: none; }
+    .mtitle { font-size: 13px; }
     .room-photo { width: 104px; height: 104px; margin-left: 14px; }
     .room-body { padding: 18px 18px 4px; }
     .room-foot > * { flex: 1 1 100%; text-align: center; }
@@ -260,6 +319,32 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
 
 <script>
   import { startGame } from '../game/game';
+
+  // Filtros del blog en miniatura: temática + texto, como en /blog.
+  document.querySelectorAll<HTMLElement>('.mini-blog').forEach((blog) => {
+    const input = blog.querySelector<HTMLInputElement>('.psearch')!;
+    const chips = [...blog.querySelectorAll<HTMLButtonElement>('.pchip')];
+    const cards = [...blog.querySelectorAll<HTMLElement>('.mcard')];
+    const none = blog.querySelector<HTMLElement>('.mini-none')!;
+    let topic = '';
+    const apply = () => {
+      const q = input.value.trim().toLowerCase();
+      let visible = 0;
+      for (const card of cards) {
+        card.hidden = !((!topic || card.dataset.topic === topic) && (!q || card.dataset.text!.includes(q)));
+        if (!card.hidden) visible++;
+      }
+      none.hidden = visible > 0;
+    };
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        topic = chip.dataset.topic!;
+        for (const c of chips) c.setAttribute('aria-pressed', String(c === chip));
+        apply();
+      });
+    }
+    input.addEventListener('input', apply);
+  });
 
   const root = document.getElementById('game');
   if (root) startGame(root);
