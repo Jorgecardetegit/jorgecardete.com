@@ -1,4 +1,4 @@
-import { coinSprite, groundTiles, mushroomSprite, playerSprites, questionSprite, starSprite, type Frame } from './sprites';
+import { coinSprite, enemySprites, groundTiles, mushroomSprite, playerSprites, questionSprite, starSprite, type Frame } from './sprites';
 
 // Coordenadas del mundo en píxeles "lógicos"; el canvas se escala con image-rendering: pixelated.
 const WORLD_H = 200;
@@ -33,6 +33,15 @@ type Block = Rect & { kind: 'brick' | 'question' | 'stone'; used: boolean; bump:
 type Item = Rect & { kind: 'mushroom' | 'star'; vx: number; vy: number; rise: number };
 type Debris = { x: number; y: number; vx: number; vy: number; t: number; color: string };
 type Fireball = Rect & { vx: number; t: number };
+type Enemy = Rect & {
+  kind: 'hamster' | 'turtle' | 'shell';
+  vx: number; vy: number;
+  /** Tramo que patrulla (entre dos casas); el caparazón pateado lo ignora. */
+  minX: number; maxX: number;
+  squash: number; flipped: boolean;
+  /** Frames tras patear un caparazón en los que no hace daño a quien lo pateó. */
+  grace: number;
+};
 type Coin = { x: number; y: number; taken: boolean };
 type Pop = { x: number; y: number; vy: number; t: number };
 type House = { x: number; door: number; color: string; shade: string; href: string; sign: HTMLAnchorElement; room: HTMLDialogElement };
@@ -78,6 +87,7 @@ export function startGame(root: HTMLElement) {
   ];
   const mushroomImg = mushroomSprite();
   const starImg = starSprite();
+  const enemyImg = enemySprites();
   const coinImg = coinSprite();
   const questionImg = questionSprite();
   const tiles = groundTiles();
@@ -139,6 +149,25 @@ export function startGame(root: HTMLElement) {
         coin(mid + 12, GROUND - 116);
         break;
     }
+  });
+
+  // Hámsters y tortugas: cada uno patrulla el hueco entre dos casas.
+  const enemies: Enemy[] = [];
+  const enemy = (kind: 'hamster' | 'turtle', x: number, minX: number, maxX: number) => {
+    const h = kind === 'hamster' ? 11 : 14;
+    enemies.push({ kind, x, y: GROUND - h, w: 14, h, vx: -0.4, vy: 0, minX, maxX, squash: 0, flipped: false, grace: 0 });
+  };
+  houses.slice(0, -1).forEach((house, i) => {
+    const left = house.x + HOUSE_W + 8;
+    const right = houses[i + 1].x - 22;
+    const mid = house.x + HOUSE_W + (SPACING - HOUSE_W) / 2;
+    if (i === 0) enemy('hamster', mid + 40, left, right);
+    if (i === 1) enemy('turtle', left + 12, left, mid - 24 - 14); // antes de la escalera
+    if (i === 2) {
+      enemy('hamster', mid - 30, left, right);
+      enemy('hamster', mid + 40, left, right);
+    }
+    if (i === 3) enemy('turtle', mid + 10, left, right);
   });
 
   const clouds = Array.from({ length: 9 }, (_, i) => ({ x: i * 150 + ((i * 53) % 70), y: 18 + ((i * 37) % 50), big: i % 3 === 0 }));
@@ -280,6 +309,84 @@ export function startGame(root: HTMLElement) {
       hitBoss();
     } else {
       hurtPlayer(boss.x + boss.w / 2);
+    }
+  }
+
+  function flip(e: Enemy) {
+    e.flipped = true;
+    e.vy = -3;
+  }
+
+  function kick(e: Enemy) {
+    e.vx = player.x + player.w / 2 < e.x + e.w / 2 ? 3 : -3;
+    e.grace = 12;
+  }
+
+  function updateEnemies(prevBottom: number) {
+    for (const e of [...enemies]) {
+      if (e.flipped) {
+        e.vy += GRAVITY;
+        e.y += e.vy;
+        if (e.y > WORLD_H + 30) enemies.splice(enemies.indexOf(e), 1);
+        continue;
+      }
+      if (e.squash > 0) {
+        if (--e.squash === 0) enemies.splice(enemies.indexOf(e), 1);
+        continue;
+      }
+      e.grace = Math.max(0, e.grace - 1);
+
+      // Andar y darse la vuelta en los bloques o al final de su tramo.
+      const [minX, maxX] = e.kind === 'shell' ? [0, ARENA_L - e.w] : [e.minX, e.maxX];
+      e.x += e.vx;
+      if (e.x < minX || e.x > maxX || blocks.some((b) => overlap(e, b))) {
+        e.x -= e.vx;
+        e.vx = -e.vx;
+      }
+      e.vy = Math.min(e.vy + GRAVITY, MAX_FALL);
+      e.y += e.vy;
+      if (e.y + e.h >= GROUND) {
+        e.y = GROUND - e.h;
+        e.vy = 0;
+      }
+      for (const b of blocks) {
+        if (overlap(e, b) && e.vy > 0) {
+          e.y = b.y - e.h;
+          e.vy = 0;
+        }
+      }
+      // Un caparazón lanzado se lleva por delante a los demás.
+      if (e.kind === 'shell' && e.vx !== 0) {
+        for (const other of enemies) {
+          if (other !== e && !other.flipped && !other.squash && overlap(e, other)) flip(other);
+        }
+      }
+
+      if (state !== 'play' || !overlap(player, e)) continue;
+      const stomp = player.vy > 0 && prevBottom <= e.y + 4;
+      if (starTime > 0) {
+        flip(e);
+      } else if (stomp) {
+        player.vy = -4.2;
+        if (e.kind === 'hamster') {
+          e.squash = 30;
+          e.y += e.h - 5;
+          e.h = 5;
+        } else if (e.kind === 'turtle') {
+          e.kind = 'shell';
+          e.y += e.h - 10;
+          e.h = 10;
+          e.vx = 0;
+        } else if (e.vx !== 0) {
+          e.vx = 0;
+        } else {
+          kick(e);
+        }
+      } else if (e.kind === 'shell' && e.vx === 0) {
+        kick(e);
+      } else if (!(e.kind === 'shell' && e.grace > 0)) {
+        hurtPlayer(e.x + e.w / 2);
+      }
     }
   }
 
@@ -592,6 +699,7 @@ export function startGame(root: HTMLElement) {
 
     invuln = Math.max(0, invuln - 1);
     updateBoss(prevBottom);
+    updateEnemies(prevBottom);
     for (const f of [...fireballs]) {
       f.t++;
       f.x += f.vx;
@@ -860,6 +968,25 @@ export function startGame(root: HTMLElement) {
     }
   }
 
+  function drawEnemy(e: Enemy) {
+    const side = e.vx > 0 ? 'right' : 'left';
+    const step = Math.floor(tick / 10) % 2 ? 'a' : 'b';
+    const img =
+      e.kind === 'shell' ? enemyImg.shell[side]
+      : e.kind === 'turtle' ? enemyImg.turtle[step][side]
+      : e.squash > 0 ? enemyImg.hamster.flat[side]
+      : enemyImg.hamster[step][side];
+    const x = Math.round(e.x);
+    const y = Math.round(e.y + e.h - img.height);
+    if (!e.flipped) return ctx.drawImage(img, x, y);
+    // Tumbado: boca arriba mientras cae fuera de la pantalla.
+    ctx.save();
+    ctx.translate(x, y + img.height);
+    ctx.scale(1, -1);
+    ctx.drawImage(img, 0, 0);
+    ctx.restore();
+  }
+
   function drawFireball(f: Fireball) {
     const x = Math.round(f.x);
     const y = Math.round(f.y);
@@ -931,6 +1058,7 @@ export function startGame(root: HTMLElement) {
     houses.forEach(drawHouse);
     drawFlag();
     blocks.forEach(drawBlock);
+    enemies.forEach(drawEnemy);
     for (const c of coins) if (!c.taken) drawCoin(c.x, c.y + Math.round(Math.sin(tick / 15 + c.x) * 1.5));
     for (const p of pops) drawCoin(p.x, p.y);
     items.forEach(drawItem);
@@ -974,7 +1102,7 @@ export function startGame(root: HTMLElement) {
   }
   camX = worldW <= W ? (worldW - W) / 2 : clamp(player.x + player.w / 2 - W / 2, 0, worldW - W);
   // Solo en desarrollo: estado a mano para depurar desde la consola o los tests.
-  if (import.meta.env.DEV) Object.assign(window, { __game: { player, boss, blocks, get state() { return state; } } });
+  if (import.meta.env.DEV) Object.assign(window, { __game: { player, boss, blocks, enemies, get state() { return state; } } });
   root.classList.add('is-ready');
   requestAnimationFrame(frame);
 }

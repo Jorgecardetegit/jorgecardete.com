@@ -9,6 +9,11 @@ const palette: Record<string, string> = {
   y: '#f7d046',
   Y: '#c9a227',
   w: '#ffffff',
+  o: '#e8a15c',
+  p: '#f48fa6',
+  c: '#f6f1e4',
+  s: '#2b9476',
+  S: '#217a61',
 };
 
 const head = [
@@ -96,6 +101,62 @@ const star = [
   'kkk......kkk',
 ];
 
+// Enemigos, mirando a la izquierda. Dos frames de andar cada uno.
+const hamsterBody = [
+  '...kk...kk....',
+  '..kppk.kppk...',
+  '.kooooooooook.',
+  'kokwoooookwook',
+  'kpooookkooopk.',
+  'kooccccccccook',
+  'kocccccccccok.',
+  '.kcccccccccck.',
+  '.kooooooooook.',
+];
+const hamster = {
+  a: [...hamsterBody, '..kok....kok..', '..kkk....kkk..'],
+  b: [...hamsterBody, '...kok..kok...', '...kkk..kkk...'],
+  flat: [
+    '.kkkkkkkkkkkk.',
+    'kokwooookwook.',
+    'kccccccccccck.',
+    'kooooooooooook',
+    '.kkkkkkkkkkkk.',
+  ],
+};
+
+const turtleBody = [
+  '..kkk.........',
+  '.kyyyk........',
+  'kywyyyk.......',
+  'kykyyyk.......',
+  'kyyyyyk.kkkk..',
+  '.kyyyk.kssssk.',
+  '..kyyk.kssSSsk',
+  '..kyykksSccSsk',
+  '...kykssSccSsk',
+  '...kykssSSSssk',
+  '...kykccccccck',
+  '....kkkkkkkkk.',
+];
+const turtle = {
+  a: [...turtleBody, '....kyyk.kyyk.', '....kkkk.kkkk.'],
+  b: [...turtleBody, '.....kyykyyk..', '.....kkkkkkk..'],
+};
+
+const shell = [
+  '....kkkkkk....',
+  '..kksssSsskk..',
+  '.ksssSSSSsssk.',
+  '.kssSccccSssk.',
+  'kssSccccccSssk',
+  'kssSccccccSssk',
+  'ksssSSSSSSsssk',
+  'kcccccccccccck',
+  '.kcccccccccck.',
+  '..kkkkkkkkkk..',
+];
+
 const question = [
   '.kkkk.',
   'kk..kk',
@@ -148,6 +209,20 @@ export function playerSprites(shirt = palette.r, pants = palette.b): PlayerSprit
 
 export const mushroomSprite = () => paint(mushroom);
 export const starSprite = () => paint(star);
+
+export type Facing = { left: HTMLCanvasElement; right: HTMLCanvasElement };
+const both = (rows: string[]): Facing => {
+  const left = paint(rows);
+  return { left, right: mirror(left) };
+};
+
+export function enemySprites() {
+  return {
+    hamster: { a: both(hamster.a), b: both(hamster.b), flat: both(hamster.flat) },
+    turtle: { a: both(turtle.a), b: both(turtle.b) },
+    shell: both(shell),
+  };
+}
 
 export const coinSprite = () => paint(coin);
 export const questionSprite = () => paint(question);
