@@ -90,7 +90,7 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
             <a class="house" href={path('academic', lang)} title={t('nav.academic')} style="left:43%;top:68%;"><div style="background:#b5553f;"></div></a>
             <div class="plaza"></div>
           </div>
-          <div class="map-hint" set:html={t('sidebar.mapHint').replace('{link}', `<a href="/quest/">${t('sidebar.mapHintLink')}</a>`)} />
+          <div class="map-hint" set:html={t('sidebar.mapHint').replace('{link}', `<a href="${path('game', lang)}">${t('sidebar.mapHintLink')}</a>`)} />
         </div>
 
         <div class="side-foot">
