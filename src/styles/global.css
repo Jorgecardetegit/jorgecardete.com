@@ -110,20 +110,23 @@ section { margin-bottom: 64px; }
 .about-updated { margin: 0 0 12px; font-style: italic; color: var(--text-soft); }
 .about-list { margin: 0 0 44px; padding-left: 22px; font-size: 16.5px; line-height: 1.9; }
 .ac-label { margin: 0 0 16px; font-family: var(--pixel); font-weight: 400; font-size: 10px; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; }
-.papers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
-.paper { background: #fbf8ef; border: 1px solid rgba(31,29,26,0.22); border-left: 8px solid var(--red); border-radius: 2px; padding: 28px 30px 26px; }
-.paper-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.papers { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.paper { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 8px 28px; padding: 30px 0 32px; border-bottom: 1px solid var(--line); }
+.paper-year { font-family: var(--pixel); font-size: 13px; line-height: 1; color: var(--red); padding-top: 5px; }
+.paper-body { max-width: 760px; }
+.paper-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 10px; }
 .paper-journal { font-family: 'Newsreader', Georgia, serif; font-style: italic; font-size: 17px; color: var(--red); }
 .paper-dot { opacity: 0.6; }
-.paper-title { margin: 0 0 14px; font-family: 'Newsreader', Georgia, serif; font-weight: 700; font-size: clamp(24px, 3vw, 31px); line-height: 1.2; letter-spacing: -0.3px; text-wrap: balance; }
-.paper-title a { color: var(--ink); text-decoration: none; }
+.paper-title { margin: 0 0 12px; font-family: 'Newsreader', Georgia, serif; font-weight: 700; font-size: clamp(23px, 2.6vw, 29px); line-height: 1.22; letter-spacing: -0.3px; text-wrap: balance; }
+.paper-title a { color: var(--ink); font-weight: inherit; text-decoration: none; }
 .paper-title a:hover { color: var(--red); }
-.paper-authors { margin: 0 0 4px; font-family: 'Newsreader', Georgia, serif; font-size: 18px; line-height: 1.5; color: var(--text-soft); }
-.paper-note { margin: 0 0 20px; font-size: 14px; color: var(--muted); }
-.paper-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
-.paper-btn { font-family: var(--mono); font-size: 13px; text-decoration: none; color: var(--ink); background: var(--bg); border: 2px solid var(--ink); border-radius: 3px; padding: 7px 12px; box-shadow: 3px 3px 0 var(--shadow); }
-.paper-btn:hover { color: var(--ink); background: var(--card); transform: translate(-1px, -1px); }
-.paper-doi { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.paper-authors { margin: 0 0 4px; font-family: 'Newsreader', Georgia, serif; font-size: 17.5px; line-height: 1.5; color: var(--text-soft); text-wrap: pretty; }
+.paper-authors strong { color: var(--ink); font-weight: 700; background: linear-gradient(transparent 62%, rgba(181, 85, 63, 0.22) 62%); }
+.paper-note { margin: 0 0 16px; font-size: 14px; color: var(--muted); }
+.paper-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; font-family: var(--mono); font-size: 13px; }
+.paper-links a { color: var(--red); text-decoration-thickness: 1.5px; }
+.paper-links a:hover { color: var(--ink); }
+.paper-doi { font-size: 12px; color: var(--muted); user-select: all; }
 .pfilters { display: flex; flex-wrap: wrap; gap: 10px; margin: -16px 0 14px; }
 .psearch { width: 100%; max-width: 420px; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--bg); border: 3px solid var(--ink); border-radius: 3px; padding: 10px 12px; outline: none; }
 .psearch:focus { box-shadow: 3px 3px 0 var(--shadow); }
@@ -185,6 +188,8 @@ section { margin-bottom: 64px; }
   .sidebar { max-width: none; border-right: 0; border-bottom: 1px solid var(--line); position: static; height: auto; overflow: visible; }
   .main { padding: 36px 20px 60px; }
   .footer { margin: 0 20px; }
+  .paper { grid-template-columns: minmax(0, 1fr); }
+  .paper-year { padding-top: 0; }
 }
 
 /* ---- Blog (página ancha) ---- */

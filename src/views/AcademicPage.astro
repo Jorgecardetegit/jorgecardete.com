@@ -5,6 +5,8 @@ import { dateFormat, l, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 
+const me = 'Jorge Cardete';
+
 const papers = [
   {
     title: 'How well do different chatbots respond to multiple myeloma treatment guidelines?',
@@ -50,19 +52,26 @@ const text = {
   <ol class="papers">
     {papers.map((p) => (
       <li class="paper">
-        <div class="paper-meta">
-          <span class="paper-journal">{p.journal}</span>
-          <span class="paper-dot">·</span>
-          <span>{p.publisher}</span>
-          <span class="paper-dot">·</span>
-          <time>{dateFormat(lang, { month: 'long', year: 'numeric' }).format(p.date)}</time>
-        </div>
-        <h2 class="paper-title"><a href={`https://doi.org/${p.doi}`}>{p.title}</a></h2>
-        <p class="paper-authors">{p.authors.join(', ')}</p>
-        <p class="paper-note">{l(p.note, lang)}</p>
-        <div class="paper-links">
-          <a class="paper-btn" href={`https://doi.org/${p.doi}`}>{text.read} ↗</a>
-          <span class="paper-doi">DOI {p.doi}</span>
+        <time class="paper-year" datetime={p.date.toISOString().slice(0, 10)}>{p.date.getFullYear()}</time>
+        <div class="paper-body">
+          <div class="paper-meta">
+            <span class="paper-journal">{p.journal}</span>
+            <span class="paper-dot">·</span>
+            <span>{p.publisher}</span>
+            <span class="paper-dot">·</span>
+            <span>{dateFormat(lang, { month: 'long', year: 'numeric' }).format(p.date)}</span>
+          </div>
+          <h3 class="paper-title"><a href={`https://doi.org/${p.doi}`}>{p.title}</a></h3>
+          <p class="paper-authors">
+            {p.authors.map((a, i) => (
+              <>{i > 0 && ', '}{a === me ? <strong>{a}</strong> : a}</>
+            ))}
+          </p>
+          <p class="paper-note">{l(p.note, lang)}</p>
+          <div class="paper-links">
+            <a href={`https://doi.org/${p.doi}`}>{text.read} ↗</a>
+            <span class="paper-doi">DOI {p.doi}</span>
+          </div>
         </div>
       </li>
     ))}
