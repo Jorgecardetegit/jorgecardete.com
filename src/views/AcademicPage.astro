@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import { dateFormat, l, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const papers = [
+  {
+    title: 'How well do different chatbots respond to multiple myeloma treatment guidelines?',
+    journal: 'Leukemia',
+    publisher: 'Nature Portfolio',
+    date: new Date('2025-04-07'),
+    authors: ['Edwin Uriel Suárez', 'Fabio Torres-Saavedra', 'Amalia Domingo-González', 'Jorge Cardete', 'Pilar Llamas-Sillero'],
+    note: {
+      es: 'Con Edwin Uriel Suárez (Fundación Jiménez Díaz).',
+      en: 'With Edwin Uriel Suárez (Fundación Jiménez Díaz).',
+    },
+    doi: '10.1038/s41375-025-02604-8',
+  },
+];
+
+const text = {
+  es: {
+    title: 'Académico',
+    description: 'Publicaciones académicas: How well do different chatbots respond to multiple myeloma treatment guidelines? (Leukemia, 2025).',
+    badge: 'MUNDO 6 — ACADÉMICO',
+    lead: 'Publicaciones revisadas por pares en las que soy coautor.',
+    papers: 'Artículos',
+    read: 'Leer artículo',
+  },
+  en: {
+    title: 'Academic',
+    description: 'Academic publications: How well do different chatbots respond to multiple myeloma treatment guidelines? (Leukemia, 2025).',
+    badge: 'WORLD 6 — ACADEMIC',
+    lead: 'Peer-reviewed publications I have co-authored.',
+    papers: 'Papers',
+    read: 'Read paper',
+  },
+}[lang];
+---
+<Base title={text.title} description={text.description}>
+  <link slot="head" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,400&display=swap" />
+
+  <div class="badge">{text.badge}</div>
+  <h1 class="hero">{text.title}</h1>
+  <p class="lead">{text.lead}</p>
+
+  <h2 class="ac-label">{text.papers} · {papers.length}</h2>
+  <ol class="papers">
+    {papers.map((p) => (
+      <li class="paper">
+        <div class="paper-meta">
+          <span class="paper-journal">{p.journal}</span>
+          <span class="paper-dot">·</span>
+          <span>{p.publisher}</span>
+          <span class="paper-dot">·</span>
+          <time>{dateFormat(lang, { month: 'long', year: 'numeric' }).format(p.date)}</time>
+        </div>
+        <h2 class="paper-title"><a href={`https://doi.org/${p.doi}`}>{p.title}</a></h2>
+        <p class="paper-authors">{p.authors.join(', ')}</p>
+        <p class="paper-note">{l(p.note, lang)}</p>
+        <div class="paper-links">
+          <a class="paper-btn" href={`https://doi.org/${p.doi}`}>{text.read} ↗</a>
+          <span class="paper-doi">DOI {p.doi}</span>
+        </div>
+      </li>
+    ))}
+  </ol>
+</Base>
