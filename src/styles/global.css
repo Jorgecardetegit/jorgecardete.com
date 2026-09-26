@@ -16,14 +16,16 @@
   --display: 'Bricolage Grotesque', sans-serif;
 }
 html, body { margin: 0; padding: 0; background: var(--bg); }
+/* Sin rebote elástico: al pasarse de arriba o abajo el sidebar no se separa del resto. */
+html { overscroll-behavior-y: none; }
 * { box-sizing: border-box; }
 body { color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Google Sans Flex", Helvetica, Arial, sans-serif; }
 a { color: var(--green); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 a:hover { color: var(--terracotta); }
 
 .shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(32px, 12vw, 220px); }
-.sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; border-right: 1px solid var(--line); position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
-.main-col { flex: 999 1 520px; min-width: 320px; max-width: 1140px; display: flex; flex-direction: column; }
+.sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 40px 30px; display: flex; flex-direction: column; gap: 30px; position: sticky; top: 0; align-self: flex-start; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
+.main-col { flex: 999 1 520px; min-width: 320px; max-width: 1140px; display: flex; flex-direction: column; border-left: 1px solid var(--line); }
 .main { flex: 1; padding: 56px 40px 80px 88px; }
 .footer { margin: 0 40px 0 88px; padding: 1.5rem 0 2rem; border-top: 1px solid #e5dcbd; display: flex; flex-direction: column; gap: 1rem; font-size: 14px; color: #5a5a61; }
 .footer-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
@@ -190,7 +192,8 @@ section { margin-bottom: 64px; }
 
 @media (max-width: 720px) {
   .shell { padding-left: 0; }
-  .sidebar { max-width: none; border-right: 0; border-bottom: 1px solid var(--line); position: static; height: auto; overflow: visible; }
+  .sidebar { max-width: none; border-bottom: 1px solid var(--line); position: static; height: auto; overflow: visible; }
+  .main-col { border-left: 0; }
   .main { padding: 36px 20px 60px; }
   .footer { margin: 0 20px; }
   .paper { grid-template-columns: minmax(0, 1fr); }
