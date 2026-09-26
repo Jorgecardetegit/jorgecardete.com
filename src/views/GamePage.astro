@@ -76,7 +76,12 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
 };
 ---
 <Base title={t('game.title')} description={t('game.description')} sidebar={false}>
-  <div class="game" id="game">
+  <div
+    class="game"
+    id="game"
+    data-boss-hint={es ? '¡Un jefe! Sáltale en la cabeza tres veces' : 'A boss! Jump on its head three times'}
+    data-boss-down={es ? '¡Jefe derrotado! El camino a la bandera está libre' : 'Boss defeated! The way to the flag is open'}
+  >
     <canvas class="game-canvas" aria-hidden="true"></canvas>
 
     <div class="game-layer">
@@ -102,6 +107,8 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
         <span class="coin-icon" aria-hidden="true"></span>× <span class="game-coins-count">00</span>
       </div>
     </header>
+
+    <div class="game-toast" role="status" hidden></div>
 
     <div class="game-pad" aria-hidden="true">
       <div class="pad-move">
@@ -179,6 +186,35 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
       </dialog>
     ))}
 
+    <dialog class="room" data-room="win" aria-labelledby="room-win" style="--c:#2b9476">
+      <div class="room-head">
+        <span class="room-icon" aria-hidden="true">
+          <svg viewBox="0 0 12 12" width="40" height="40" shape-rendering="crispEdges">
+            <rect x="2" y="0" width="2" height="2" fill="#f7d046" /><rect x="2.5" y="2" width="1" height="8" fill="#8a8a96" />
+            <rect x="3.5" y="2" width="6" height="1" fill="#2b9476" /><rect x="3.5" y="3" width="5" height="1" fill="#2b9476" />
+            <rect x="3.5" y="4" width="4" height="1" fill="#2b9476" /><rect x="3.5" y="5" width="2" height="1" fill="#2b9476" />
+            <rect x="1" y="10" width="4" height="2" fill="#1f1d1a" />
+          </svg>
+        </span>
+        <div>
+          <div class="room-badge">{es ? 'FIN DEL PUEBLO' : 'END OF THE VILLAGE'}</div>
+          <h2 id="room-win">{es ? '¡Victoria!' : 'You win!'}</h2>
+        </div>
+        <button type="button" class="room-close" data-close aria-label={t('game.keepPlaying')}>✕</button>
+      </div>
+      <div class="room-body">
+        <p class="room-text">
+          {es ? 'Has derrotado al jefe y llegado a la bandera. Monedas recogidas: ' : 'You beat the boss and reached the flag. Coins collected: '}
+          <strong class="win-coins">0</strong>.
+        </p>
+        <p class="room-text">{es ? 'Gracias por recorrer el pueblo. Si te ha gustado, echa un vistazo a cómo está hecho en el blog o escríbeme.' : 'Thanks for walking through the village. If you enjoyed it, check out the blog or drop me a line.'}</p>
+      </div>
+      <div class="room-foot">
+        <button type="button" class="room-back" data-close>{t('game.keepPlaying')}</button>
+        <a class="room-go" href={path('home', lang)}>{es ? 'Ir al inicio' : 'Go home'}</a>
+      </div>
+    </dialog>
+
     <div class="game-iris" aria-hidden="true"></div>
     <noscript>
       <style is:inline>
@@ -249,6 +285,9 @@ const rooms: Record<(typeof houses)[number]['route'], { lead?: string; paragraph
   /* Transición de "iris" al entrar en una casa. */
   .game-iris { position: absolute; left: var(--iris-x, 50%); top: var(--iris-y, 50%); width: 300vmax; height: 300vmax; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 300vmax var(--ink); pointer-events: none; opacity: 0; }
   .game.is-leaving .game-iris { opacity: 1; width: 0; height: 0; transition: width .45s ease-in, height .45s ease-in; }
+  .game-toast { position: absolute; top: 72px; left: 50%; translate: -50% 0; max-width: calc(100vw - 32px); padding: 10px 16px; background: var(--ink); color: var(--bg); border: 3px solid var(--bg); box-shadow: 4px 4px 0 var(--shadow); font-family: var(--pixel); font-size: clamp(9px, 1.2vw, 12px); line-height: 1.6; text-align: center; pointer-events: none; animation: pop .2s ease-out; }
+  .game-toast[hidden] { display: none; }
+
   /* Interior de la casa: un modal con el estilo de las tarjetas de la web. */
   .room { width: min(820px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 0; background: var(--bg); color: var(--ink); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--shadow); overflow: hidden; flex-direction: column; }
   .room[open] { display: flex; animation: pop .22s ease-out; }

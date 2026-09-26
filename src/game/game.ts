@@ -28,9 +28,10 @@ const CREAM = '#f6f1e4';
 const STORAGE_KEY = 'jorge.dev:game';
 
 type Rect = { x: number; y: number; w: number; h: number };
-type Block = Rect & { kind: 'brick' | 'question' | 'stone'; used: boolean; bump: number; item: Item['kind'] | 'coin' };
+type Block = Rect & { kind: 'brick' | 'question' | 'stone'; used: boolean; bump: number; item: Item['kind'] | 'coin'; wall?: boolean };
 type Item = Rect & { kind: 'mushroom' | 'star'; vx: number; vy: number; rise: number };
-type Debris = { x: number; y: number; vx: number; vy: number; t: number };
+type Debris = { x: number; y: number; vx: number; vy: number; t: number; color: string };
+type Fireball = Rect & { vx: number; t: number };
 type Coin = { x: number; y: number; taken: boolean };
 type Pop = { x: number; y: number; vy: number; t: number };
 type House = { x: number; door: number; color: string; shade: string; href: string; sign: HTMLAnchorElement; room: HTMLDialogElement };
@@ -85,7 +86,10 @@ export function startGame(root: HTMLElement) {
     const room = root.querySelector<HTMLDialogElement>(`dialog[data-room="${sign.dataset.room}"]`)!;
     return { x, door: x + HOUSE_W / 2, color: sign.dataset.color!, shade: sign.dataset.shade!, href: sign.href, sign, room };
   });
-  const worldW = FIRST_HOUSE + (houses.length - 1) * SPACING + HOUSE_W + 160;
+  // Tras la última casa, la arena del jefe; al final, el muro y la bandera.
+  const ARENA_L = FIRST_HOUSE + (houses.length - 1) * SPACING + HOUSE_W + 70;
+  const ARENA_R = ARENA_L + 320;
+  const worldW = ARENA_R + 150;
 
   // Entre cada par de casas, una formación distinta de bloques y monedas.
   const blocks: Block[] = [];
@@ -93,6 +97,9 @@ export function startGame(root: HTMLElement) {
   const block = (x: number, y: number, kind: Block['kind'] = 'brick', item: Block['item'] = 'coin') =>
     blocks.push({ x, y, w: TILE, h: TILE, kind, used: false, bump: 0, item });
   const coin = (x: number, y: number) => coins.push({ x, y, taken: false });
+
+  // Muro de piedra de 5 bloques (más alto que el salto): se derrumba al vencer al jefe.
+  for (let k = 1; k <= 5; k++) blocks.push({ x: ARENA_R, y: GROUND - TILE * k, w: TILE, h: TILE, kind: 'stone', used: false, bump: 0, item: 'coin', wall: true });
 
   houses.slice(0, -1).forEach((house, i) => {
     const mid = house.x + HOUSE_W + (SPACING - HOUSE_W) / 2;
@@ -134,9 +141,9 @@ export function startGame(root: HTMLElement) {
   });
 
   const clouds = Array.from({ length: 9 }, (_, i) => ({ x: i * 150 + ((i * 53) % 70), y: 18 + ((i * 37) % 50), big: i % 3 === 0 }));
-  const trees = [140, worldW - 110];
+  const trees = [140, worldW - 40];
   const bushes = houses.flatMap((h) => [h.x - 26, h.x + HOUSE_W + 6]);
-  const flag = worldW - 50;
+  const flag = ARENA_R + 70;
   const BOARD_LEFT = 12;
 
   // Estado.
@@ -161,10 +168,105 @@ export function startGame(root: HTMLElement) {
   let big = false;
   let growTime = 0;
   let starTime = 0;
+  let invuln = 0;
+  let flagDrop = 0;
+  let won = false;
+  const fireballs: Fireball[] = [];
+
+  // El jefe: pasea por la arena, salta y escupe fuego. Tres pisotones en la cabeza y cae.
+  const boss = {
+    x: ARENA_L + 220, y: GROUND - 32, w: 32, h: 32, vx: 0, vy: 0,
+    hp: 3, hurt: 0, timer: 0, facing: -1, pace: -1, mouth: 0, dead: false, active: false,
+  };
 
   const keys = { left: false, right: false, jump: false };
 
   // Con el champiñón mide el doble: 24×32 en vez de 12×16, con los pies en el mismo sitio.
+  function shrink() {
+    big = false;
+    player.x += PW / 2;
+    player.y += PH;
+    player.w = PW;
+    player.h = PH;
+  }
+
+  const toast = root.querySelector<HTMLElement>('.game-toast')!;
+  let toastTimer = 0;
+  function say(text: string) {
+    toast.textContent = text;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (toast.hidden = true), 2600);
+  }
+
+  // Un golpe: grande vuelve a pequeño; pequeño sale despedido hacia atrás.
+  function hurtPlayer(fromX: number) {
+    if (invuln > 0 || starTime > 0 || state !== 'play') return;
+    invuln = 100;
+    if (big) return shrink();
+    player.vx = player.x + player.w / 2 < fromX ? -3 : 3;
+    player.vy = -3.5;
+  }
+
+  function hitBoss() {
+    if (boss.hurt > 0 || boss.dead) return;
+    boss.hp--;
+    boss.hurt = 45;
+    if (boss.hp > 0) return;
+    boss.dead = true;
+    boss.vy = -4;
+    fireballs.length = 0;
+    // El muro se viene abajo y deja paso a la bandera.
+    for (const b of blocks.filter((b) => b.wall)) {
+      blocks.splice(blocks.indexOf(b), 1);
+      debris.push({ x: b.x, y: b.y, vx: -1 + Math.random() * 2, vy: -3 - Math.random() * 2, t: 0, color: '#a4a4b0' });
+      debris.push({ x: b.x + 8, y: b.y + 8, vx: -1 + Math.random() * 2, vy: -2 - Math.random() * 2, t: 0, color: '#a4a4b0' });
+    }
+    say(root.dataset.bossDown!);
+  }
+
+  function updateBoss(prevBottom: number) {
+    if (boss.dead) {
+      boss.vy += GRAVITY;
+      boss.y += boss.vy;
+      return;
+    }
+    if (!boss.active) {
+      if (player.x > ARENA_L - 40) {
+        boss.active = true;
+        say(root.dataset.bossHint!);
+      }
+      return;
+    }
+    boss.timer++;
+    boss.hurt = Math.max(0, boss.hurt - 1);
+    boss.mouth = Math.max(0, boss.mouth - 1);
+    const grounded = boss.y + boss.h >= GROUND;
+    if (grounded) boss.facing = player.x + player.w / 2 < boss.x + boss.w / 2 ? -1 : 1;
+    if (boss.timer % 90 === 0) boss.pace = -boss.pace;
+    boss.x = clamp(boss.x + boss.pace * 0.45, ARENA_L, ARENA_R - boss.w);
+    if (boss.x === ARENA_L || boss.x === ARENA_R - boss.w) boss.pace = -boss.pace;
+    if (grounded && boss.timer % 150 === 75) boss.vy = -5;
+    boss.vy = Math.min(boss.vy + GRAVITY, MAX_FALL);
+    boss.y = Math.min(boss.y + boss.vy, GROUND - boss.h);
+    if (boss.y + boss.h >= GROUND) boss.vy = 0;
+    if (boss.timer % 110 === 0 && boss.hurt === 0) {
+      boss.mouth = 20;
+      fireballs.push({ x: boss.facing < 0 ? boss.x - 8 : boss.x + boss.w, y: boss.y + 9, w: 10, h: 6, vx: boss.facing * 1.7, t: 0 });
+    }
+
+    if (state !== 'play' || !overlap(player, boss)) return;
+    // Pisotón: venía cayendo y en el frame anterior sus pies estaban por encima de la cabeza.
+    if (player.vy > 0 && prevBottom <= boss.y + 6) {
+      hitBoss();
+      player.vy = -5;
+    } else if (starTime > 0) {
+      hitBoss();
+    } else {
+      hurtPlayer(boss.x + boss.w / 2);
+    }
+  }
+
   function grow() {
     if (big) return;
     big = true;
@@ -230,6 +332,15 @@ export function startGame(root: HTMLElement) {
     state = 'exit';
     target = null;
   }
+  const winDialog = root.querySelector<HTMLDialogElement>('dialog[data-room="win"]')!;
+  winDialog.addEventListener('close', () => {
+    if (state === 'room') state = 'play';
+  });
+  winDialog.addEventListener('click', (e) => {
+    const el = e.target as HTMLElement;
+    if (el === winDialog || el.closest('[data-close]')) winDialog.close();
+  });
+
   // Ir a la página: la misma transición de iris que antes, recordando la casa para volver.
   function visit(house: House) {
     writeStorage({ x: house.door });
@@ -377,7 +488,7 @@ export function startGame(root: HTMLElement) {
   function smash(b: Block) {
     blocks.splice(blocks.indexOf(b), 1);
     for (const [dx, dy, vx] of [[0, 0, -1], [8, 0, 1], [0, 8, -0.7], [8, 8, 0.7]]) {
-      debris.push({ x: b.x + dx, y: b.y + dy, vx, vy: dy ? -3 : -4.5, t: 0 });
+      debris.push({ x: b.x + dx, y: b.y + dy, vx, vy: dy ? -3 : -4.5, t: 0, color: '#b5623c' });
     }
   }
 
@@ -412,6 +523,7 @@ export function startGame(root: HTMLElement) {
 
   function step() {
     tick++;
+    const prevBottom = player.y + player.h;
     if (state === 'play') {
       const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
       const boost = starTime > 0 ? 1.6 : 1;
@@ -447,6 +559,30 @@ export function startGame(root: HTMLElement) {
     }
 
     walkTime = onGround && Math.abs(player.vx) > 0.2 ? walkTime + Math.abs(player.vx) : 0;
+
+    invuln = Math.max(0, invuln - 1);
+    updateBoss(prevBottom);
+    for (const f of [...fireballs]) {
+      f.t++;
+      f.x += f.vx;
+      f.y += (GROUND - 14 - f.y) * 0.04; // baja hasta la altura del personaje: hay que saltarla
+      if (f.t > 260 || f.x < ARENA_L - 60 || f.x > ARENA_R) fireballs.splice(fireballs.indexOf(f), 1);
+      else if (state === 'play' && overlap(player, f)) {
+        fireballs.splice(fireballs.indexOf(f), 1);
+        hurtPlayer(f.x);
+      }
+    }
+
+    // La bandera: solo se llega con el muro caído.
+    if (boss.dead && !won && state === 'play' && player.x + player.w >= flag - 2) {
+      won = true;
+      state = 'room';
+      player.vx = 0;
+      keys.left = keys.right = keys.jump = false;
+      root.querySelector<HTMLElement>('.win-coins')!.textContent = String(collected);
+      setTimeout(() => winDialog.showModal(), 700);
+    }
+    if (won) flagDrop = Math.min(80, flagDrop + 1.2);
 
     for (const b of blocks) b.bump = Math.max(0, b.bump - 1);
     for (const it of [...items]) {
@@ -629,9 +765,78 @@ export function startGame(root: HTMLElement) {
     rect(flag - 2, GROUND - 106, 6, 6, INK);
     rect(flag - 1, GROUND - 105, 4, 4, '#f7d046');
     const wave = Math.round(Math.sin(tick / 10) * 1.5);
-    for (let i = 0; i < 14; i++) rect(flag + 2, GROUND - 98 + i, 22 - Math.abs(i - 7) * 3 + (i % 2) * wave, 1, '#2b9476');
+    const top = GROUND - 98 + Math.round(flagDrop);
+    for (let i = 0; i < 14; i++) rect(flag + 2, top + i, 22 - Math.abs(i - 7) * 3 + (i % 2) * wave, 1, '#2b9476');
     rect(flag - 6, GROUND - 6, 14, 6, INK);
     rect(flag - 5, GROUND - 5, 12, 5, '#a4a4b0');
+  }
+
+  // Rey dragón pixel-art, dibujado mirando a la izquierda; se voltea para mirar a la derecha.
+  function drawBoss() {
+    if (boss.hurt > 0 && Math.floor(boss.hurt / 4) % 2) return;
+    ctx.save();
+    ctx.translate(Math.round(boss.x + boss.w / 2), Math.round(boss.y + boss.h / 2));
+    ctx.scale(boss.facing > 0 ? -1 : 1, boss.dead ? -1 : 1);
+    ctx.translate(-16, -16);
+    const step = boss.active && !boss.dead && Math.floor(boss.timer / 10) % 2 ? 1 : 0;
+    const shell = '#2b9476';
+    const skin = '#e8b92c';
+    // Pies
+    rect(5 - step, 27, 9, 5, INK); rect(6 - step, 28, 7, 3, skin); rect(5 - step, 30, 2, 2, CREAM);
+    rect(19 + step, 27, 9, 5, INK); rect(20 + step, 28, 7, 3, skin); rect(19 + step, 30, 2, 2, CREAM);
+    // Caparazón con pinchos
+    rect(13, 8, 19, 21, INK);
+    rect(14, 9, 17, 19, shell);
+    rect(15, 10, 6, 3, '#4fb892');
+    rect(14, 25, 17, 3, CREAM);
+    for (const sx of [15, 21, 27]) {
+      rect(sx, 5, 4, 5, INK);
+      rect(sx + 1, 5, 2, 4, CREAM);
+      rect(sx + 1, 3, 2, 2, INK);
+    }
+    // Barriga y brazo
+    rect(7, 12, 12, 16, INK);
+    rect(8, 13, 10, 14, '#f7d046');
+    for (let y = 16; y < 27; y += 3) rect(8, y, 10, 1, '#c9a227');
+    rect(4, 16, 7, 5, INK); rect(5, 17, 5, 3, skin); rect(3, 17, 2, 2, CREAM);
+    // Cabeza, hocico, cuernos y cresta
+    rect(3, 0, 15, 14, INK);
+    rect(4, 1, 13, 12, skin);
+    rect(0, 6, 7, 8, INK);
+    rect(1, 7, 6, 6, skin);
+    rect(1, 7, 2, 1, INK);
+    rect(5, -3, 3, 4, INK); rect(6, -3, 1, 3, CREAM);
+    rect(12, -3, 3, 4, INK); rect(13, -3, 1, 3, CREAM);
+    rect(15, 1, 5, 9, '#e8574c'); rect(15, 1, 5, 1, INK); rect(19, 1, 1, 9, INK);
+    // Ojo con ceja enfadada
+    rect(6, 3, 5, 5, INK); rect(7, 4, 3, 3, '#ffffff'); rect(7, 5, 2, 2, INK);
+    rect(5, 2, 4, 1, INK);
+    // Boca: abierta al escupir fuego
+    if (boss.mouth > 0) {
+      rect(0, 10, 8, 4, INK); rect(1, 11, 6, 2, '#e8574c'); rect(2, 10, 1, 1, CREAM); rect(5, 10, 1, 1, CREAM);
+    } else {
+      rect(1, 11, 7, 1, INK); rect(2, 12, 1, 1, CREAM); rect(5, 12, 1, 1, CREAM);
+    }
+    ctx.restore();
+
+    // Vidas encima de la cabeza.
+    if (boss.active && !boss.dead) {
+      for (let i = 0; i < 3; i++) {
+        const hx = Math.round(boss.x + boss.w / 2 - 13 + i * 9);
+        const hy = Math.round(boss.y - 12);
+        rect(hx, hy, 7, 7, INK);
+        rect(hx + 1, hy + 1, 5, 5, i < boss.hp ? '#e8574c' : '#5c5c68');
+      }
+    }
+  }
+
+  function drawFireball(f: Fireball) {
+    const x = Math.round(f.x);
+    const y = Math.round(f.y);
+    const flick = Math.floor(tick / 4) % 2;
+    rect(x, y, 10, 6, INK);
+    rect(x + 1, y + 1, 8, 4, flick ? '#e8574c' : '#f79a3a');
+    rect(x + (f.vx < 0 ? 1 : 5), y + 2, 4, 2, '#f7d046');
   }
 
   function drawItem(it: Item) {
@@ -662,7 +867,8 @@ export function startGame(root: HTMLElement) {
       ctx.globalAlpha = 0.12 * (i + 1) * player.alpha;
       ctx.drawImage(t.img, t.x, t.y, w, h);
     });
-    ctx.globalAlpha = player.alpha;
+    // Tras un golpe parpadea mientras es invulnerable.
+    ctx.globalAlpha = invuln > 0 && Math.floor(invuln / 4) % 2 ? 0.25 : player.alpha;
     ctx.drawImage(img, x, y, w, h);
     ctx.globalAlpha = 1;
   }
@@ -700,8 +906,10 @@ export function startGame(root: HTMLElement) {
     items.forEach(drawItem);
     for (const d of debris) {
       rect(Math.round(d.x), Math.round(d.y), 6, 6, INK);
-      rect(Math.round(d.x) + 1, Math.round(d.y) + 1, 4, 4, '#b5623c');
+      rect(Math.round(d.x) + 1, Math.round(d.y) + 1, 4, 4, d.color);
     }
+    if (boss.y < WORLD_H + 40) drawBoss();
+    fireballs.forEach(drawFireball);
     drawPlayer();
     ctx.restore();
 
@@ -734,6 +942,8 @@ export function startGame(root: HTMLElement) {
     requestAnimationFrame(frame);
   }
   camX = worldW <= W ? (worldW - W) / 2 : clamp(player.x + player.w / 2 - W / 2, 0, worldW - W);
+  // Solo en desarrollo: estado a mano para depurar desde la consola o los tests.
+  if (import.meta.env.DEV) Object.assign(window, { __game: { player, boss, blocks, get state() { return state; } } });
   root.classList.add('is-ready');
   requestAnimationFrame(frame);
 }
