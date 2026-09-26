@@ -43,8 +43,8 @@ a:hover { color: var(--terracotta); }
 .map-hint { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 8px; }
 .map-hint a { text-decoration: none; }
 
-.nav { display: flex; flex-direction: column; gap: 2px; }
-.nav a { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 9px; text-decoration: none; color: var(--ink); font-size: 16px; font-weight: 500; }
+.nav { display: flex; flex-direction: column; gap: 0; }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 5px 8px; border-radius: 7px; text-decoration: none; color: var(--ink); font-size: 16px; font-weight: 500; }
 .nav a:hover { background: rgba(63, 111, 82, 0.10); color: var(--ink); }
 .nav .nav-icon { flex: none; }
 
