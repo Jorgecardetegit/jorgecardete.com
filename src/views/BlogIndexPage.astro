@@ -103,8 +103,8 @@ const text = {
   .bcard[hidden] { display: none; }
   .bcard:hover, .bcard:focus-visible { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--shadow); color: var(--ink); }
   .bcard:hover .btitle { color: var(--green); }
-  .bcover { aspect-ratio: 16 / 9; border-bottom: 3px solid var(--ink); background: #e9e2d0; display: grid; place-items: center; font-size: 40px; }
-  .bcover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bcover { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-bottom: 3px solid var(--ink); background: #e9e2d0; display: grid; place-items: center; font-size: 40px; }
+  .bcover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .bbody { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 18px; }
   .btopic { font-family: var(--pixel); font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--c); line-height: 1.5; }
   .btitle { margin: 0; font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.25; letter-spacing: -0.3px; text-wrap: balance; transition: color .15s; }
