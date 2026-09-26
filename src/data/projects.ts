@@ -7,7 +7,7 @@ export const projects = [
   { name: 'Parking Detector', year: '2024', tags: ['computer-vision', 'tensorflow', 'docker', 'c++'], desc: 'Detector de plazas libres en un parking a partir de vídeo, con una CNN en TensorFlow, desplegado con Docker y Azure.', links: [{ label: 'Código', url: 'https://github.com/TheDeepHub/ParkingDetector' }, { label: 'Artículo', url: '/blog/parking-detector-parte-1/' }, { label: 'Despliegue', url: '/blog/parking-detector-parte-2/' }], color: '#b5623c' },
   { name: 'Every System Is Broken', year: '20XX', tags: ['seguridad', 'hacking'], desc, links, color: '#b5553f' },
   { name: 'Colosseum', year: '2024', tags: ['hackathon', 'solana', 'ai-agents'], desc: 'Top 10 en el hackathon de Solana de Colosseum con xFractal, una plataforma de trading con agentes de IA.', links: [{ label: 'Vídeo', url: 'https://www.youtube.com/watch?v=7CRCodieh1g' }], color: '#2b9476' },
-  { name: 'Hackspain', year: '20XX', tags: ['hackathon', 'comunidad'], desc, links, color: '#6b5ea8' },
+  { name: 'X-Ray · HackSpain', year: '2026', tags: ['hackathon', 'fintech', 'lightgbm'], desc: 'Reto de Embat: un score de salud financiera de 0 a 100 para pymes a partir de su tesorería, con previsión a 3 meses, alertas y un simulador de escenarios.', links: [{ label: 'Demo', url: 'https://xakal-hackspain.vercel.app/' }, { label: 'Código', url: 'https://github.com/xakal-hs/hackspain' }], color: '#6b5ea8' },
   { name: 'UFV Labs', year: '20XX', tags: ['universidad', 'laboratorio'], desc, links, color: '#c9a227' },
   { name: 'Gather Simulator', year: '20XX', tags: ['simulacion'], desc, links, color: '#c9a227' },
 ];
