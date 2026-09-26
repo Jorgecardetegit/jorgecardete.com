@@ -13,6 +13,7 @@ const routes = {
   startups: { es: '/startups/', en: '/en/startups/' },
   academic: { es: '/academico/', en: '/en/academic/' },
   about: { es: '/sobre-mi/', en: '/en/about/' },
+  game: { es: '/juego/', en: '/en/game/' },
 } as const;
 export type Route = keyof typeof routes;
 
@@ -54,6 +55,15 @@ const ui = {
     'sidebar.language': 'Idioma',
     'footer.social': 'Redes',
     'footer.madeWith': 'Hecho con {heart} por Jorge Cardete',
+    'game.title': 'Juego',
+    'game.description': 'Un pueblo en pixel art: camina de casa en casa para visitar cada sección de la web.',
+    'game.welcome': 'Bienvenido al pueblo',
+    'game.help': '← → caminar · espacio saltar · ↑ entrar',
+    'game.helpTouch': 'Usa los botones para moverte y entrar en las casas',
+    'game.enter': 'Entrar',
+    'game.exit': 'Salir',
+    'game.coins': 'Monedas',
+    'game.noscript': 'El juego necesita JavaScript. Puedes navegar con los carteles de las casas.',
   },
   en: {
     'site.description': 'Software engineer and Growth Engineer. Notes, projects and startups.',
@@ -70,6 +80,15 @@ const ui = {
     'sidebar.language': 'Language',
     'footer.social': 'Social',
     'footer.madeWith': 'Made with {heart} by Jorge Cardete',
+    'game.title': 'Game',
+    'game.description': 'A pixel-art village: walk from house to house to visit each section of the site.',
+    'game.welcome': 'Welcome to the village',
+    'game.help': '← → walk · space jump · ↑ enter',
+    'game.helpTouch': 'Use the buttons to move and enter the houses',
+    'game.enter': 'Enter',
+    'game.exit': 'Exit',
+    'game.coins': 'Coins',
+    'game.noscript': 'The game needs JavaScript. You can still browse with the house signs.',
   },
 } satisfies Record<Lang, Record<string, string>>;
 

@@ -1,0 +1,136 @@
+---
+import Base from '../layouts/Base.astro';
+import PixelIcon from '../components/PixelIcon.astro';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Mismo orden y colores que las casas del mapa de la barra lateral.
+const houses = [
+  { route: 'about', icon: 'sobre-mi', label: t('nav.about'), color: '#6b5ea8', shade: '#584c8f' },
+  { route: 'blog', icon: 'blog', label: t('nav.blog'), color: '#b5623c', shade: '#984f2f' },
+  { route: 'projects', icon: 'proyectos', label: t('nav.projects'), color: '#2b9476', shade: '#217a61' },
+  { route: 'startups', icon: 'startups', label: t('nav.startups'), color: '#c9a227', shade: '#a8871d' },
+  { route: 'academic', icon: 'academico', label: t('nav.academic'), color: '#b5553f', shade: '#984433' },
+] as const;
+---
+<Base title={t('game.title')} description={t('game.description')} sidebar={false}>
+  <div class="game" id="game">
+    <canvas class="game-canvas" aria-hidden="true"></canvas>
+
+    <div class="game-layer">
+      <div class="game-board">
+        <h1>{t('game.welcome')}</h1>
+        <p class="help-keys">{t('game.help')}</p>
+        <p class="help-touch">{t('game.helpTouch')}</p>
+      </div>
+      <nav aria-label={t('nav.label')}>
+        {houses.map((h) => (
+          <a class="game-sign" href={path(h.route, lang)} data-color={h.color} data-shade={h.shade} style={`--c:${h.color}`}>
+            <PixelIcon name={h.icon} size={18} />
+            <span>{h.label}</span>
+          </a>
+        ))}
+      </nav>
+      <div class="game-prompt" hidden aria-hidden="true"><kbd>↑</kbd> {t('game.enter')}</div>
+    </div>
+
+    <header class="game-hud">
+      <a class="game-exit" href={path('home', lang)}>{t('game.exit')}</a>
+      <div class="game-coins" aria-label={t('game.coins')}>
+        <span class="coin-icon" aria-hidden="true"></span>× <span class="game-coins-count">00</span>
+      </div>
+    </header>
+
+    <div class="game-pad" aria-hidden="true">
+      <div class="pad-move">
+        <button type="button" tabindex="-1" data-action="left">◀</button>
+        <button type="button" tabindex="-1" data-action="right">▶</button>
+      </div>
+      <div class="pad-act">
+        <button type="button" tabindex="-1" data-action="enter" class="pad-enter">▲</button>
+        <button type="button" tabindex="-1" data-action="jump" class="pad-jump">A</button>
+      </div>
+    </div>
+
+    <div class="game-iris" aria-hidden="true"></div>
+    <noscript>
+      <style is:inline>
+        .game-layer nav { position: absolute; left: 16px; right: 16px; top: 45%; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+        .game-layer .game-sign { position: relative !important; visibility: visible !important; }
+      </style>
+      <p class="game-noscript">{t('game.noscript')}</p>
+    </noscript>
+  </div>
+</Base>
+
+<style>
+  :global(body:has(.game)) { overflow: hidden; }
+  .game { position: fixed; inset: 0; z-index: 10; overflow: hidden; background: #cdecf6; user-select: none; -webkit-user-select: none; touch-action: none; }
+  .game-canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0; transition: opacity .3s; }
+  .game.is-ready .game-canvas { opacity: 1; }
+
+  .game-layer { position: absolute; inset: 0; pointer-events: none; }
+  .game-board, .game-sign, .game-prompt { position: absolute; left: 0; top: 0; pointer-events: auto; will-change: transform; }
+  .game:not(.is-ready) .game-layer > *, .game:not(.is-ready) .game-sign { visibility: hidden; }
+
+  .game-board { width: max-content; max-width: min(78vw, 360px); padding: 10px 14px; background: #d9a47c; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); text-align: center; }
+  .game-board h1 { margin: 0 0 8px; font-family: var(--pixel); font-size: clamp(9px, 1.4vw, 12px); line-height: 1.5; color: var(--ink); }
+  .game-board p { margin: 0; font-family: var(--mono); font-size: 12px; color: #3a2a1c; }
+  .help-touch { display: none; }
+  @media (pointer: coarse) {
+    .help-keys { display: none; }
+    .help-touch { display: block; }
+    .game-board { max-width: 220px; padding: 8px 10px; }
+    .game-board h1 { font-size: 9px; margin-bottom: 6px; }
+    .game-board p { font-size: 10.5px; }
+  }
+
+  .game-sign { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--card); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--shadow); font-family: var(--pixel); font-size: clamp(8px, 1.1vw, 11px); color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .game-sign::after { content: ''; position: absolute; left: 50%; bottom: -9px; width: 4px; height: 6px; margin-left: -2px; background: var(--ink); }
+  .game-sign:hover, .game-sign.is-near { background: var(--c); color: var(--bg); }
+  .game-sign.is-near { animation: bob .6s ease-in-out infinite alternate; }
+  .game-sign:focus-visible { outline: 3px solid var(--bg); outline-offset: 2px; }
+  @keyframes bob { to { margin-top: -4px; } }
+
+  .game-prompt { padding: 5px 8px; background: var(--ink); color: var(--bg); font-family: var(--pixel); font-size: 9px; white-space: nowrap; }
+  .game-prompt kbd { font: inherit; color: #f7d046; }
+  .game-prompt::after { content: ''; position: absolute; left: 50%; bottom: -5px; margin-left: -5px; border: 5px solid transparent; border-bottom: 0; border-top-color: var(--ink); }
+
+  .game-hud { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; pointer-events: none; }
+  .game-hud > * { pointer-events: auto; }
+  .game-exit, .game-coins { padding: 8px 12px; background: var(--card); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--shadow); font-family: var(--pixel); font-size: 10px; color: var(--ink); text-decoration: none; }
+  .game-exit { display: flex; align-items: center; gap: 8px; }
+  .game-exit::before { content: ''; border: 5px solid transparent; border-left: 0; border-right: 6px solid currentColor; }
+  .game-exit:hover { background: var(--ink); color: var(--bg); }
+  .game-coins { display: flex; align-items: center; gap: 6px; }
+  .coin-icon { width: 10px; height: 12px; background: #f7d046; border: 2px solid var(--ink); border-radius: 50%; }
+
+  .game-pad { display: none; position: absolute; left: 0; right: 0; bottom: 0; justify-content: space-between; align-items: flex-end; padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); pointer-events: none; }
+  @media (pointer: coarse) { .game-pad { display: flex; } }
+  .pad-move, .pad-act { display: flex; gap: 12px; align-items: flex-end; }
+  .game-pad button { pointer-events: auto; width: 60px; height: 60px; display: grid; place-items: center; background: rgba(246, 241, 228, 0.85); border: 3px solid var(--ink); border-radius: 8px; box-shadow: 3px 3px 0 var(--shadow); font-family: var(--pixel); font-size: 16px; color: var(--ink); touch-action: none; -webkit-tap-highlight-color: transparent; }
+  .game-pad button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+  .game-pad .pad-jump { width: 68px; height: 68px; border-radius: 50%; background: #e8574c; color: var(--bg); }
+  .game-pad .pad-enter { opacity: .35; transition: opacity .15s; }
+  .game.can-enter .pad-enter { opacity: 1; background: #f7d046; }
+
+  /* Transición de "iris" al entrar en una casa. */
+  .game-iris { position: absolute; left: var(--iris-x, 50%); top: var(--iris-y, 50%); width: 300vmax; height: 300vmax; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 300vmax var(--ink); pointer-events: none; opacity: 0; }
+  .game.is-leaving .game-iris { opacity: 1; width: 0; height: 0; transition: width .45s ease-in, height .45s ease-in; }
+  @media (prefers-reduced-motion: reduce) {
+    .game.is-leaving .game-iris { transition: none; }
+    .game-sign.is-near { animation: none; }
+  }
+
+  .game-noscript { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); margin: 0; padding: 10px 14px; background: var(--card); border: 3px solid var(--ink); font-family: var(--mono); font-size: 13px; }
+</style>
+
+<script>
+  import { startGame } from '../game/game';
+
+  const root = document.getElementById('game');
+  if (root) startGame(root);
+</script>
