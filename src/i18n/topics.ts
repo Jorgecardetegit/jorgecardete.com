@@ -4,7 +4,7 @@ import type { Localized } from '.';
 export const topics = {
   vision: { label: { es: 'Computer vision', en: 'Computer vision' }, color: '#2b9476' },
   ml: { label: { es: 'Machine learning', en: 'Machine learning' }, color: '#6b5ea8' },
-  ai: { label: { es: 'IA y lenguaje', en: 'AI & language' }, color: '#b5623c' },
+  ai: { label: { es: 'IA', en: 'AI' }, color: '#b5623c' },
   practice: { label: { es: 'Programación', en: 'Programming' }, color: '#9a7b12' },
 } satisfies Record<string, { label: Localized; color: string }>;
 
