@@ -106,6 +106,13 @@ const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', ye
     if (!row.hidden) input.focus();
     else { input.value = ''; apply(); }
   });
+  const fromUrl = new URLSearchParams(location.search).get('tema');
+  if (fromUrl) {
+    topic = fromUrl;
+    buttons.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.topic === topic)));
+    apply();
+  }
+
   for (const b of buttons) {
     b.addEventListener('click', () => {
       topic = b.dataset.topic!;
