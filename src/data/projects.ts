@@ -2,6 +2,7 @@ const desc = 'Descripción del proyecto en una frase.';
 const links = [{ label: 'Código', url: '#' }, { label: 'Demo', url: '#' }];
 
 export const projects = [
+  { name: 'Home Improvement Scraper', year: '2024', tags: ['rust', 'terraform'], desc: 'API de comparación de precios en tiempo real entre Leroy Merlin, BricoDepot y Bauhaus, con workers distribuidos y caché.', links: [{ label: 'Código', url: 'https://github.com/The-Deep-Hub/product-scraper-comparison' }], color: '#b5553f' },
   { name: 'UFV Parking', year: '2024', tags: ['computer-vision', 'ufv'], desc: 'Detector de plazas libres con visión artificial, desplegado con Docker y Azure.', links: [{ label: 'Artículo', url: '/blog/parking-detector-parte-1/' }, { label: 'Despliegue', url: '/blog/parking-detector-parte-2/' }], color: '#b5623c' },
   { name: 'OCR Parser', year: '2023', tags: ['ocr', 'ml', 'parsing'], desc: 'Extracción automática de datos de pliegos de licitación no estructurados con OCR y Python.', links: [], color: '#6b5ea8' },
   { name: 'Every System Is Broken', year: '20XX', tags: ['seguridad', 'hacking'], desc, links, color: '#b5553f' },
