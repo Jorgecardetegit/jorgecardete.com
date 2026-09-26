@@ -4,6 +4,7 @@ description: "Revolutionizing Machine Learning with high-performance computation
 date: 2024-02-20
 tags: [rust, machine-learning, data-science]
 icon: "🦀"
+order: 3
 ---
 
 *Revolutionizing Machine Learning with high-performance computation. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/rust-a-new-titan-in-data-science-d449463078b2).*

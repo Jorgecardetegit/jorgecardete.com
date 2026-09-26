@@ -4,6 +4,7 @@ description: "ViTs are precise but not so efficient and CNNs are efficient but n
 date: 2024-01-01
 tags: [deep-learning, cnn, computer-vision]
 icon: "🧩"
+order: 4
 ---
 
 *ViTs are precise but not so efficient and CNNs are efficient but not so precise. Let’s create a precise and efficient neural network. Publicado originalmente en [Level Up Coding](https://medium.com/gitconnected/convnext-in-search-of-the-last-convolutional-layer-da801d9f123b).*

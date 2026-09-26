@@ -10,6 +10,8 @@ const blog = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
     icon: z.string().default('💾'),
+    // Posición fija al principio del listado del blog; el resto va por fecha.
+    order: z.number().optional(),
   }),
 });
 
