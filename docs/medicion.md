@@ -22,7 +22,6 @@ Visitante ─► Banner propio (Consent Mode v2)          src/components/Consent
 |---|---|---|
 | `newsletter_signup` | **Conversión principal**: alta confirmada en Substack | `form_placement`, `how_found`, `value` (1), `currency` (EUR); `user_data.sha256_email_address` con consentimiento de publicidad |
 | `newsletter_form_start` | Primer foco en el formulario | `form_placement` |
-| `newsletter_error` | Falla el alta | `form_placement`, `error` |
 | `landing_view` | Se abre una landing `/lp/…` | `landing` |
 | `post_read` | El lector llega al 75 % del artículo | `post_slug`, `post_lang`, `seconds_to_read` |
 | `contact_click` | Clic en un `mailto:` | `method` |
@@ -37,7 +36,7 @@ Un enlace con `data-track="nombre"` envía ese evento en lugar del automático.
 
 ### 1. Vercel
 1. Importar el repo en Vercel (framework Astro; se detecta solo).
-2. Variables de entorno: `PUBLIC_GTM_ID`, `PUBLIC_POSTHOG_KEY`, `SUBSTACK_URL` y, cuando haya dominio, `SITE_URL` (ver `.env.example`).
+2. Variables de entorno: `PUBLIC_GTM_ID`, `PUBLIC_POSTHOG_KEY` y, cuando haya dominio, `SITE_URL` (ver `.env.example`).
 3. Añadir el dominio propio en *Settings → Domains*.
 4. Bots de IA: *Firewall → Bot Management → AI Bots* en modo **Log**. Así se ve cuántas veces entran `ChatGPT-User`, `Perplexity-User`, `Claude-User`… sin bloquearlos.
 5. Desactivar GitHub Pages en el repo (el workflow de despliegue ya no existe).
@@ -60,7 +59,7 @@ Un enlace con `data-track="nombre"` envía ese evento en lugar del automático.
 - Enlazar GA4 con Google Ads e importar allí `newsletter_signup` solo si no se usa la etiqueta de conversión directa (una de las dos, no ambas).
 
 ### 4. Newsletter (Substack)
-`SUBSTACK_URL` = `https://<publicación>.substack.com`. El alta usa el endpoint de su formulario incrustado, que no es una API pública: si deja de funcionar, el formulario ofrece su página de suscripción y registra `newsletter_error`.
+El formulario envía el alta desde el navegador a `https://jorgecardete.substack.com` (constante `SUBSTACK` en `src/components/Newsletter.astro`) en una pestaña nueva, con el mismo endpoint que su formulario incrustado. No se hace desde un servidor porque Substack lo bloquea con Cloudflare. Como la respuesta llega en otra pestaña, `newsletter_signup` se registra al enviar un email válido, no al confirmar.
 
 ### 5. Buscadores
 - **Search Console**: propiedad de dominio (verificación por DNS) y enviar `/sitemap-index.xml`.

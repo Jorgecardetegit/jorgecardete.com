@@ -1,5 +1,6 @@
 ---
-// Formulario de la newsletter (Substack a través de /api/subscribe).
+// Formulario de la newsletter. El alta se envía desde el navegador a Substack en una
+// pestaña nueva: Substack bloquea con Cloudflare las altas que llegan desde un servidor.
 // La suscripción es la conversión principal: sale como newsletter_signup, con el
 // email cifrado para las conversiones mejoradas y cómo nos conoció el lector.
 import type { Lang } from '../i18n';
@@ -19,11 +20,8 @@ const text = {
     email: 'Tu email',
     how: '¿Cómo me conociste? (opcional)',
     submit: 'Suscribirme',
-    sending: 'Enviando…',
-    done: '¡Listo! Revisa tu correo para confirmar la suscripción.',
+    done: '¡Listo! Se ha abierto Substack en otra pestaña; revisa tu correo para confirmar.',
     invalid: 'Ese email no parece válido.',
-    error: 'No se ha podido completar la suscripción.',
-    fallback: 'Suscríbete directamente en Substack',
     options: [['google', 'Google u otro buscador'], ['ai', 'ChatGPT u otra IA'], ['linkedin', 'LinkedIn'], ['x', 'X (Twitter)'], ['community', 'Reddit u otra comunidad'], ['medium', 'Medium / The Deep Hub'], ['friend', 'Me lo recomendaron'], ['other', 'Otro']],
   },
   en: {
@@ -32,11 +30,8 @@ const text = {
     email: 'Your email',
     how: 'How did you find me? (optional)',
     submit: 'Subscribe',
-    sending: 'Sending…',
-    done: 'Done! Check your inbox to confirm your subscription.',
+    done: 'Done! Substack opened in a new tab; check your inbox to confirm.',
     invalid: "That email doesn't look right.",
-    error: "The subscription couldn't be completed.",
-    fallback: 'Subscribe directly on Substack',
     options: [['google', 'Google or another search engine'], ['ai', 'ChatGPT or another AI'], ['linkedin', 'LinkedIn'], ['x', 'X (Twitter)'], ['community', 'Reddit or another community'], ['medium', 'Medium / The Deep Hub'], ['friend', 'Someone recommended it'], ['other', 'Other']],
   },
 }[lang];
@@ -44,7 +39,7 @@ const text = {
 <section class="newsletter" data-placement={placement}>
   <h2 class="newsletter-title">{title ?? text.title}</h2>
   <p class="newsletter-lead">{lead ?? text.lead}</p>
-  <form class="newsletter-form" novalidate data-msg-sending={text.sending} data-msg-done={text.done} data-msg-invalid={text.invalid} data-msg-error={text.error} data-msg-fallback={text.fallback}>
+  <form class="newsletter-form" novalidate data-msg-done={text.done} data-msg-invalid={text.invalid}>
     <label class="visually-hidden" for={`nl-email-${placement}`}>{text.email}</label>
     <input id={`nl-email-${placement}`} type="email" name="email" placeholder={text.email} autocomplete="email" required />
     <label class="visually-hidden" for={`nl-how-${placement}`}>{text.how}</label>
@@ -61,9 +56,21 @@ const text = {
 <script>
   import { identify, track } from '../lib/analytics';
 
+  const SUBSTACK = 'https://jorgecardete.substack.com';
+
+  // Mismo envío que el formulario incrustado de Substack, sin JS (`nojs`). Tiene que
+  // ir dentro del clic, sin esperas antes, para que el navegador abra la pestaña.
+  function subscribe(email: string) {
+    const fields = { email, first_url: location.href, first_referrer: document.referrer, current_url: location.href, current_referrer: document.referrer, referral_code: '', source: 'embed' };
+    const post = Object.assign(document.createElement('form'), { method: 'POST', action: `${SUBSTACK}/api/v1/free?nojs=true`, target: '_blank', rel: 'noopener' });
+    for (const [name, value] of Object.entries(fields)) post.append(Object.assign(document.createElement('input'), { type: 'hidden', name, value }));
+    document.body.append(post);
+    post.submit();
+    post.remove();
+  }
+
   for (const form of document.querySelectorAll<HTMLFormElement>('.newsletter-form')) {
     const status = form.querySelector<HTMLElement>('.newsletter-status')!;
-    const button = form.querySelector<HTMLButtonElement>('button')!;
     const placement = form.closest<HTMLElement>('.newsletter')!.dataset.placement!;
     const msg = form.dataset;
     const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
@@ -83,31 +90,16 @@ const text = {
         status.textContent = msg.msgInvalid!;
         return;
       }
-      button.disabled = true;
-      status.textContent = msg.msgSending!;
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, website: field('website').value, page: location.pathname }),
-      }).catch(() => null);
-      const data = await res?.json().catch(() => null);
-      button.disabled = false;
-
-      if (data?.ok) {
-        form.reset();
-        status.textContent = msg.msgDone!;
-        await identify(email, { how_found: how });
-        // Valor fijo para que las pujas automáticas tengan algo que optimizar.
-        track('newsletter_signup', { form_placement: placement, how_found: how, value: 1, currency: 'EUR' }, { email });
-      } else {
-        status.textContent = msg.msgError!;
-        if (data?.fallback) {
-          const link = Object.assign(document.createElement('a'), { href: data.fallback, textContent: msg.msgFallback });
-          link.dataset.track = 'newsletter_fallback_click';
-          status.append(' ', link, '.');
-        }
-        track('newsletter_error', { form_placement: placement, error: data?.error ?? 'network' });
-      }
+      // Campo trampa: los humanos no lo ven, los bots lo rellenan. Al bot se le dice que
+      // ha ido bien, pero ni se suscribe ni cuenta como conversión.
+      const bot = Boolean(field('website').value);
+      if (!bot) subscribe(email);
+      form.reset();
+      status.textContent = msg.msgDone!;
+      if (bot) return;
+      await identify(email, { how_found: how });
+      // Valor fijo para que las pujas automáticas tengan algo que optimizar.
+      track('newsletter_signup', { form_placement: placement, how_found: how, value: 1, currency: 'EUR' }, { email });
     });
   }
 </script>
