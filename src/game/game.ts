@@ -1,4 +1,4 @@
-import { coinSprite, enemySprites, groundTiles, mushroomSprite, playerSprites, questionSprite, starSprite, type Frame } from './sprites';
+import { coinSprites, enemySprites, groundTiles, mushroomSprite, playerSprites, questionSprite, starSprite, type Frame } from './sprites';
 
 // Coordenadas del mundo en píxeles "lógicos"; el canvas se escala con image-rendering: pixelated.
 const WORLD_H = 200;
@@ -11,6 +11,9 @@ const FIRST_HOUSE = 200;
 const SPACING = 240;
 const PW = 12;
 const PH = 16;
+// Con el champiñón: 1,5 veces el tamaño normal.
+const BIG_W = 18;
+const BIG_H = 24;
 
 const GRAVITY = 0.28;
 const MAX_FALL = 6;
@@ -88,7 +91,7 @@ export function startGame(root: HTMLElement) {
   const mushroomImg = mushroomSprite();
   const starImg = starSprite();
   const enemyImg = enemySprites();
-  const coinImg = coinSprite();
+  const coinFrames = coinSprites();
   const questionImg = questionSprite();
   const tiles = groundTiles();
 
@@ -217,11 +220,11 @@ export function startGame(root: HTMLElement) {
 
   const keys = { left: false, right: false, jump: false };
 
-  // Con el champiñón mide el doble: 24×32 en vez de 12×16, con los pies en el mismo sitio.
+  // Con el champiñón mide 1,5 veces: 18×24 en vez de 12×16, con los pies en el mismo sitio.
   function shrink() {
     big = false;
-    player.x += PW / 2;
-    player.y += PH;
+    player.x += (BIG_W - PW) / 2;
+    player.y += BIG_H - PH;
     player.w = PW;
     player.h = PH;
   }
@@ -397,10 +400,10 @@ export function startGame(root: HTMLElement) {
     if (big) return;
     big = true;
     growTime = 40;
-    player.x = clamp(player.x - PW / 2, 0, worldW - PW * 2);
-    player.y -= PH;
-    player.w = PW * 2;
-    player.h = PH * 2;
+    player.x = clamp(player.x - (BIG_W - PW) / 2, 0, worldW - BIG_W);
+    player.y -= BIG_H - PH;
+    player.w = BIG_W;
+    player.h = BIG_H;
   }
 
   // Tamaño lógico del canvas: 200 px de alto como mínimo y al menos 200 de ancho.
@@ -897,8 +900,9 @@ export function startGame(root: HTMLElement) {
   }
 
   function drawCoin(x: number, y: number) {
-    const w = Math.max(2, Math.round(Math.abs(Math.cos(tick / 12 + x)) * 8));
-    ctx.drawImage(coinImg, Math.round(x + (8 - w) / 2), Math.round(y), w, 8);
+    // Cada moneda arranca en un punto distinto del giro para que no giren todas a la vez.
+    const img = coinFrames[Math.floor((tick + x * 3) / 8) % coinFrames.length];
+    ctx.drawImage(img, Math.round(x + (8 - img.width) / 2), Math.round(y));
   }
 
   function drawFlag() {
@@ -1013,8 +1017,8 @@ export function startGame(root: HTMLElement) {
     const img = player.facing > 0 ? look[frame].right : look[frame].left;
     // Al crecer parpadea entre los dos tamaños, como en Mario.
     const drawBig = big && !(growTime > 0 && Math.floor(growTime / 5) % 2);
-    const w = drawBig ? PW * 2 : PW;
-    const h = drawBig ? PH * 2 : PH;
+    const w = drawBig ? BIG_W : PW;
+    const h = drawBig ? BIG_H : PH;
     const x = Math.round(player.x + (player.w - w) / 2);
     const y = Math.round(player.y + player.h - h);
     if (starTime > 0 && tick % 3 === 0) {
@@ -1105,7 +1109,7 @@ export function startGame(root: HTMLElement) {
   }
   camX = worldW <= W ? (worldW - W) / 2 : clamp(player.x + player.w / 2 - W / 2, 0, worldW - W);
   // Solo en desarrollo: estado a mano para depurar desde la consola o los tests.
-  if (import.meta.env.DEV) Object.assign(window, { __game: { player, boss, blocks, enemies, get state() { return state; } } });
+  if (import.meta.env.DEV) Object.assign(window, { __game: { player, boss, blocks, enemies, items, get state() { return state; } } });
   root.classList.add('is-ready');
   requestAnimationFrame(frame);
 }

@@ -224,7 +224,18 @@ export function enemySprites() {
   };
 }
 
-export const coinSprite = () => paint(coin);
+// Giro de la moneda dibujado a mano, en vez de estirar el sprite (que descolocaba bordes y brillo).
+const coinTurn = [
+  coin,
+  ['.kkkk.', 'kyyyYk', 'kywyYk', 'kywyYk', 'kywyYk', 'kyyyYk', 'kyyyYk', '.kkkk.'],
+  ['.kk.', 'kyYk', 'kyYk', 'kyYk', 'kyYk', 'kyYk', 'kyYk', '.kk.'],
+  ['kk', 'kY', 'kY', 'kY', 'kY', 'kY', 'kY', 'kk'],
+];
+/** Fotogramas de la moneda girando: llena, media, fina, de canto y vuelta. */
+export function coinSprites() {
+  const [full, half, thin, edge] = coinTurn.map((rows) => paint(rows));
+  return [full, half, thin, edge, mirror(thin), mirror(half)];
+}
 export const questionSprite = () => paint(question);
 
 /** Tile de 16×16 de césped sobre tierra, y el de tierra sola para debajo. */
