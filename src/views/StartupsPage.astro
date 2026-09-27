@@ -70,7 +70,7 @@ const text = {
           <h2 class="startup-name"><a href={s.url}>{s.name}</a></h2>
           <div class="startup-role">{l(s.role, lang)}</div>
           <p class="startup-desc">{l(s.desc, lang)}</p>
-          <a class="startup-url" href={s.url}>{s.label} ↗</a>
+          <a class="startup-url" href={s.url}>{s.label} <span aria-hidden="true">↗</span></a>
         </div>
         <a class="startup-img" href={s.url} aria-label={s.name} style={`--c:${s.color}`}>
           <span>{s.name[0]}</span>
