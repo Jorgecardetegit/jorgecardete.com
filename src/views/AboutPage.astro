@@ -18,17 +18,19 @@ const to = (route: Parameters<typeof path>[0]) => path(route, lang);
     <div class="about-photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
     {lang === 'es' ? (
       <div class="about-text">
-        <p>¡Hola! Soy Jorge. Bienvenido a mi rincón de la web para <a href={to('blog')}>escribir</a>, <a href={to('projects')}>enseñar proyectos</a> y contar cómo construyo <a href={to('startups')}>startups</a>. Ahora mismo trabajo como Growth Engineer en Bit2Me: después de muchos años programando, quiero aprender la otra mitad del juego, la distribución. En mi tiempo libre me gusta hacer deporte, viajar y jugar al ajedrez.</p>
-        <p>Este sitio es un espacio para expresarme y compartir lo que voy aprendiendo. Aquí no hay anuncios, ni enlaces de afiliado, ni rastreo o analítica, ni posts patrocinados, ni muros de pago.</p>
-        <p>Ojalá sirva para animar a alguien más a montarse su propio rincón en la web.</p>
-        <p>Si quieres seguir mis publicaciones, suscríbete al <a href="/rss.xml">feed RSS</a>. Hay artículos y código abierto de sobra para curiosear, así que disfruta.</p>
+        <p>¡Hola! Soy Jorge. Me gusta construir cosas, entender cómo funcionan y aprender por el camino. Este es el lugar donde voy reuniendo <a href={to('projects')}>proyectos</a>, ideas y aprendizajes en el <a href={to('blog')}>blog</a>, y algunas de las <a href={to('startups')}>startups</a> en las que estoy trabajando.</p>
+        <p>Empecé a <a href="https://medium.com/thedeephub">escribir</a> casi como una forma de ordenar lo que iba aprendiendo. Con el tiempo me di cuenta de que, cuando quieres entender muy bien un tema, una de las mejores formas de hacerlo es intentar explicárselo a los demás. 👨‍🏫</p>
+        <p>Ahora mismo trabajo como Growth Engineer en <a href="https://bit2me.com/es">Bit2Me</a>. Después de muchos años programando, quiero mejorar en la otra mitad del juego: la distribución.</p>
+        <p>En mi tiempo libre me gusta hacer deporte, viajar y jugar al ajedrez. Ahora mismo me estoy preparando para correr la <a href="https://www.zurichmaratobarcelona.es/">Maratón de Barcelona</a> 🏃</p>
+        <p>Si quieres seguir lo que publico, tienes mis datos de contacto y redes justo debajo.</p>
       </div>
     ) : (
       <div class="about-text">
-        <p>Hi! I'm Jorge. Welcome to my corner of the web, where I <a href={to('blog')}>write</a>, <a href={to('projects')}>show my projects</a> and share how I build <a href={to('startups')}>startups</a>. I currently work as a Growth Engineer at Bit2Me: after many years of writing code, I want to learn the other half of the game, distribution. In my free time I enjoy sports, travelling and playing chess.</p>
-        <p>This site is a space to express myself and share what I learn along the way. There are no ads, no affiliate links, no tracking or analytics, no sponsored posts and no paywalls.</p>
-        <p>I hope it encourages someone else to build their own corner of the web.</p>
-        <p>If you want to follow what I publish, subscribe to the <a href="/rss.xml">RSS feed</a>. There are plenty of articles and open-source code to browse, so enjoy.</p>
+        <p>Hi! I'm Jorge. I like building things, understanding how they work and learning along the way. This is where I gather <a href={to('projects')}>projects</a>, ideas and learnings on the <a href={to('blog')}>blog</a>, along with some of the <a href={to('startups')}>startups</a> I’m working on.</p>
+        <p>I started <a href="https://medium.com/thedeephub">writing</a> almost as a way to organise what I was learning. Over time I realised that, when you want to understand a subject really well, one of the best ways is to try to explain it to others. 👨‍🏫</p>
+        <p>I currently work as a Growth Engineer at <a href="https://bit2me.com/">Bit2Me</a>. After many years of writing code, I want to get better at the other half of the game: distribution.</p>
+        <p>In my free time I enjoy sports, travelling and playing chess. Right now I’m training to run the <a href="https://www.zurichmaratobarcelona.es/">Barcelona Marathon</a> 🏃</p>
+        <p>If you want to follow what I publish, my contact details and social links are just below.</p>
       </div>
     )}
   </div>
@@ -36,7 +38,7 @@ const to = (route: Parameters<typeof path>[0]) => path(route, lang);
   <h2 class="about-h">{lang === 'es' ? 'Contacto' : 'Contact'}</h2>
   <p class="about-p2">{lang === 'es' ? 'Escríbeme un email para saludar o encuéntrame en las redes.' : 'Send me an email to say hi or find me on social media.'}</p>
   <ul class="about-list">
-    <li>Email: <a href="mailto:jorgecardete@gmail.com">jorgecardete@gmail.com</a></li>
+    <li><a href="mailto:jorgecardete@gmail.com">jorgecardete@gmail.com</a></li>
     <li><a href="https://www.linkedin.com/in/jorgecardetellamas/">LinkedIn</a></li>
     <li><a href="https://x.com/JorgeCardete">X (Twitter)</a></li>
     <li><a href="https://medium.com/@jorgecardete">Medium</a></li>
