@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import WorldBadge from '../components/WorldBadge.astro';
 import { projectLinks, projects } from '../data/projects';
 import { l, type Lang } from '../i18n';
 
@@ -21,7 +22,7 @@ const text = {
 }[lang];
 ---
 <Base title={text.title} description={`${text.title}: ${projects.map((p) => l(p.name, lang)).join(', ')}.`}>
-  <div class="badge">{text.badge}</div>
+  <WorldBadge house="projects" lang={lang}>{text.badge}</WorldBadge>
   <h1 class="hero">{text.title}</h1>
   <p class="lead">{text.lead}</p>
 

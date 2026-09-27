@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import WorldBadge from '../components/WorldBadge.astro';
 import { path, type Lang } from '../i18n';
 
 interface Props { lang: Lang }
@@ -10,7 +11,7 @@ const to = (route: Parameters<typeof path>[0]) => path(route, lang);
   title={lang === 'es' ? 'Sobre mí' : 'About me'}
   description={lang === 'es' ? 'Quién soy, cómo contactarme y en qué estoy trabajando ahora.' : 'Who I am, how to reach me and what I am working on now.'}
 >
-  <div class="badge">{lang === 'es' ? 'MUNDO 5 — SOBRE MÍ' : 'WORLD 5 — ABOUT ME'}</div>
+  <WorldBadge house="about" lang={lang}>{lang === 'es' ? 'MUNDO 5 — SOBRE MÍ' : 'WORLD 5 — ABOUT ME'}</WorldBadge>
   <h1 class="hero">{lang === 'es' ? 'Sobre mí' : 'About me'}</h1>
 
   <div class="about-top">

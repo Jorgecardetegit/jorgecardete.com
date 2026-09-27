@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import WorldBadge from '../components/WorldBadge.astro';
 import { dateFormat, l, postPath, type Lang } from '../i18n';
 import { topics, type Topic } from '../i18n/topics';
 
@@ -34,7 +35,7 @@ const text = {
   <header class="head">
     <div class="photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
     <div class="intro-block">
-      <div class="badge">{text.badge}</div>
+      <WorldBadge house="blog" lang={lang}>{text.badge}</WorldBadge>
       <h1 class="big">Blog</h1>
       <p class="role">{text.role}</p>
     </div>

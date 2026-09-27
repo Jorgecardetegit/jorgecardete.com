@@ -1,0 +1,10 @@
+---
+// Etiqueta «MUNDO N — SECCIÓN» de cada página: lleva a su casa dentro del juego.
+import { path, type Lang } from '../i18n';
+
+interface Props { house: 'about' | 'blog' | 'projects' | 'startups' | 'academic'; lang: Lang }
+const { house, lang } = Astro.props;
+---
+<a class="badge" href={`${path('game', lang)}?casa=${house}`} title={lang === 'es' ? 'Ir a esta casa en el juego' : 'Go to this house in the game'}>
+  <slot />
+</a>

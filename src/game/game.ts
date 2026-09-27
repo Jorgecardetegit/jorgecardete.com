@@ -177,7 +177,10 @@ export function startGame(root: HTMLElement) {
   const BOARD_LEFT = 12;
 
   // Estado.
-  const saved = takeStorage().x;
+  // ?casa=blog (desde la etiqueta «MUNDO» de cada página) te deja en la puerta de esa casa.
+  const linked = houses.find((h) => h.sign.dataset.room === new URLSearchParams(location.search).get('casa'));
+  const stored = takeStorage().x;
+  const saved = linked ? linked.door : stored;
   const player = { w: PW, h: PH, x: typeof saved === 'number' ? clamp(saved - PW / 2, 0, worldW - PW) : 36, y: GROUND - PH, vx: 0, vy: 0, facing: 1, alpha: 1 };
   let onGround = true;
   let coyote = 0;

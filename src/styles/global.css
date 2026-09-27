@@ -68,6 +68,9 @@ a.footer-link:hover { color: var(--green); text-decoration: underline; }
 .side-note { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 
 .badge { display: inline-block; font-family: var(--pixel); font-size: 10px; line-height: 1.6; color: var(--bg); background: var(--red); border: 3px solid var(--ink); padding: 8px 12px; margin-bottom: 18px; box-shadow: 4px 4px 0 var(--shadow); }
+/* La etiqueta es un enlace a su casa en el juego. */
+a.badge { color: var(--bg); text-decoration: none; transition: translate .15s, box-shadow .15s; }
+a.badge:hover, a.badge:focus-visible { color: var(--bg); translate: -2px -2px; box-shadow: 6px 6px 0 var(--shadow); }
 h1.hero { margin: 0 0 10px; font-family: var(--display); font-weight: 800; font-size: clamp(38px, 5.5vw, 58px); line-height: 1.02; letter-spacing: -1.6px; }
 .lead { margin: 0 0 44px; font-size: 19px; line-height: 1.55; color: var(--text-soft); }
 h2.section { margin: 0 0 26px; font-family: var(--display); font-weight: 800; font-size: 32px; letter-spacing: -0.8px; }
@@ -236,6 +239,11 @@ section { margin-bottom: 64px; }
   .paper { grid-template-columns: minmax(0, 1fr); }
   .paper-year { padding-top: 0; }
   .prose table { display: block; overflow-x: auto; }
+  /* Filtros del blog: una sola fila deslizable en lugar de chips partidos en dos líneas. */
+  .blog-filters .pfilter-row { flex-wrap: nowrap; overflow-x: auto; margin-inline: -20px; padding: 0 20px 4px; scrollbar-width: none; }
+  .blog-filters .pfilter-row::-webkit-scrollbar { display: none; }
+  .blog-filters .pfilter-row > * { flex: none; }
+  .blog-filters .pfilter-row > .group-toggle { margin-left: 6px; }
 }
 
 /* ---- Blog (página ancha) ---- */

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import WorldBadge from '../components/WorldBadge.astro';
 import { l, type Lang, type Localized } from '../i18n';
 
 interface Props { lang: Lang }
@@ -58,7 +59,7 @@ const text = {
 }[lang];
 ---
 <Base title="Startups" description={text.description}>
-  <div class="badge">{text.badge}</div>
+  <WorldBadge house="startups" lang={lang}>{text.badge}</WorldBadge>
   <h1 class="hero">Startups</h1>
   <p class="lead">{text.lead}</p>
 
