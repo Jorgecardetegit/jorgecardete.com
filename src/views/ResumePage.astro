@@ -2,60 +2,62 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { dateFormat, l, path, type Lang } from '../i18n';
-import { startups } from '../data/startups';
+import { education, experience } from '../data/resume';
 import { projects, projectLinks } from '../data/projects';
 import { me, papers } from '../data/papers';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 
-// Todo sale de los datos de la web: startups, proyectos, papers y el blog.
+// Experiencia y formación en data/resume.ts; proyectos, papers y el blog, de sus propios datos.
 const postCount = (await getCollection('blog')).length;
 const shipped = projects.filter((p) => !p.soon);
 const fmt = dateFormat(lang, { month: 'long', year: 'numeric' });
+const monthFmt = dateFormat(lang, { month: 'short', year: 'numeric' });
+const month = (ym: string) => monthFmt.format(new Date(`${ym}-01`));
 
 const text = {
   es: {
     title: 'Currículum',
-    description: 'Experiencia, startups, proyectos, publicaciones y habilidades de Jorge Cardete.',
+    description: 'Experiencia, proyectos, publicaciones, habilidades y formación de Jorge Cardete.',
     role: 'Growth Engineer',
     experience: 'Experiencia',
-    present: 'Actualidad',
-    bit2me: 'Después de muchos años programando, mejorando en la otra mitad del juego: la distribución. Aprendiendo Google Ads y Meta Ads.',
-    startups: 'Startups',
+    present: 'actualidad',
+    education: 'Formación',
     projects: 'Proyectos y hackathons',
     skills: 'Habilidades',
     skillList: [
       ['Lenguajes', 'Python, Rust, TypeScript, C++, SQL'],
-      ['Machine learning', 'PyTorch, TensorFlow y Keras, OpenCV, LightGBM, CNN, detección de objetos, LLM y agentes de IA'],
+      ['Machine learning', 'PyTorch, TensorFlow y Keras, OpenCV, LightGBM, Azure ML, CNN, detección de objetos, OCR, speech-to-text'],
+      ['IA generativa', 'LLM (GPT, Llama, Cohere) y agentes de IA, también on-chain en Solana'],
+      ['Datos', 'Databricks, Grafana, Power BI, SAS Viya, SQL'],
       ['Backend e infraestructura', 'Flask, Docker, Azure, Terraform, RabbitMQ, MySQL'],
       ['Web', 'Astro, TypeScript, HTML y CSS'],
-      ['Growth', 'Google Ads, Meta Ads, distribución y contenido técnico'],
+      ['Growth', 'Experimentación en embudos, tracking, automatización, personalización, Google Ads y Meta Ads'],
     ],
     writing: 'Escritura y publicaciones',
-    deepHub: 'fundador de una publicación técnica en Medium sobre data science y machine learning, con más de 570 artículos de unos 100 autores.',
     blog: `${postCount} artículos sobre visión artificial, machine learning, IA y Python en este`,
     paper: 'Artículo científico',
   },
   en: {
     title: 'Resume',
-    description: 'Experience, startups, projects, publications and skills of Jorge Cardete.',
+    description: 'Experience, projects, publications, skills and education of Jorge Cardete.',
     role: 'Growth Engineer',
     experience: 'Experience',
     present: 'Present',
-    bit2me: 'After many years of writing code, getting better at the other half of the game: distribution. Learning Google Ads and Meta Ads.',
-    startups: 'Startups',
+    education: 'Education',
     projects: 'Projects and hackathons',
     skills: 'Skills',
     skillList: [
       ['Languages', 'Python, Rust, TypeScript, C++, SQL'],
-      ['Machine learning', 'PyTorch, TensorFlow and Keras, OpenCV, LightGBM, CNNs, object detection, LLMs and AI agents'],
+      ['Machine learning', 'PyTorch, TensorFlow and Keras, OpenCV, LightGBM, Azure ML, CNNs, object detection, OCR, speech-to-text'],
+      ['Generative AI', 'LLMs (GPT, Llama, Cohere) and AI agents, including on-chain on Solana'],
+      ['Data', 'Databricks, Grafana, Power BI, SAS Viya, SQL'],
       ['Backend and infrastructure', 'Flask, Docker, Azure, Terraform, RabbitMQ, MySQL'],
       ['Web', 'Astro, TypeScript, HTML and CSS'],
-      ['Growth', 'Google Ads, Meta Ads, distribution and technical content'],
+      ['Growth', 'Funnel experimentation, tracking, automation, personalization, Google Ads and Meta Ads'],
     ],
     writing: 'Writing and publications',
-    deepHub: 'founder of a technical Medium publication on data science and machine learning, with 570+ articles from around 100 authors.',
     blog: `${postCount} articles on computer vision, machine learning, AI and Python on this`,
     paper: 'Research paper',
   },
@@ -75,14 +77,22 @@ const text = {
     </p>
 
     <h2 id="experience">{text.experience}</h2>
-    <h3><a href={lang === 'es' ? 'https://bit2me.com/es' : 'https://bit2me.com/'}>Bit2Me</a></h3>
-    <div class="resume-role"><strong>Growth Engineer</strong><span class="resume-date">{text.present}</span></div>
-    <ul><li>{text.bit2me}</li></ul>
-    {startups.map((s) => (
+    {experience.map((job) => (
       <>
-        <h3><a href={s.url}>{s.name}</a></h3>
-        <div class="resume-role"><strong>{l(s.role, lang)}</strong></div>
-        <ul><li>{l(s.desc, lang)}</li></ul>
+        <h3>{job.url ? <a href={job.url}>{job.company}</a> : job.company}</h3>
+        {job.roles.map((role) => (
+          <>
+            <div class="resume-role">
+              <strong>{l(role.title, lang)}</strong>
+              <span class="resume-date">{month(role.start)} – {role.end ? month(role.end) : text.present}</span>
+            </div>
+            {role.points.length > 0 && (
+              <ul>
+                {role.points.map((pt) => <li>{pt.lead && <><strong>{pt.lead}</strong>: </>}{l(pt.text, lang)}</li>)}
+              </ul>
+            )}
+          </>
+        ))}
       </>
     ))}
 
@@ -106,7 +116,6 @@ const text = {
 
     <h2 id="writing">{text.writing}</h2>
     <ul>
-      <li><strong>The Deep Hub</strong>: {text.deepHub} <a href="https://medium.com/thedeephub">medium.com/thedeephub</a></li>
       <li><strong>Blog</strong>: {text.blog} <a href={path('blog', lang)}>blog</a>.</li>
       {papers.map((paper) => (
         <li>
@@ -116,6 +125,17 @@ const text = {
         </li>
       ))}
     </ul>
+
+    <h2 id="education">{text.education}</h2>
+    {education.map((e) => (
+      <>
+        <h3><a href={e.url}>{e.school}</a></h3>
+        <div class="resume-role">
+          <strong>{l(e.degree, lang)}</strong>
+          <span class="resume-date">{month(e.start)} – {month(e.end)}</span>
+        </div>
+      </>
+    ))}
   </div>
 </Base>
 
@@ -129,6 +149,7 @@ const text = {
   .resume h2 { margin: 44px 0 20px; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--text-soft); }
   .resume h3 { margin: 26px 0 8px; font-size: 17px; font-weight: 500; }
   .resume h2 + h3 { margin-top: 0; }
+  .resume-role + .resume-role, ul + .resume-role { margin-top: 18px; }
   .resume-role { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 16px; margin-bottom: 16px; font-size: 16.5px; }
   .resume-date { font-family: var(--mono); font-size: 13px; color: var(--text-soft); }
   .resume ul { margin: 0; padding-left: 16px; }
