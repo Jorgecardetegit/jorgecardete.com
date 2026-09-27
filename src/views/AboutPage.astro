@@ -14,6 +14,7 @@ const to = (route: Parameters<typeof path>[0]) => path(route, lang);
   <h1 class="hero">{lang === 'es' ? 'Sobre mí' : 'About me'}</h1>
 
   <div class="about-top">
+    <div class="about-photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
     {lang === 'es' ? (
       <div class="about-text">
         <p>¡Hola! Soy Jorge. Bienvenido a mi rincón de la web para <a href={to('blog')}>escribir</a>, <a href={to('projects')}>enseñar proyectos</a> y contar cómo construyo <a href={to('startups')}>startups</a>. Ahora mismo trabajo como Growth Engineer en Bit2Me: después de muchos años programando, quiero aprender la otra mitad del juego, la distribución. En mi tiempo libre me gusta hacer deporte, viajar y jugar al ajedrez.</p>
@@ -29,7 +30,6 @@ const to = (route: Parameters<typeof path>[0]) => path(route, lang);
         <p>If you want to follow what I publish, subscribe to the <a href="/rss.xml">RSS feed</a>. There are plenty of articles and open-source code to browse, so enjoy.</p>
       </div>
     )}
-    <div class="about-photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
   </div>
 
   <h2 class="about-h">{lang === 'es' ? 'Contacto' : 'Contact'}</h2>
