@@ -1,0 +1,23 @@
+name: Visibilidad en IA
+
+# Cada lunes comprueba si los asistentes de IA citan la web (ver scripts/ai-visibility.mjs).
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node scripts/ai-visibility.mjs
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
