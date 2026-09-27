@@ -1,19 +1,20 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import WorldBadge from '../components/WorldBadge.astro';
 import { dateFormat, l, postPath, type Lang } from '../i18n';
 import { topics, type Topic } from '../i18n/topics';
+import { getBlogPosts, getBlogSlug } from '../lib/blog';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 
-const posts = (await getCollection('blog')).sort(
+const posts = (await getBlogPosts(lang)).sort(
   (a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity) || b.data.date.getTime() - a.data.date.getTime()
 );
 const sections = (Object.keys(topics) as Topic[])
   .map((key) => ({ key, ...topics[key], posts: posts.filter((p) => p.data.topic === key) }))
   .filter((s) => s.posts.length > 0);
+const years = [...new Set(posts.map((post) => post.data.date.getFullYear()))];
 
 const fmt = dateFormat(lang, { day: 'numeric', month: 'short', year: 'numeric' });
 const text = {
@@ -33,7 +34,6 @@ const text = {
 ---
 <Base title="Blog" description={text.description}>
   <header class="head">
-    <div class="photo"><img src="/jorge.jpg" alt="Jorge Cardete" /></div>
     <div class="intro-block">
       <WorldBadge house="blog" lang={lang}>{text.badge}</WorldBadge>
       <h1 class="big">Blog</h1>
@@ -57,30 +57,38 @@ const text = {
     </div>
   </div>
 
-  <div class="bgrid" id="flat">
-    {posts.map((post) => {
-      const topic = topics[post.data.topic];
-      return (
-        <a
-          class="bcard"
-          href={postPath(post.id, lang)}
-          style={`--c:${topic.color}`}
-          data-topic={post.data.topic}
-          data-text={[post.data.title, post.data.description, ...post.data.tags].join(' ').toLowerCase()}
-          data-tags={post.data.tags.join(',')}
-        >
-          <div class="bcover">
-            {post.data.cover ? <img src={post.data.cover} alt="" loading="lazy" decoding="async" /> : <span aria-hidden="true">{post.data.icon}</span>}
-          </div>
-          <div class="bbody">
-            <span class="btopic">{l(topic.label, lang)}</span>
-            <h3 class="btitle">{post.data.title}</h3>
-            <p class="bdesc">{post.data.description}</p>
-            <time class="bdate" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
-          </div>
-        </a>
-      );
-    })}
+  <div id="flat">
+    {years.map((year) => (
+      <section class="year-group" data-year={year}>
+        <h2 class="year-title">{year}</h2>
+        <div class="bgrid">
+          {posts.filter((post) => post.data.date.getFullYear() === year).map((post) => {
+            const topic = topics[post.data.topic];
+            return (
+              <a
+                class="bcard"
+                href={postPath(getBlogSlug(post), lang)}
+                style={`--c:${topic.color}`}
+                data-topic={post.data.topic}
+                data-year={post.data.date.getFullYear()}
+                data-text={[post.data.title, post.data.description, ...post.data.tags].join(' ').toLowerCase()}
+                data-tags={post.data.tags.join(',')}
+              >
+                <div class="bcover">
+                  {post.data.cover ? <img src={post.data.cover} alt="" loading="lazy" decoding="async" /> : <span aria-hidden="true">{post.data.icon}</span>}
+                </div>
+                <div class="bbody">
+                  <span class="btopic">{l(topic.label, lang)}</span>
+                  <h3 class="btitle">{post.data.title}</h3>
+                  <p class="bdesc">{post.data.description}</p>
+                  <time class="bdate" datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    ))}
   </div>
 
   {sections.map((s) => (
@@ -94,8 +102,6 @@ const text = {
 
 <style>
   .head { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; margin-bottom: 40px; }
-  .photo { flex: none; width: 205px; height: 205px; background: #e9e2d0; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); overflow: hidden; }
-  .photo img { width: 100%; height: 100%; object-fit: cover; }
   .intro-block { flex: 1 1 320px; min-width: 260px; }
   .big { margin: 0 0 20px; font-family: var(--display); font-weight: 800; font-size: clamp(56px, 9vw, 96px); line-height: 0.95; letter-spacing: -3px; color: var(--ink); text-shadow: 3px 3px 0 var(--gold), 6px 6px 0 var(--terracotta); }
   .role { margin: 0; font-size: 19px; line-height: 1.55; color: var(--text-soft); }
@@ -108,8 +114,11 @@ const text = {
   .group-toggle { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; padding: 6px 12px; font: inherit; font-size: 14px; font-weight: 500; color: #28282e; background: transparent; border: 1.5px dashed #c6ba93; border-radius: 999px; cursor: pointer; }
   .group-toggle:hover { background: #ece4ca; }
   .group-toggle[aria-pressed='true'] { background: #28282e; border: 1.5px solid #28282e; color: #f6f1e4; }
-  #flat { margin-bottom: 56px; }
+  #flat { display: flex; flex-direction: column; gap: 56px; margin-bottom: 56px; }
   #flat[hidden] { display: none; }
+  .year-group { margin: 0; }
+  .year-group[hidden] { display: none; }
+  .year-title { margin: 0 0 20px; padding-bottom: 10px; border-bottom: 1px solid var(--line); font-family: var(--pixel); font-size: 16px; line-height: 1.2; color: var(--ink); }
   .topic { margin-bottom: 56px; }
   .topic[hidden] { display: none; }
   .topic-title { display: flex; align-items: center; gap: 10px; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 3px solid var(--c); font-family: var(--display); font-weight: 800; font-size: 28px; letter-spacing: -0.6px; }
@@ -137,6 +146,7 @@ const text = {
   const groupBtn = document.getElementById('group')!;
   const flat = document.getElementById('flat')!;
   const sections = [...document.querySelectorAll<HTMLElement>('.topic')];
+  const yearSections = [...flat.querySelectorAll<HTMLElement>('.year-group')];
   const cards = [...flat.querySelectorAll<HTMLElement>('.bcard')];
   const none = document.getElementById('none')!;
   const topicKeys = new Set(sections.map((s) => s.dataset.topic!));
@@ -156,6 +166,9 @@ const text = {
       if (ok) visible++;
     }
     flat.hidden = grouped;
+    for (const section of yearSections) {
+      section.hidden = grouped || !section.querySelector('.bcard:not([hidden])');
+    }
     for (const section of sections) {
       section.hidden = !grouped || !section.querySelector('.bcard:not([hidden])');
     }
@@ -167,7 +180,9 @@ const text = {
     grouped = value;
     groupBtn.setAttribute('aria-pressed', String(value));
     for (const card of cards) {
-      const target = value ? sections.find((s) => s.dataset.topic === card.dataset.topic)!.querySelector('.bgrid')! : flat;
+      const target = value
+        ? sections.find((s) => s.dataset.topic === card.dataset.topic)!.querySelector('.bgrid')!
+        : yearSections.find((s) => s.dataset.year === card.dataset.year)!.querySelector('.bgrid')!;
       target.appendChild(card);
     }
     apply();

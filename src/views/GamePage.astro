@@ -1,11 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PixelIcon from '../components/PixelIcon.astro';
 import { papers, me } from '../data/papers';
 import { projectLinks, projects } from '../data/projects';
 import { startups } from '../data/startups';
 import { dateFormat, l, path, postPath, useTranslations, type Lang } from '../i18n';
+import { getBlogPosts, getBlogSlug } from '../lib/blog';
 import { topics, type Topic } from '../i18n/topics';
 
 interface Props { lang: Lang }
@@ -23,7 +23,7 @@ const houses = [
 
 // Al entrar en cada casa se ve la sección en miniatura, con el mismo marcado que su página.
 // Mismo orden que /blog: primero los fijados, luego por fecha.
-const posts = (await getCollection('blog')).sort(
+const posts = (await getBlogPosts(lang)).sort(
   (a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity) || b.data.date.getTime() - a.data.date.getTime(),
 );
 const blogTopics = (Object.keys(topics) as Topic[]).filter((key) => posts.some((p) => p.data.topic === key));
@@ -144,7 +144,7 @@ const leads = {
                 {posts.map((post) => (
                   <a
                     class="mcard"
-                    href={postPath(post.id, lang)}
+                    href={postPath(getBlogSlug(post), lang)}
                     style={`--c:${topics[post.data.topic].color}`}
                     data-tags={post.data.topic}
                     data-text={[post.data.title, post.data.description, ...post.data.tags].join(' ').toLowerCase()}
