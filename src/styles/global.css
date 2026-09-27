@@ -25,7 +25,7 @@ a:hover { color: var(--terracotta); }
 
 /* El margen izquierdo se va cerrando al estrechar la pantalla hasta casi desaparecer hacia 1380px. */
 .shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(16px, calc((100vw - 1380px) * 0.5), 220px); }
-.sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 24px 30px 10px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 0; align-self: flex-start; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
+.sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 24px 30px 18px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 0; align-self: flex-start; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
 .main-col { flex: 999 1 520px; min-width: 320px; max-width: 1140px; display: flex; flex-direction: column; border-left: 1px solid var(--line); }
 .main { flex: 1; padding: 56px 40px 80px 88px; }
 .footer { margin: 0 40px 0 88px; padding: 1.5rem 0 2rem; border-top: 1px solid #e5dcbd; display: flex; flex-direction: column; gap: 1rem; font-size: 14px; color: #5a5a61; }
@@ -38,8 +38,8 @@ a.footer-link:hover { color: var(--green); text-decoration: underline; }
 .footer-pages a + a::before { content: '|'; display: inline-block; margin: 0 12px; color: #d4c89f; }
 .footer-pages a:hover { color: var(--green); }
 .footer-pages a[aria-current='page'] { color: var(--ink); font-weight: 600; }
-.side-foot .footer-pages { margin-top: 8px; font-size: 12px; }
-.side-foot .footer-pages a + a::before { margin: 0 8px; }
+.side-foot .footer-pages { margin-top: 8px; font-size: 13px; }
+.side-foot .footer-pages a + a::before { margin: 0 10px; }
 .footer-made-by { display: flex; align-items: center; gap: 5px; }
 .footer-made-by svg { color: #e0314b; }
 
