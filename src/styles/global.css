@@ -286,8 +286,8 @@ section { margin-bottom: 64px; }
 /* Paleta oscura cálida, a juego con el crema: los bordes pixel pasan a crema claro. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1c1a17;
-  --card: #26231f;
+  --bg: #202025;
+  --card: #2a2a30;
   --ink: #ece5d3;
   --muted: #a39a8a;
   --text-soft: #cfc6b3;
@@ -313,8 +313,8 @@ section { margin-bottom: 64px; }
 :root[data-theme="dark"] .pchip, :root[data-theme="dark"] .group-toggle { color: var(--ink); border-color: rgba(236, 229, 211, 0.2); }
 :root[data-theme="dark"] .pchip:hover, :root[data-theme="dark"] .group-toggle:hover { background: var(--card); }
 :root[data-theme="dark"] .pchip[aria-pressed='true'], :root[data-theme="dark"] .group-toggle[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
-:root[data-theme="dark"] .home { --c-text: #e4dccb; --c-strong: #f3ecdb; --c-muted: var(--muted); --c-border: var(--line); --c-card: var(--card); --c-card-border: rgba(236, 229, 211, 0.18); --c-hover: #2e2b26; }
-:root[data-theme="dark"] .home a.cta:hover { background: #2e2b26; }
+:root[data-theme="dark"] .home { --c-text: #e4dccb; --c-strong: #f3ecdb; --c-muted: var(--muted); --c-border: var(--line); --c-card: var(--card); --c-card-border: rgba(236, 229, 211, 0.18); --c-hover: #303037; }
+:root[data-theme="dark"] .home a.cta:hover { background: #303037; }
 /* El avatar pixel mantiene su contorno oscuro. */
 :root[data-theme="dark"] .avatar > div { border-color: #1f1d1a !important; }
 /* Texto sobre bloques de color: crema, como en claro. */
