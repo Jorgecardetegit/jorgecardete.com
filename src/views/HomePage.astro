@@ -1,15 +1,15 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { projectLinks, projects } from '../data/projects';
 import { dateFormat, l, path, postPath, type Lang } from '../i18n';
+import { getBlogPosts, getBlogSlug } from '../lib/blog';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const to = (route: Parameters<typeof path>[0]) => path(route, lang);
 const post = (slug: string) => postPath(slug, lang);
 
-const allPosts = (await getCollection('blog')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const allPosts = (await getBlogPosts(lang)).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const latest = allPosts.slice(0, 4);
 const countTag = (tag: string) => allPosts.filter((p) => p.data.tags.includes(tag)).length;
 const fmt = dateFormat(lang, { day: 'numeric', month: 'short', year: 'numeric' });
@@ -153,7 +153,7 @@ const text = {
       </div>
       <div class="posts">
         {latest.map((entry) => (
-          <a class="post" href={post(entry.id)}>
+          <a class="post" href={post(getBlogSlug(entry))}>
             <div class="post-thumbnail" aria-hidden="true">{entry.data.icon}</div>
             <div class="post-info">
               <div class="post-title">{entry.data.title}</div>
