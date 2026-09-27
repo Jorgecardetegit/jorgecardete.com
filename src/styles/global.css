@@ -24,7 +24,7 @@ a { color: var(--green); font-weight: 600; text-decoration: underline; text-deco
 a:hover { color: var(--terracotta); }
 
 /* El margen izquierdo se va cerrando al estrechar la pantalla hasta casi desaparecer hacia 1380px. */
-.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(16px, calc((100vw - 1380px) * 0.5), 220px); }
+.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(0px, calc((100vw - 1380px) * 0.5), 220px); }
 .sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 24px 30px 18px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 0; align-self: flex-start; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
 .main-col { flex: 999 1 520px; min-width: 320px; max-width: 1140px; display: flex; flex-direction: column; border-left: 1px solid var(--line); }
 .main { flex: 1; padding: 56px 40px 80px 88px; }
@@ -220,6 +220,13 @@ section { margin-bottom: 64px; }
   .about-top { display: flow-root; max-width: 940px; }
   .about-text { min-width: 0; max-width: none; }
   .about-photo { float: right; width: min(300px, 42%); margin: 6px 0 20px 40px; }
+}
+
+/* Hasta 1380px la barra va pegada al borde: menos relleno y el pie de la barra en una línea. */
+@media (min-width: 1001px) and (max-width: 1380px) {
+  .sidebar { padding-left: 16px; padding-right: 16px; }
+  .side-foot .footer-pages { white-space: nowrap; }
+  .side-foot .footer-pages a + a::before { margin: 0 7px; }
 }
 
 /* De 1000px a 800px: la barra lateral pasa a ser una cabecera horizontal con el índice en fila. */
