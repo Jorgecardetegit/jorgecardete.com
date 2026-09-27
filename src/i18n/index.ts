@@ -14,6 +14,8 @@ const routes = {
   academic: { es: '/academico/', en: '/en/academic/' },
   about: { es: '/sobre-mi/', en: '/en/about/' },
   game: { es: '/juego/', en: '/en/game/' },
+  resume: { es: '/cv/', en: '/en/resume/' },
+  topics: { es: '/temas/', en: '/en/topics/' },
 } as const;
 export type Route = keyof typeof routes;
 
@@ -58,6 +60,10 @@ const ui = {
     'sidebar.menu': 'Menú',
     'footer.social': 'Redes',
     'footer.madeWith': 'Hecho con {heart} por Jorge Cardete',
+    'footer.pages': 'Más páginas',
+    'footer.resume': 'Currículum',
+    'footer.topics': 'Temas',
+    'footer.source': 'Código',
     'game.title': 'Juego',
     'game.description': 'Un pueblo en pixel art: camina de casa en casa para visitar cada sección de la web.',
     'game.welcome': 'Bienvenido al pueblo',
@@ -88,6 +94,10 @@ const ui = {
     'sidebar.menu': 'Menu',
     'footer.social': 'Social',
     'footer.madeWith': 'Made with {heart} by Jorge Cardete',
+    'footer.pages': 'More pages',
+    'footer.resume': 'Resume',
+    'footer.topics': 'Topics',
+    'footer.source': 'Source',
     'game.title': 'Game',
     'game.description': 'A pixel-art village: walk from house to house to visit each section of the site.',
     'game.welcome': 'Welcome to the village',

@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { dateFormat, l, path, type Lang } from '../i18n';
+import { startups } from '../data/startups';
+import { projects, projectLinks } from '../data/projects';
+import { me, papers } from '../data/papers';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+// Todo sale de los datos de la web: startups, proyectos, papers y el blog.
+const postCount = (await getCollection('blog')).length;
+const shipped = projects.filter((p) => !p.soon);
+const fmt = dateFormat(lang, { month: 'long', year: 'numeric' });
+
+const text = {
+  es: {
+    title: 'Currículum',
+    description: 'Experiencia, startups, proyectos, publicaciones y habilidades de Jorge Cardete.',
+    role: 'Growth Engineer',
+    experience: 'Experiencia',
+    present: 'Actualidad',
+    bit2me: 'Después de muchos años programando, mejorando en la otra mitad del juego: la distribución. Aprendiendo Google Ads y Meta Ads.',
+    startups: 'Startups',
+    projects: 'Proyectos y hackathons',
+    skills: 'Habilidades',
+    skillList: [
+      ['Lenguajes', 'Python, Rust, TypeScript, C++, SQL'],
+      ['Machine learning', 'PyTorch, TensorFlow y Keras, OpenCV, LightGBM, CNN, detección de objetos, LLM y agentes de IA'],
+      ['Backend e infraestructura', 'Flask, Docker, Azure, Terraform, RabbitMQ, MySQL'],
+      ['Web', 'Astro, TypeScript, HTML y CSS'],
+      ['Growth', 'Google Ads, Meta Ads, distribución y contenido técnico'],
+    ],
+    writing: 'Escritura y publicaciones',
+    deepHub: 'fundador de una publicación técnica en Medium sobre data science y machine learning, con más de 570 artículos de unos 100 autores.',
+    blog: `${postCount} artículos sobre visión artificial, machine learning, IA y Python en este`,
+    paper: 'Artículo científico',
+  },
+  en: {
+    title: 'Resume',
+    description: 'Experience, startups, projects, publications and skills of Jorge Cardete.',
+    role: 'Growth Engineer',
+    experience: 'Experience',
+    present: 'Present',
+    bit2me: 'After many years of writing code, getting better at the other half of the game: distribution. Learning Google Ads and Meta Ads.',
+    startups: 'Startups',
+    projects: 'Projects and hackathons',
+    skills: 'Skills',
+    skillList: [
+      ['Languages', 'Python, Rust, TypeScript, C++, SQL'],
+      ['Machine learning', 'PyTorch, TensorFlow and Keras, OpenCV, LightGBM, CNNs, object detection, LLMs and AI agents'],
+      ['Backend and infrastructure', 'Flask, Docker, Azure, Terraform, RabbitMQ, MySQL'],
+      ['Web', 'Astro, TypeScript, HTML and CSS'],
+      ['Growth', 'Google Ads, Meta Ads, distribution and technical content'],
+    ],
+    writing: 'Writing and publications',
+    deepHub: 'founder of a technical Medium publication on data science and machine learning, with 570+ articles from around 100 authors.',
+    blog: `${postCount} articles on computer vision, machine learning, AI and Python on this`,
+    paper: 'Research paper',
+  },
+}[lang];
+---
+<Base title={text.title} description={text.description}>
+  <h1 class="hero">Jorge Cardete</h1>
+  <div class="resume-title">{text.role}</div>
+
+  <div class="prose resume">
+    <p class="resume-contact">
+      <span><strong>Email</strong>: <a href="mailto:jorgecardete@gmail.com">jorgecardete@gmail.com</a></span>
+      <span class="sep" aria-hidden="true">|</span>
+      <span><strong>GitHub</strong>: <a href="https://github.com/Jorgecardetegit">@Jorgecardetegit</a></span>
+      <span class="sep" aria-hidden="true">|</span>
+      <span><strong>LinkedIn</strong>: <a href="https://www.linkedin.com/in/jorgecardetellamas/">jorgecardetellamas</a></span>
+    </p>
+
+    <h2 id="experience">{text.experience}</h2>
+    <h3><a href={lang === 'es' ? 'https://bit2me.com/es' : 'https://bit2me.com/'}>Bit2Me</a></h3>
+    <p><strong>Growth Engineer</strong><br /><em>{text.present}</em></p>
+    <ul><li>{text.bit2me}</li></ul>
+
+    <h2 id="startups">{text.startups}</h2>
+    {startups.map((s) => (
+      <>
+        <h3><a href={s.url}>{s.name}</a></h3>
+        <p><strong>{l(s.role, lang)}</strong></p>
+        <ul><li>{l(s.desc, lang)}</li></ul>
+      </>
+    ))}
+
+    <h2 id="projects">{text.projects}</h2>
+    <ul>
+      {shipped.map((p) => {
+        const links = projectLinks(p, lang);
+        return (
+          <li>
+            <strong>{l(p.name, lang)}</strong> ({p.year}): {l(p.desc, lang)}
+            {links.length > 0 && <> {links.map((link, i) => <>{i > 0 && ' · '}<a href={link.url}>{link.label}</a></>)}</>}
+          </li>
+        );
+      })}
+    </ul>
+
+    <h2 id="skills">{text.skills}</h2>
+    <ul>
+      {text.skillList.map(([name, list]) => <li><strong>{name}</strong>: {list}</li>)}
+    </ul>
+
+    <h2 id="writing">{text.writing}</h2>
+    <ul>
+      <li><strong>The Deep Hub</strong>: {text.deepHub} <a href="https://medium.com/thedeephub">medium.com/thedeephub</a></li>
+      <li><strong>Blog</strong>: {text.blog} <a href={path('blog', lang)}>blog</a>.</li>
+      {papers.map((paper) => (
+        <li>
+          <strong>{text.paper}</strong>: <a href={`https://doi.org/${paper.doi}`}>{paper.title}</a>{' '}
+          <em>{paper.journal}</em> ({paper.publisher}, {fmt.format(paper.date)}).{' '}
+          {paper.authors.map((a, i) => <>{i > 0 && ', '}{a === me ? <strong>{a}</strong> : a}</>)}.
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .resume-title { margin: 0 0 28px; font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--muted); }
+  .resume h2 { margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .resume h2:first-of-type { margin-top: 32px; }
+  .resume h3 { margin: 26px 0 6px; }
+  .resume h3 a { color: var(--ink); text-decoration: none; }
+  .resume h3 a:hover { color: var(--green); }
+  .resume h3 + p { margin-bottom: 10px; }
+  .resume-contact { font-size: 15.5px; }
+  .resume-contact > span:not(.sep) { white-space: nowrap; }
+  .resume-contact .sep { margin: 0 6px; color: var(--muted); }
+</style>

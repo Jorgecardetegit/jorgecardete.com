@@ -32,6 +32,12 @@ a:hover { color: var(--terracotta); }
 .footer-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
 a.footer-link { display: inline-flex; align-items: center; gap: .375rem; color: #5a5a61; font-weight: 500; text-decoration: none; white-space: nowrap; }
 a.footer-link:hover { color: var(--green); text-decoration: underline; }
+/* Currículum | Temas | Código, bajo los iconos de redes. */
+.footer-pages { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; }
+.footer-pages a { color: #5a5a61; font-weight: 500; text-decoration: none; white-space: nowrap; }
+.footer-pages a + a::before { content: '|'; display: inline-block; margin: 0 12px; color: #d4c89f; }
+.footer-pages a:hover { color: var(--green); }
+.footer-pages a[aria-current='page'] { color: var(--ink); font-weight: 600; }
 .footer-made-by { display: flex; align-items: center; gap: 5px; }
 .footer-made-by svg { color: #e0314b; }
 

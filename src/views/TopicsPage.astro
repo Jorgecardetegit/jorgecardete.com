@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { path, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+// Cada etiqueta de los posts con cuántos la usan, agrupadas por su inicial.
+const counts = new Map<string, number>();
+for (const post of await getCollection('blog')) {
+  for (const tag of post.data.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+}
+const tags = [...counts].sort(([a], [b]) => a.localeCompare(b));
+const letters = [...new Set(tags.map(([tag]) => tag[0].toUpperCase()))];
+
+const text = {
+  es: {
+    title: 'Temas',
+    description: 'Todas las etiquetas del blog: visión artificial, machine learning, IA, Python y lo que voy aprendiendo.',
+    posts: (n: number) => (n === 1 ? 'post' : 'posts'),
+  },
+  en: {
+    title: 'Topics',
+    description: 'Every tag on the blog: computer vision, machine learning, AI, Python and whatever I am learning.',
+    posts: (n: number) => (n === 1 ? 'post' : 'posts'),
+  },
+}[lang];
+---
+<Base title={text.title} description={text.description}>
+  <h1 class="hero">{text.title}</h1>
+  <p class="para">{text.description}</p>
+
+  {letters.map((letter) => (
+    <section class="tletter">
+      <h2 class="tletter-title">{letter}</h2>
+      <div class="tgrid">
+        {tags.filter(([tag]) => tag[0].toUpperCase() === letter).map(([tag, n]) => (
+          <a class="tcard" href={`${path('blog', lang)}?tema=${encodeURIComponent(tag)}`}>
+            <span class="tcard-name">{tag}</span>
+            <span class="tcard-count"><strong>{n}</strong> {text.posts(n)}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+</Base>
+
+<style>
+  .tletter { margin: 36px 0 0; }
+  .tletter-title { margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-family: var(--pixel); font-size: 14px; line-height: 1.2; color: var(--ink); }
+  .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .tcard { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; padding: 10px 12px 10px 14px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, box-shadow .15s; }
+  .tcard:hover, .tcard:focus-visible { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--shadow); color: var(--ink); }
+  .tcard:hover .tcard-name { color: var(--green); }
+  .tcard-name { min-width: 0; overflow-wrap: anywhere; font-family: var(--mono); font-size: 14px; font-weight: 500; }
+  .tcard-count { flex: none; font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 9px; }
+  .tcard-count strong { color: var(--green); font-weight: 600; }
+</style>
