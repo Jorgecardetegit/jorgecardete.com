@@ -32,7 +32,7 @@ const morePages = [
   { href: path('topics', lang), label: t('footer.topics') },
   { href: 'https://github.com/Jorgecardetegit/Jorgecardetegit.github.io', label: t('footer.source') },
 ].map((p) => ({ ...p, current: p.href === Astro.url.pathname }));
-const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${title} · tunombre.dev`;
+const fullTitle = title === 'Inicio' || title === 'Home' ? 'jorge.dev' : `${title} · jorge.dev`;
 ---
 <!doctype html>
 <html lang={lang}>
@@ -83,7 +83,8 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="sidebar-menu" aria-label={t('sidebar.menu')}>
           <span></span><span></span><span></span>
         </button>
-        <a class="brand" href={path('home', lang)}>
+        <div class="sidebar-profile">
+          <a class="brand" href={path('home', lang)}>
           <div class="avatar" aria-hidden="true">
             <div style="left:3px;top:0;width:24px;height:9px;background:#8b5a2b;border-radius:8px 8px 0 0;"></div>
             <div style="left:6px;top:7px;width:18px;height:13px;background:#f7d3ae;"></div>
@@ -91,8 +92,20 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
             <div style="left:18px;top:12px;width:3px;height:3px;background:#1f1d1a;border:0;"></div>
             <div style="left:5px;top:19px;width:20px;height:11px;background:#b5553f;"></div>
           </div>
-          <span class="brand-name">tunombre.dev</span>
+          <span class="brand-name">jorge.dev</span>
         </a>
+          <button type="button" class="theme-toggle" aria-label={t('sidebar.theme')} title={t('sidebar.theme')}>
+            <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          </button>
+          <nav class="lang-switch" aria-label={t('sidebar.language')}>
+            {alternates.map((a) => (
+              <a href={a.href.replace(Astro.site!.origin, '')} hreflang={a.code} lang={a.code} aria-current={a.code === lang ? 'true' : undefined}>
+                {a.code.toUpperCase()}
+              </a>
+            ))}
+          </nav>
+        </div>
 
         <div class="sidebar-menu" id="sidebar-menu">
         <p class="intro" set:html={t('sidebar.intro').replace('{name}', `<a href="${path('about', lang)}">Jorge</a>`)} />
@@ -111,17 +124,6 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
         </div>
 
         <div class="side-foot">
-          <button type="button" class="theme-toggle" aria-label={t('sidebar.theme')} title={t('sidebar.theme')}>
-            <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
-            <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-          </button>
-          <nav class="lang-switch" aria-label={t('sidebar.language')}>
-            {alternates.map((a) => (
-              <a href={a.href.replace(Astro.site!.origin, '')} hreflang={a.code} lang={a.code} aria-current={a.code === lang ? 'true' : undefined}>
-                {a.code.toUpperCase()}
-              </a>
-            ))}
-          </nav>
           <div class="side-links">
             <a href="mailto:jorgecardete@gmail.com" aria-label="Email" title="Email">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
@@ -187,7 +189,7 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
     </div>
     ) : (
     <div class="wide">
-      <a class="wide-brand" href={path('home', lang)}>← tunombre.dev</a>
+      <a class="wide-brand" href={path('home', lang)}>← jorge.dev</a>
       <main class="wide-main">
         <slot />
       </main>

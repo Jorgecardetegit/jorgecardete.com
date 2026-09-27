@@ -47,7 +47,11 @@ a.footer-button:hover { background: rgba(43, 148, 118, 0.1); color: var(--green)
 .footer-made-by { display: flex; align-items: center; gap: 5px; }
 .footer-made-by svg { color: #e0314b; }
 
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.brand { display: flex; align-items: center; gap: 5px; min-width: 0; text-decoration: none; color: var(--ink); }
+.sidebar-profile { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
+.sidebar-profile .brand-name { font-size: 14px; }
+.sidebar-profile .lang-switch { flex: none; gap: 2px; }
+.sidebar-profile .lang-switch a { padding-inline: 7px; }
 .brand-name { font-family: var(--mono); font-size: 17px; font-weight: 500; letter-spacing: -0.4px; }
 .avatar { position: relative; width: 30px; height: 30px; flex: none; }
 .avatar > div { position: absolute; border: 3px solid var(--ink); }
