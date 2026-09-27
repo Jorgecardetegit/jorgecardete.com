@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import { projectLinks, projects } from '../data/projects';
 import { dateFormat, l, path, postPath, type Lang } from '../i18n';
 import { getBlogPosts, getBlogSlug } from '../lib/blog';
+import { person, website } from '../lib/seo';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -124,7 +125,7 @@ const text = {
   },
 }[lang];
 ---
-<Base title={text.title}>
+<Base title={text.title} jsonLd={[person(Astro.site!), website(Astro.site!, lang)]}>
   <div class="home">
     <header class="hero-index">
       <div class="hero-wrapper">

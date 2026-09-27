@@ -3,18 +3,29 @@ import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { dateFormat, path, type Lang } from '../i18n';
+import { blogPosting, breadcrumbs } from '../lib/seo';
 
 interface Props { post: CollectionEntry<'blog'>; lang: Lang }
 const { post, lang } = Astro.props;
 const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 const fmt = dateFormat(lang, { day: 'numeric', month: 'long', year: 'numeric' });
+const site = Astro.site!;
+const url = new URL(Astro.url.pathname, site);
+const jsonLd = [
+  blogPosting(post, url, site, lang),
+  breadcrumbs([
+    { name: 'jorge.dev', url: new URL(path('home', lang), site) },
+    { name: 'Blog', url: new URL(path('blog', lang), site) },
+    { name: post.data.title, url },
+  ]),
+];
 const text = {
   es: { tocLabel: 'Índice del artículo', toc: 'ÍNDICE', back: '← Volver al blog' },
   en: { tocLabel: 'Table of contents', toc: 'CONTENTS', back: '← Back to the blog' },
 }[lang];
 ---
-<Base title={post.data.title} description={post.data.description} type="article">
+<Base title={post.data.title} description={post.data.description} type="article" image={post.data.cover} jsonLd={jsonLd}>
   <article>
     <a class="post-back" href={path('blog', lang)}>{text.back}</a>
     <h1 class="hero" style="font-size:clamp(32px,4.5vw,46px);">{post.data.title}</h1>

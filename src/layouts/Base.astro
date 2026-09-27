@@ -9,6 +9,12 @@ interface Props {
   description?: string;
   type?: 'website' | 'article';
   sidebar?: boolean;
+  /** Imagen para redes (ruta en /public); con ella la tarjeta se muestra grande. */
+  image?: string;
+  /** Fuera de buscadores: landings de campaña y páginas legales. */
+  noindex?: boolean;
+  /** Datos estructurados schema.org de la página. */
+  jsonLd?: Record<string, unknown>[];
 }
 
 const lang = getLang(Astro.url);
@@ -19,9 +25,13 @@ const {
   description = t('site.description'),
   type = 'website',
   sidebar = true,
+  image,
+  noindex = false,
+  jsonLd = [],
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image ?? '/jorge.jpg', Astro.site);
 const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
   code,
   href: new URL(translatePath(Astro.url.pathname, code), Astro.site).href,
@@ -67,7 +77,12 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'jorge.dev' : `${titl
     <meta property="og:description" content={description} />
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:site_name" content="jorge.dev" />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:site" content="@JorgeCardete" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
