@@ -58,6 +58,9 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
     {sidebar ? (
     <div class="shell">
       <aside class="sidebar">
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="sidebar-menu" aria-label={t('sidebar.menu')}>
+          <span></span><span></span><span></span>
+        </button>
         <a class="brand" href={path('home', lang)}>
           <div class="avatar" aria-hidden="true">
             <div style="left:3px;top:0;width:24px;height:9px;background:#8b5a2b;border-radius:8px 8px 0 0;"></div>
@@ -69,6 +72,7 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
           <span class="brand-name">tunombre.dev</span>
         </a>
 
+        <div class="sidebar-menu" id="sidebar-menu">
         <p class="intro" set:html={t('sidebar.intro').replace('{name}', `<a href="${path('about', lang)}">Jorge</a>`)} />
 
         <nav class="nav" aria-label={t('nav.label')}>
@@ -110,7 +114,19 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'tunombre.dev' : `${t
             </a>
           </div>
         </div>
+        </div>
       </aside>
+      <script>
+        // Menú hamburguesa de móvil: abre y cierra el resto de la barra.
+        const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+        const sidebar = toggle?.closest('.sidebar');
+        const setOpen = (open: boolean) => {
+          sidebar?.classList.toggle('is-open', open);
+          toggle?.setAttribute('aria-expanded', String(open));
+        };
+        toggle?.addEventListener('click', () => setOpen(!sidebar?.classList.contains('is-open')));
+        document.addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+      </script>
 
       <div class="main-col">
         <main class="main">
