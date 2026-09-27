@@ -40,7 +40,9 @@ export function initAnalytics() {
 }
 
 // Mientras no haya decisión se trata como rechazo: se mide, pero sin guardar nada.
+// Solo se cambia el estado si difiere: cada opt_in manda un evento `$opt_in`.
 function applyPostHogConsent() {
+  if (consent.analytics === posthog.has_opted_in_capturing()) return;
   if (consent.analytics) posthog.opt_in_capturing();
   else posthog.opt_out_capturing();
 }
