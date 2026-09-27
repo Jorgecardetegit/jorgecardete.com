@@ -16,6 +16,9 @@ const routes = {
   game: { es: '/juego/', en: '/en/game/' },
   resume: { es: '/cv/', en: '/en/resume/' },
   topics: { es: '/temas/', en: '/en/topics/' },
+  privacy: { es: '/privacidad/', en: '/en/privacy/' },
+  cookies: { es: '/cookies/', en: '/en/cookies/' },
+  legal: { es: '/aviso-legal/', en: '/en/legal-notice/' },
 } as const;
 export type Route = keyof typeof routes;
 
@@ -66,6 +69,11 @@ const ui = {
     'footer.resume': 'Currículum',
     'footer.topics': 'Temas',
     'footer.source': 'Código',
+    'footer.legal': 'Legal',
+    'footer.privacy': 'Privacidad',
+    'footer.cookies': 'Cookies',
+    'footer.legalNotice': 'Aviso legal',
+    'footer.cookieSettings': 'Preferencias de cookies',
     'game.title': 'Juego',
     'game.description': 'Un pueblo en pixel art: camina de casa en casa para visitar cada sección de la web.',
     'game.welcome': 'Bienvenido al pueblo',
@@ -102,6 +110,11 @@ const ui = {
     'footer.resume': 'Resume',
     'footer.topics': 'Topics',
     'footer.source': 'Source',
+    'footer.legal': 'Legal',
+    'footer.privacy': 'Privacy',
+    'footer.cookies': 'Cookies',
+    'footer.legalNotice': 'Legal notice',
+    'footer.cookieSettings': 'Cookie settings',
     'game.title': 'Game',
     'game.description': 'A pixel-art village: walk from house to house to visit each section of the site.',
     'game.welcome': 'Welcome to the village',

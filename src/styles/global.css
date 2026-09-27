@@ -46,6 +46,9 @@ a.footer-button:hover { background: rgba(43, 148, 118, 0.1); color: var(--green)
 .side-foot .footer-pages a + a::before { margin: 0 10px; }
 .footer-made-by { display: flex; align-items: center; gap: 5px; }
 .footer-made-by svg { color: #e0314b; }
+.footer-legal { display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--mono); font-size: 12px; }
+.footer-legal a, .footer-legal button { padding: 0; font: inherit; font-weight: 400; color: var(--muted); background: none; border: 0; text-decoration: none; cursor: pointer; }
+.footer-legal a:hover, .footer-legal button:hover { color: var(--green); text-decoration: underline; }
 
 .brand { display: flex; align-items: center; gap: 5px; min-width: 0; text-decoration: none; color: var(--ink); }
 .sidebar-profile { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }

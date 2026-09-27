@@ -1,0 +1,138 @@
+---
+// Privacidad, cookies y aviso legal. Plantillas pensadas para una web personal
+// con analítica y campañas; revísalas si cambian las herramientas o los datos.
+import Base from '../layouts/Base.astro';
+import { path, type Lang } from '../i18n';
+
+interface Props { lang: Lang; doc: 'privacy' | 'cookies' | 'legal' }
+const { lang, doc } = Astro.props;
+
+const updated = { es: '27 de septiembre de 2026', en: '27 September 2026' }[lang];
+const email = 'jorgecardete@gmail.com';
+const to = (route: Parameters<typeof path>[0]) => path(route, lang);
+
+// Cookies y almacenamiento por proveedor; solo se usan con consentimiento, salvo las técnicas.
+const cookies = [
+  { name: 'jorge.dev:consent, jorge.dev:theme', who: 'jorge.dev', kind: { es: 'Técnica', en: 'Necessary' }, purpose: { es: 'Recordar tu elección de cookies y el tema claro u oscuro.', en: 'Remember your cookie choice and light or dark theme.' }, ttl: { es: 'Hasta que la borres', en: 'Until you clear it' } },
+  { name: 'jorge.dev:touch (sessionStorage)', who: 'jorge.dev', kind: { es: 'Analítica', en: 'Analytics' }, purpose: { es: 'Recordar durante la visita de qué campaña o web llegaste.', en: 'Remember during the visit which campaign or site you came from.' }, ttl: { es: 'Sesión', en: 'Session' } },
+  { name: 'ph_*_posthog', who: 'PostHog', kind: { es: 'Analítica', en: 'Analytics' }, purpose: { es: 'Distinguir visitantes y sesiones para medir el uso de la web.', en: 'Tell visitors and sessions apart to measure how the site is used.' }, ttl: { es: '1 año', en: '1 year' } },
+  { name: '_ga, _ga_*', who: 'Google Analytics', kind: { es: 'Analítica', en: 'Analytics' }, purpose: { es: 'Estadísticas de visitas y conversiones.', en: 'Visit and conversion statistics.' }, ttl: { es: '2 años', en: '2 years' } },
+  { name: '_gcl_*', who: 'Google Ads', kind: { es: 'Publicidad', en: 'Advertising' }, purpose: { es: 'Atribuir conversiones a anuncios de Google.', en: 'Attribute conversions to Google ads.' }, ttl: { es: '90 días', en: '90 days' } },
+  { name: '_fbp, _fbc', who: 'Meta', kind: { es: 'Publicidad', en: 'Advertising' }, purpose: { es: 'Medir anuncios de Facebook e Instagram.', en: 'Measure Facebook and Instagram ads.' }, ttl: { es: '90 días', en: '90 days' } },
+  { name: 'li_fat_id, _gcl_au, lidc, bcookie', who: 'LinkedIn', kind: { es: 'Publicidad', en: 'Advertising' }, purpose: { es: 'Medir anuncios de LinkedIn.', en: 'Measure LinkedIn ads.' }, ttl: { es: 'Hasta 1 año', en: 'Up to 1 year' } },
+  { name: '_ttp, ttclid', who: 'TikTok', kind: { es: 'Publicidad', en: 'Advertising' }, purpose: { es: 'Medir anuncios de TikTok.', en: 'Measure TikTok ads.' }, ttl: { es: '13 meses', en: '13 months' } },
+  { name: '_rdt_uuid, _rdt_cid', who: 'Reddit', kind: { es: 'Publicidad', en: 'Advertising' }, purpose: { es: 'Medir anuncios de Reddit.', en: 'Measure Reddit ads.' }, ttl: { es: '90 días', en: '90 days' } },
+  { name: 'muc_ads, _twclid', who: 'X', kind: { es: 'Publicidad', en: 'Advertising' }, purpose: { es: 'Medir anuncios de X.', en: 'Measure X ads.' }, ttl: { es: 'Hasta 2 años', en: 'Up to 2 years' } },
+  { name: '_uetsid, _uetvid, _uetmsclkid', who: 'Microsoft Advertising', kind: { es: 'Publicidad', en: 'Advertising' }, purpose: { es: 'Medir anuncios de Bing.', en: 'Measure Bing ads.' }, ttl: { es: 'Hasta 13 meses', en: 'Up to 13 months' } },
+];
+const title = {
+  privacy: { es: 'Política de privacidad', en: 'Privacy policy' },
+  cookies: { es: 'Política de cookies', en: 'Cookie policy' },
+  legal: { es: 'Aviso legal', en: 'Legal notice' },
+}[doc][lang];
+---
+<Base title={title} description={title} noindex>
+  <article class="legal prose">
+    <h1 class="hero">{title}</h1>
+    <p class="post-date">{lang === 'es' ? 'Última actualización' : 'Last updated'}: {updated}</p>
+
+    {doc === 'legal' && (lang === 'es' ? (
+      <>
+        <p>En cumplimiento de la Ley 34/2002 de servicios de la sociedad de la información (LSSI), estos son los datos del titular de esta web:</p>
+        <ul>
+          <li><strong>Titular:</strong> Jorge Cardete Llamas</li>
+          <li><strong>Contacto:</strong> <a href={`mailto:${email}`}>{email}</a></li>
+          <li><strong>Actividad:</strong> blog personal sin ánimo de lucro</li>
+        </ul>
+        <p>Los textos, imágenes y código de esta web son de su autor salvo que se indique lo contrario. Puedes citarlos enlazando a la fuente. Los enlaces a webs de terceros se ofrecen como referencia y no implican responsabilidad sobre su contenido.</p>
+        <p>El tratamiento de datos personales se explica en la <a href={to('privacy')}>política de privacidad</a> y el uso de cookies en la <a href={to('cookies')}>política de cookies</a>.</p>
+      </>
+    ) : (
+      <>
+        <p>Under Spanish Law 34/2002 on information society services (LSSI), these are the details of the owner of this website:</p>
+        <ul>
+          <li><strong>Owner:</strong> Jorge Cardete Llamas</li>
+          <li><strong>Contact:</strong> <a href={`mailto:${email}`}>{email}</a></li>
+          <li><strong>Activity:</strong> non-profit personal blog</li>
+        </ul>
+        <p>The texts, images and code on this site belong to their author unless stated otherwise. You may quote them with a link to the source. Links to third-party sites are provided for reference and imply no responsibility for their content.</p>
+        <p>Personal data processing is explained in the <a href={to('privacy')}>privacy policy</a> and cookie use in the <a href={to('cookies')}>cookie policy</a>.</p>
+      </>
+    ))}
+
+    {doc === 'privacy' && (lang === 'es' ? (
+      <>
+        <h2>Responsable</h2>
+        <p>Jorge Cardete Llamas, <a href={`mailto:${email}`}>{email}</a>.</p>
+        <h2>Qué datos trato y para qué</h2>
+        <ul>
+          <li><strong>Newsletter.</strong> Tu email, para enviarte los artículos nuevos. La lista la gestiona Substack. Si lo indicas, también cómo conociste la web, para saber qué canales funcionan. Base legal: tu consentimiento al suscribirte.</li>
+          <li><strong>Analítica.</strong> Páginas visitadas, clics, dispositivo, país aproximado y de dónde llegaste (web, buscador o campaña). Con tu consentimiento se usan cookies. Sin él, las visitas se cuentan de forma anónima, sin guardar nada en tu navegador. Base legal: consentimiento y, para el recuento anónimo, interés legítimo en conocer el uso de la web.</li>
+          <li><strong>Publicidad.</strong> Si aceptas las cookies de publicidad y llegas desde un anuncio, se comparte con la red que lo mostró que hubo una visita o suscripción, para medir y optimizar campañas. Si te suscribes, se envía además tu email cifrado (hash SHA-256), nunca en claro. Base legal: tu consentimiento.</li>
+        </ul>
+        <h2>Con quién se comparten</h2>
+        <p>Proveedores que tratan los datos por encargo: Vercel (alojamiento), PostHog (analítica, servidores en la UE), Substack (newsletter) y, solo con consentimiento de publicidad, Google, Meta, LinkedIn, TikTok, Reddit, X y Microsoft. Algunos están en EE. UU.; las transferencias se amparan en el Marco de Privacidad de Datos UE-EE. UU. o en cláusulas contractuales tipo.</p>
+        <h2>Cuánto tiempo</h2>
+        <p>El email, hasta que te des de baja (hay un enlace en cada envío). Los datos de analítica, un máximo de 2 años.</p>
+        <h2>Tus derechos</h2>
+        <p>Puedes acceder, rectificar, suprimir, oponerte, limitar el tratamiento o pedir la portabilidad de tus datos escribiendo a <a href={`mailto:${email}`}>{email}</a>. Puedes retirar el consentimiento de cookies en cualquier momento desde <button type="button" class="link-button" data-consent-open>preferencias de cookies</button>. Si crees que no se han respetado tus derechos, puedes reclamar ante la <a href="https://www.aepd.es/">Agencia Española de Protección de Datos</a>.</p>
+      </>
+    ) : (
+      <>
+        <h2>Controller</h2>
+        <p>Jorge Cardete Llamas, <a href={`mailto:${email}`}>{email}</a>.</p>
+        <h2>What data I process and why</h2>
+        <ul>
+          <li><strong>Newsletter.</strong> Your email, to send you new articles. The list is managed by Substack. If you tell me, also how you found the site, to learn which channels work. Legal basis: your consent when subscribing.</li>
+          <li><strong>Analytics.</strong> Pages visited, clicks, device, approximate country and where you came from (website, search engine or campaign). Cookies are used only with your consent. Without it, visits are counted anonymously, without storing anything in your browser. Legal basis: consent and, for anonymous counting, legitimate interest in understanding how the site is used.</li>
+          <li><strong>Advertising.</strong> If you accept advertising cookies and arrive from an ad, the network that showed it is told that a visit or sign-up happened, to measure and optimise campaigns. If you subscribe, your hashed email (SHA-256) is also sent, never in plain text. Legal basis: your consent.</li>
+        </ul>
+        <h2>Who it is shared with</h2>
+        <p>Processors acting on my behalf: Vercel (hosting), PostHog (analytics, EU servers), Substack (newsletter) and, only with advertising consent, Google, Meta, LinkedIn, TikTok, Reddit, X and Microsoft. Some are based in the US; transfers rely on the EU-US Data Privacy Framework or standard contractual clauses.</p>
+        <h2>How long</h2>
+        <p>Your email, until you unsubscribe (every email has a link). Analytics data, for up to 2 years.</p>
+        <h2>Your rights</h2>
+        <p>You can access, rectify, erase, object to, restrict or port your data by writing to <a href={`mailto:${email}`}>{email}</a>. You can withdraw cookie consent at any time from <button type="button" class="link-button" data-consent-open>cookie settings</button>. If you believe your rights have not been respected, you can complain to the <a href="https://www.aepd.es/">Spanish Data Protection Agency (AEPD)</a>.</p>
+      </>
+    ))}
+
+    {doc === 'cookies' && (
+      <>
+        {lang === 'es' ? (
+          <p>Una cookie es un pequeño archivo que una web guarda en tu navegador. Esta web solo usa las técnicas sin pedirte permiso. Las de analítica y publicidad se activan únicamente si las aceptas, y puedes cambiar de opinión cuando quieras desde <button type="button" class="link-button" data-consent-open>preferencias de cookies</button>. Si las rechazas, las visitas se cuentan de forma anónima sin guardar nada en tu navegador.</p>
+        ) : (
+          <p>A cookie is a small file a website stores in your browser. This site only uses necessary ones without asking. Analytics and advertising cookies are only enabled if you accept them, and you can change your mind at any time from <button type="button" class="link-button" data-consent-open>cookie settings</button>. If you reject them, visits are counted anonymously without storing anything in your browser.</p>
+        )}
+        <div class="legal-table">
+          <table>
+            <thead>
+              <tr>
+                <th>{lang === 'es' ? 'Nombre' : 'Name'}</th>
+                <th>{lang === 'es' ? 'Proveedor' : 'Provider'}</th>
+                <th>{lang === 'es' ? 'Tipo' : 'Type'}</th>
+                <th>{lang === 'es' ? 'Finalidad' : 'Purpose'}</th>
+                <th>{lang === 'es' ? 'Duración' : 'Duration'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cookies.map((c) => (
+                <tr><td><code>{c.name}</code></td><td>{c.who}</td><td>{c.kind[lang]}</td><td>{c.purpose[lang]}</td><td>{c.ttl[lang]}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>{lang === 'es' ? 'Más detalles sobre los datos en la' : 'More about the data in the'} <a href={to('privacy')}>{lang === 'es' ? 'política de privacidad' : 'privacy policy'}</a>.</p>
+      </>
+    )}
+  </article>
+</Base>
+
+<style>
+  .legal { max-width: 720px; }
+  .legal .post-date { margin-bottom: 28px; }
+  .legal-table { overflow-x: auto; margin: 0 0 20px; }
+  .legal-table table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .legal-table th, .legal-table td { padding: 8px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+  .legal-table code { font-size: 12.5px; }
+  .link-button { padding: 0; font: inherit; font-weight: 600; color: var(--green); background: none; border: 0; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; }
+</style>

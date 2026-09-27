@@ -23,7 +23,7 @@ export default defineConfig({
     sitemap({
       i18n: { defaultLocale: 'es', locales: { es: 'es-ES', en: 'en-US' } },
       // Landings de campaña y páginas legales fuera del sitemap.
-      filter: (page) => !/\/(lp|legal)\//.test(new URL(page).pathname),
+      filter: (page) => !/^\/(en\/)?(lp\/|privacidad|privacy|cookies|aviso-legal|legal-notice)/.test(new URL(page).pathname),
     }),
   ],
 });
