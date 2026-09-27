@@ -30,7 +30,6 @@ Visitante ─► Banner propio (Consent Mode v2)          src/components/Consent
 | `outbound_click` | Cualquier otro enlace externo | `link_url`, `link_domain` |
 | `game_house_enter` / `game_complete` | Juego del pueblo | `house` / `coins` |
 | `consent_update` | Cambia el consentimiento (solo `dataLayer`) | `consent_analytics`, `consent_ads` |
-| `ai_visibility_check` | Semanal, desde GitHub Actions | `prompt`, `cited`, `in_results`, `mentioned`, `our_urls` |
 
 Un enlace con `data-track="nombre"` envía ese evento en lugar del automático.
 
@@ -69,7 +68,7 @@ Un enlace con `data-track="nombre"` envía ese evento en lugar del automático.
 - **IndexNow**: variable de repositorio `SITE_URL` en GitHub (*Settings → Variables*). El workflow `IndexNow` se lanza tras cada despliegue a producción.
 
 ### 6. Visibilidad en IA
-Secretos de GitHub `ANTHROPIC_API_KEY` y `POSTHOG_KEY`, y la variable `SITE_URL`. Las preguntas están en `scripts/ai-visibility-prompts.json`.
+Las citas en ChatGPT, Perplexity, Gemini o los AI Overviews se siguen con una herramienta externa (Peec AI, Otterly, Profound, o los módulos de IA de Semrush o Ahrefs Brand Radar), no desde este repo. Las visitas que sí llegan desde asistentes se ven en PostHog con `channel = ai` y `ai_source`.
 
 ## Campañas
 
@@ -80,4 +79,3 @@ Secretos de GitHub `ANTHROPIC_API_KEY` y `POSTHOG_KEY`, y la variable `SITE_URL`
 ## Pendiente
 
 - **GTM de servidor** (Stape) para las APIs de conversiones de Meta, LinkedIn, TikTok y Reddit. Cuando exista, añadir en `vercel.json` un rewrite de `/metrics/:path*` al contenedor de Stape y cambiar las etiquetas para que envíen allí.
-- Otros asistentes en la comprobación semanal (ChatGPT, Perplexity, Gemini).

@@ -14,8 +14,5 @@
     "@astrojs/vercel": "^11.0.11",
     "astro": "^7.3.3",
     "posthog-js": "^1.434.15"
-  },
-  "devDependencies": {
-    "@anthropic-ai/sdk": "^0.128.0"
   }
 }
