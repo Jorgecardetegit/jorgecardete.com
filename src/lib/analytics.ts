@@ -73,6 +73,15 @@ export async function track(event: string, props: Record<string, unknown> = {}, 
   if (POSTHOG_KEY) posthog.capture(event, { ...props, event_id });
 }
 
+/**
+ * Une la actividad anónima con una persona (p. ej. al suscribirse), con el email
+ * cifrado como id. Solo con consentimiento de analítica: sin él no hay perfil.
+ */
+export async function identify(email: string, props: Record<string, unknown> = {}) {
+  if (!POSTHOG_KEY || !consent.analytics) return;
+  posthog.identify(await sha256(email.trim().toLowerCase()), props);
+}
+
 async function sha256(text: string) {
   const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join('');

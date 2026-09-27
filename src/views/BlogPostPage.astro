@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Newsletter from '../components/Newsletter.astro';
 import { dateFormat, path, type Lang } from '../i18n';
 import { getBlogSlug } from '../lib/blog';
 import { blogPosting, breadcrumbs } from '../lib/seo';
@@ -50,6 +51,7 @@ const text = {
         </aside>
       )}
     </div>
+    <Newsletter lang={lang} placement="post_end" />
   </article>
 </Base>
 

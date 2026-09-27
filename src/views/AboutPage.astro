@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Newsletter from '../components/Newsletter.astro';
 import WorldBadge from '../components/WorldBadge.astro';
 import { path, type Lang } from '../i18n';
 
@@ -70,4 +71,5 @@ const to = (route: Parameters<typeof path>[0]) => path(route, lang);
       </ul>
     </>
   )}
+  <Newsletter lang={lang} placement="about" />
 </Base>
