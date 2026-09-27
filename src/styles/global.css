@@ -276,8 +276,14 @@ section { margin-bottom: 64px; }
 .wide-brand { display: inline-block; font-family: var(--mono); font-size: 13px; text-decoration: none; margin: 0 0 24px max(0px, calc((100% - 960px) / 2)); }
 .wide-main { max-width: 960px; margin: 0 auto; }
 
+/* En escritorio la barra no baja de 280px: logo, tema e idioma caben en una fila y el pie en una línea. */
+@media (min-width: 1001px) {
+  .sidebar { flex-basis: 280px; min-width: 280px; }
+  .side-foot .footer-pages { white-space: nowrap; }
+}
+
 /* ---- Botón de tema y modo oscuro ---- */
-.theme-toggle { flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-left: auto; padding: 0; background: transparent; border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; }
+.theme-toggle { flex: none; display: grid; place-items: center; width: 26px; height: 26px; margin-left: auto; padding: 0; background: transparent; border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; }
 .theme-toggle:hover { color: var(--ink); background: var(--card); }
 .theme-toggle .icon-sun { display: none; }
 :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
