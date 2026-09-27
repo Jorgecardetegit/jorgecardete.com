@@ -32,6 +32,10 @@ a:hover { color: var(--terracotta); }
 .footer-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
 a.footer-link { display: inline-flex; align-items: center; gap: .375rem; color: #5a5a61; font-weight: 500; text-decoration: none; white-space: nowrap; }
 a.footer-link:hover { color: var(--green); text-decoration: underline; }
+/* GitHub y Astro: botones con su logo, como los de «Built with» de otros blogs. */
+.footer-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+a.footer-button { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1.5px solid var(--green); border-radius: 8px; color: var(--green); font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .15s; }
+a.footer-button:hover { background: rgba(43, 148, 118, 0.1); color: var(--green); }
 /* Currículum | Temas | Código, bajo los iconos de redes. */
 .footer-pages { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; }
 .footer-pages a { color: #5a5a61; font-weight: 500; text-decoration: none; white-space: nowrap; }
