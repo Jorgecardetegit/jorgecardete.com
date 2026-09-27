@@ -23,7 +23,8 @@ body { color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Googl
 a { color: var(--green); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 a:hover { color: var(--terracotta); }
 
-.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(32px, 12vw, 220px); }
+/* El margen izquierdo se va cerrando al estrechar la pantalla hasta casi desaparecer hacia 1380px. */
+.shell { min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; padding-left: clamp(16px, calc((100vw - 1380px) * 0.5), 220px); }
 .sidebar { flex: 1 1 240px; max-width: 320px; min-width: 240px; padding: 24px 30px 40px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 0; align-self: flex-start; height: 100vh; height: 100dvh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(31,29,26,0.25) transparent; }
 .main-col { flex: 999 1 520px; min-width: 320px; max-width: 1140px; display: flex; flex-direction: column; border-left: 1px solid var(--line); }
 .main { flex: 1; padding: 56px 40px 80px 88px; }
@@ -188,21 +189,35 @@ section { margin-bottom: 64px; }
 .toc a:hover { color: var(--ink); }
 .toc a.active { color: var(--green); border-left-color: var(--green); font-weight: 500; }
 
-@media (max-width: 1000px) {
+/* Con barra lateral e índice a la vez, por debajo de 1150px el texto se queda demasiado estrecho. */
+@media (max-width: 1150px) {
   .toc { display: none; }
 }
 
 /* Pantallas medianas: la foto flota a la derecha y el texto la rodea, sin hueco debajo. */
-@media (min-width: 721px) and (max-width: 1279px) {
+@media (min-width: 801px) and (max-width: 1279px) {
   .about-top { display: flow-root; max-width: 940px; }
   .about-text { min-width: 0; max-width: none; }
   .about-photo { float: right; width: min(300px, 42%); margin: 6px 0 20px 40px; }
 }
 
-@media (max-width: 720px) {
+/* De 1000px a 800px: la barra lateral pasa a ser una cabecera horizontal con el índice en fila. */
+@media (min-width: 801px) and (max-width: 1000px) {
+  .shell { padding-left: 0; }
+  .sidebar { flex: 0 0 100%; flex-direction: row; align-items: center; gap: 16px; max-width: none; min-width: 0; height: auto; align-self: stretch; overflow: visible; position: sticky; top: 0; z-index: 30; padding: 12px 28px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .sidebar-menu > .intro, .side-map, .side-foot { display: none; }
+  .nav { flex-direction: row; gap: 2px; margin-left: auto; border-top: 0; padding-top: 0; }
+  .nav a { font-size: 15px; padding: 6px 9px; gap: 7px; }
+  .main-col { flex: 1 1 100%; max-width: none; border-left: 0; }
+  .main { padding: 40px 32px 70px; }
+  .footer { margin: 0 32px; }
+}
+
+@media (max-width: 800px) {
   .shell { padding-left: 0; }
   /* En móvil la barra es una cabecera con menú hamburguesa que despliega el resto. */
-  .sidebar { position: sticky; top: 0; z-index: 30; background: var(--bg); max-width: none; min-width: 0; border-bottom: 1px solid var(--line); height: auto; overflow: visible; padding: 14px 16px; gap: 0; }
+  /* Siempre una fila entera: si no, cabecera (240px) y contenido (520px) caben juntos hasta 800px. */
+  .sidebar { flex: 0 0 100%; position: sticky; top: 0; z-index: 30; background: var(--bg); max-width: none; min-width: 0; border-bottom: 1px solid var(--line); height: auto; overflow: visible; padding: 14px 16px; gap: 0; }
   .sidebar > .brand, .sidebar-profile { margin-right: 52px; }
   /* La cabecera va pegada arriba; el menú se despliega justo debajo de ella. */
   .menu-toggle { display: grid; position: absolute; top: 10px; right: 14px; }
@@ -215,7 +230,7 @@ section { margin-bottom: 64px; }
   .side-map { padding-top: 14px; }
   .side-foot { margin-top: 0; }
   .sidebar-menu > .intro { margin-top: 0; }
-  .main-col { border-left: 0; }
+  .main-col { flex: 1 1 100%; max-width: none; border-left: 0; }
   .main { padding: 36px 20px 60px; }
   .footer { margin: 0 20px; }
   .paper { grid-template-columns: minmax(0, 1fr); }
