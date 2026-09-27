@@ -92,6 +92,11 @@ const text = {
       </>
     ))}
 
+    <h2 id="skills">{text.skills}</h2>
+    <ul>
+      {text.skillList.map(([name, list]) => <li><strong>{name}</strong>: {list}</li>)}
+    </ul>
+
     <h2 id="projects">{text.projects}</h2>
     <ul>
       {shipped.map((p) => {
@@ -103,11 +108,6 @@ const text = {
           </li>
         );
       })}
-    </ul>
-
-    <h2 id="skills">{text.skills}</h2>
-    <ul>
-      {text.skillList.map(([name, list]) => <li><strong>{name}</strong>: {list}</li>)}
     </ul>
 
     <h2 id="writing">{text.writing}</h2>
