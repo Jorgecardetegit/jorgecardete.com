@@ -86,11 +86,7 @@ const text = {
               <strong>{l(role.title, lang)}</strong>
               <span class="resume-date">{month(role.start)} – {role.end ? month(role.end) : text.present}</span>
             </div>
-            {role.points.length > 0 && (
-              <ul>
-                {role.points.map((pt) => <li>{pt.lead && <><strong>{pt.lead}</strong>: </>}{l(pt.text, lang)}</li>)}
-              </ul>
-            )}
+            {role.points.map((pt) => <p class="resume-p">{pt.lead && <><strong>{pt.lead}</strong>: </>}{l(pt.text, lang)}</p>)}
           </>
         ))}
       </>
@@ -149,7 +145,8 @@ const text = {
   .resume h2 { margin: 44px 0 20px; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--text-soft); }
   .resume h3 { margin: 26px 0 8px; font-size: 17px; font-weight: 500; }
   .resume h2 + h3 { margin-top: 0; }
-  .resume-role + .resume-role, ul + .resume-role { margin-top: 18px; }
+  .resume-role + .resume-role, .resume-p + .resume-role { margin-top: 18px; }
+  .resume-p { margin: 0 0 10px; }
   .resume-role { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 16px; margin-bottom: 16px; font-size: 16.5px; }
   .resume-date { font-family: var(--mono); font-size: 13px; color: var(--text-soft); }
   .resume ul { margin: 0; padding-left: 16px; }
