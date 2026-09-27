@@ -40,11 +40,11 @@ export function initAnalytics() {
 }
 
 // Mientras no haya decisión se trata como rechazo: se mide, pero sin guardar nada.
-// Solo se cambia el estado si difiere: cada opt_in manda un evento `$opt_in`.
+// El opt-in solo si hace falta: cada llamada manda un evento `$opt_in`. El opt-out
+// se repite siempre: es lo que activa el modo sin cookies en cada carga.
 function applyPostHogConsent() {
-  if (consent.analytics) {
-    if (!posthog.has_opted_in_capturing()) posthog.opt_in_capturing();
-  } else if (!posthog.has_opted_out_capturing()) posthog.opt_out_capturing();
+  if (!consent.analytics) posthog.opt_out_capturing();
+  else if (!posthog.has_opted_in_capturing()) posthog.opt_in_capturing();
 }
 
 const touchProperties = () => ({
