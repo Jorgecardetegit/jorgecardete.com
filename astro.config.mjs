@@ -4,9 +4,11 @@ import vercel from '@astrojs/vercel';
 
 // Dominio público: SITE_URL si se define; si no, el de producción que Vercel
 // expone al compilar (el dominio propio en cuanto se añada al proyecto).
-const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-const site = process.env.SITE_URL
-  ?? (productionHost ? `https://${productionHost}` : 'https://jorgecardetegit.github.io');
+// Vacío cuenta como sin definir, y sin protocolo se asume https.
+const withProtocol = (host) => (/^https?:\/\//.test(host) ? host : `https://${host}`);
+const site = withProtocol(
+  process.env.SITE_URL?.trim() || process.env.VERCEL_PROJECT_PRODUCTION_URL || 'jorgecardete.com',
+);
 
 export default defineConfig({
   site,
