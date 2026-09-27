@@ -57,11 +57,12 @@ const text = {
   const prefs = banner.querySelector<HTMLFormElement>('.consent-prefs')!;
   const save = banner.querySelector<HTMLButtonElement>('[data-choice="save"]')!;
   const configure = banner.querySelector<HTMLButtonElement>('[data-choice="configure"]')!;
+  const box = (name: 'analytics' | 'ads') => prefs.elements.namedItem(name) as HTMLInputElement;
 
   const open = (withPrefs = false) => {
     const current = readConsent();
-    prefs.analytics.checked = current?.analytics ?? false;
-    prefs.ads.checked = current?.ads ?? false;
+    box('analytics').checked = current?.analytics ?? false;
+    box('ads').checked = current?.ads ?? false;
     prefs.hidden = save.hidden = !withPrefs;
     configure.hidden = withPrefs;
     banner.hidden = false;
@@ -76,7 +77,7 @@ const text = {
     if (choice === 'accept') decide(true, true);
     else if (choice === 'reject') decide(false, false);
     else if (choice === 'configure') open(true);
-    else if (choice === 'save') decide(prefs.analytics.checked, prefs.ads.checked);
+    else if (choice === 'save') decide(box('analytics').checked, box('ads').checked);
   });
   document.addEventListener('click', (e) => {
     if (!(e.target as HTMLElement).closest('[data-consent-open]')) return;
