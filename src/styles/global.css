@@ -275,3 +275,51 @@ section { margin-bottom: 64px; }
 .wide { min-height: 100vh; padding: 28px 24px 80px; }
 .wide-brand { display: inline-block; font-family: var(--mono); font-size: 13px; text-decoration: none; margin: 0 0 24px max(0px, calc((100% - 960px) / 2)); }
 .wide-main { max-width: 960px; margin: 0 auto; }
+
+/* ---- Botón de tema y modo oscuro ---- */
+.theme-toggle { flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-left: auto; padding: 0; background: transparent; border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; }
+.theme-toggle:hover { color: var(--ink); background: var(--card); }
+.theme-toggle .icon-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
+/* Paleta oscura cálida, a juego con el crema: los bordes pixel pasan a crema claro. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1c1a17;
+  --card: #26231f;
+  --ink: #ece5d3;
+  --muted: #a39a8a;
+  --text-soft: #cfc6b3;
+  --green: #4fb892;
+  --terracotta: #de9064;
+  --gold: #e0bd48;
+  --purple: #a296e6;
+  --red: #e07c65;
+  --line: rgba(236, 229, 211, 0.14);
+  --shadow: rgba(0, 0, 0, 0.6);
+}
+/* Colores que en claro van escritos a mano. */
+:root[data-theme="dark"] .nav, :root[data-theme="dark"] .side-map, :root[data-theme="dark"] .footer { border-top-color: var(--line); }
+:root[data-theme="dark"] .nav a, :root[data-theme="dark"] .nav a:hover { color: var(--ink); }
+:root[data-theme="dark"] .nav a:hover { background: rgba(79, 184, 146, 0.12); }
+:root[data-theme="dark"] .footer, :root[data-theme="dark"] a.footer-link, :root[data-theme="dark"] .footer-pages a, :root[data-theme="dark"] .side-links a { color: var(--muted); }
+:root[data-theme="dark"] .footer-pages a + a::before { color: var(--line); }
+:root[data-theme="dark"] .lang-switch a { border-color: rgba(236, 229, 211, 0.2); color: var(--muted); }
+:root[data-theme="dark"] .lang-switch a:hover { color: var(--ink); background: var(--card); }
+:root[data-theme="dark"] .lang-switch a[aria-current] { color: var(--bg); background: var(--ink); border-color: var(--ink); }
+:root[data-theme="dark"] .startup-url, :root[data-theme="dark"] .paper-links, :root[data-theme="dark"] .pcard-links { border-top-color: var(--line); }
+:root[data-theme="dark"] .about-photo, :root[data-theme="dark"] .bcover { background: var(--card); }
+:root[data-theme="dark"] .pchip, :root[data-theme="dark"] .group-toggle { color: var(--ink); border-color: rgba(236, 229, 211, 0.2); }
+:root[data-theme="dark"] .pchip:hover, :root[data-theme="dark"] .group-toggle:hover { background: var(--card); }
+:root[data-theme="dark"] .pchip[aria-pressed='true'], :root[data-theme="dark"] .group-toggle[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+:root[data-theme="dark"] .home { --c-text: #e4dccb; --c-strong: #f3ecdb; --c-muted: var(--muted); --c-border: var(--line); --c-card: var(--card); --c-card-border: rgba(236, 229, 211, 0.18); --c-hover: #2e2b26; }
+:root[data-theme="dark"] .home a.cta:hover { background: #2e2b26; }
+/* El avatar pixel mantiene su contorno oscuro. */
+:root[data-theme="dark"] .avatar > div { border-color: #1f1d1a !important; }
+/* Texto sobre bloques de color: crema, como en claro. */
+:root[data-theme="dark"] .badge, :root[data-theme="dark"] a.badge:hover, :root[data-theme="dark"] .startup-img span, :root[data-theme="dark"] .map-play, :root[data-theme="dark"] .map-play:hover { color: #f6f1e4; }
+:root[data-theme="dark"] .map-play-title { text-shadow: 2px 2px 0 #1f1d1a; }
+:root[data-theme="dark"] .map-play-sub { color: #e3f5ec; }
+/* El juego es un pueblo de día: siempre con la paleta clara. */
+:root[data-theme="dark"] .game { color-scheme: light; --bg: #f6f1e4; --card: #efe8d6; --ink: #1f1d1a; --muted: #6f675c; --text-soft: #50493f; --green: #2b9476; --terracotta: #b5623c; --line: rgba(31, 29, 26, 0.14); --shadow: rgba(31, 29, 26, 0.9); color: var(--ink); }
