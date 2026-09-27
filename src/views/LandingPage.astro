@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import Newsletter from '../components/Newsletter.astro';
+import type { Landing } from '../data/landings';
+import { path, useTranslations } from '../i18n';
+
+interface Props { landing: Landing }
+const { landing } = Astro.props;
+const t = useTranslations(landing.lang);
+---
+<Base title={landing.meta.title} description={landing.meta.description} image={landing.image} sidebar={false} noindex>
+  <article class="lp" data-experiment={landing.experiment && JSON.stringify(landing.experiment)}>
+    <h1 class="lp-title" data-copy="title">{landing.title}</h1>
+    <p class="lp-lead" data-copy="lead">{landing.lead}</p>
+    <ul class="lp-bullets">
+      {landing.bullets.map((b) => <li>{b}</li>)}
+    </ul>
+    {landing.proof && <p class="lp-proof">{landing.proof}</p>}
+    <Newsletter lang={landing.lang} placement={`lp_${landing.slug}`} title={landing.cta} lead="" />
+  </article>
+  <nav class="footer-legal lp-legal" aria-label={t('footer.legal')}>
+    <a href={path('privacy', landing.lang)}>{t('footer.privacy')}</a>
+    <a href={path('cookies', landing.lang)}>{t('footer.cookies')}</a>
+    <a href={path('legal', landing.lang)}>{t('footer.legalNotice')}</a>
+    <button type="button" data-consent-open>{t('footer.cookieSettings')}</button>
+  </nav>
+</Base>
+
+<script>
+  import { onFeatureFlag, track } from '../lib/analytics';
+
+  const lp = document.querySelector<HTMLElement>('.lp')!;
+  track('landing_view', { landing: location.pathname });
+  if (lp.dataset.experiment) {
+    const { flag, variants } = JSON.parse(lp.dataset.experiment);
+    onFeatureFlag(flag, (variant) => {
+      const copy = typeof variant === 'string' ? variants[variant] : undefined;
+      for (const [key, value] of Object.entries(copy ?? {})) {
+        const el = lp.querySelector<HTMLElement>(`[data-copy="${key}"]`);
+        if (el) el.textContent = value as string;
+      }
+    });
+  }
+</script>
+
+<style>
+  .lp { max-width: 720px; margin: 24px auto 0; }
+  .lp-title { margin: 0 0 18px; font-family: var(--display); font-weight: 800; font-size: clamp(36px, 6vw, 58px); line-height: 1.02; letter-spacing: -1.5px; text-wrap: balance; }
+  .lp-lead { margin: 0 0 24px; font-size: 19px; line-height: 1.55; color: var(--text-soft); text-wrap: pretty; }
+  .lp-bullets { margin: 0 0 20px; padding-left: 22px; font-size: 16.5px; line-height: 1.8; }
+  .lp-proof { margin: 0; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .lp-legal { max-width: 720px; margin: 56px auto 0; }
+  .lp :global(.newsletter) { margin-top: 32px; }
+  .lp :global(.newsletter-lead:empty) { display: none; }
+</style>

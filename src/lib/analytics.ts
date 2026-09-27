@@ -73,6 +73,12 @@ export async function track(event: string, props: Record<string, unknown> = {}, 
   if (POSTHOG_KEY) posthog.capture(event, { ...props, event_id });
 }
 
+/** Variante de un experimento de PostHog en cuanto se cargan los flags (nada sin PostHog). */
+export function onFeatureFlag(key: string, callback: (variant: string | boolean | undefined) => void) {
+  if (!started) initAnalytics();
+  if (POSTHOG_KEY) posthog.onFeatureFlags(() => callback(posthog.getFeatureFlag(key)));
+}
+
 /**
  * Une la actividad anónima con una persona (p. ej. al suscribirse), con el email
  * cifrado como id. Solo con consentimiento de analítica: sin él no hay perfil.
