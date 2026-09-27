@@ -48,12 +48,12 @@ const text = {
 
 <style>
   .tletter { margin: 36px 0 0; }
-  .tletter-title { margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-family: var(--pixel); font-size: 14px; line-height: 1.2; color: var(--ink); }
-  .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
-  .tcard { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; padding: 10px 12px 10px 14px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, box-shadow .15s; }
+  .tletter-title { margin: 0 0 16px; font-family: var(--pixel); font-size: 14px; line-height: 1.2; color: var(--ink); }
+  .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .tcard { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; padding: 16px 16px 16px 18px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, box-shadow .15s; }
   .tcard:hover, .tcard:focus-visible { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--shadow); color: var(--ink); }
   .tcard:hover .tcard-name { color: var(--green); }
-  .tcard-name { min-width: 0; overflow-wrap: anywhere; font-family: var(--mono); font-size: 14px; font-weight: 500; }
-  .tcard-count { flex: none; font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 9px; }
+  .tcard-name { min-width: 0; overflow-wrap: anywhere; font-family: var(--mono); font-size: 15.5px; font-weight: 500; }
+  .tcard-count { flex: none; font-family: var(--mono); font-size: 13px; color: var(--muted); border: 1.5px solid var(--line); border-radius: 999px; padding: 3px 10px; }
   .tcard-count strong { color: var(--green); font-weight: 600; }
 </style>
