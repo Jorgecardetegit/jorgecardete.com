@@ -32,12 +32,6 @@ a:hover { color: var(--terracotta); }
 .footer-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
 a.footer-link { display: inline-flex; align-items: center; gap: .375rem; color: #5a5a61; font-weight: 500; text-decoration: none; white-space: nowrap; }
 a.footer-link:hover { color: var(--green); text-decoration: underline; }
-/* Currículum | Temas | Código, bajo los iconos de redes. */
-.footer-pages { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; }
-.footer-pages a { color: #5a5a61; font-weight: 500; text-decoration: none; white-space: nowrap; }
-.footer-pages a + a::before { content: '|'; display: inline-block; margin: 0 12px; color: #d4c89f; }
-.footer-pages a:hover { color: var(--green); }
-.footer-pages a[aria-current='page'] { color: var(--ink); font-weight: 600; }
 .footer-made-by { display: flex; align-items: center; gap: 5px; }
 .footer-made-by svg { color: #e0314b; }
 
@@ -184,6 +178,9 @@ section { margin-bottom: 64px; }
 .prose pre { background: var(--card); border: 3px solid var(--ink); padding: 16px; overflow-x: auto; }
 .prose pre code { background: none; padding: 0; }
 .prose img { display: block; max-width: 100%; height: auto; margin: 28px 0; border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+/* Pie de foto: el <em> que va justo detrás de la imagen, más pequeño y pegado a ella. */
+.prose p > img + em { display: block; margin-top: -18px; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+.prose p > img + em a { font-weight: 500; text-decoration-thickness: 1px; }
 .prose hr { border: 0; height: 1px; background: var(--line); margin: 40px 0; }
 .prose table { width: 100%; margin: 0 0 24px; border-collapse: collapse; font-size: 15px; }
 .prose th, .prose td { text-align: left; padding: 9px 12px; border: 1px solid var(--line); }
