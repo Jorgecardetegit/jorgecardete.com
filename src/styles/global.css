@@ -77,6 +77,9 @@ a.footer-button:hover { background: rgba(43, 148, 118, 0.1); color: var(--green)
 .side-links { display: flex; align-items: center; gap: 16px; }
 .side-links a { display: inline-flex; color: #6b6b72; }
 .side-links a:hover { color: var(--terracotta); }
+/* Trazo algo más grueso; los iconos rellenos (X, Medium) ganan un contorno fino para igualarlos. */
+.side-links svg[stroke] { stroke-width: 2; }
+.side-links svg:not([stroke]) { stroke: currentColor; stroke-width: 0.6; }
 .side-note { font-family: var(--mono); font-size: 12px; color: var(--muted); }
 
 .badge { display: inline-block; font-family: var(--pixel); font-size: 10px; line-height: 1.6; color: var(--bg); background: var(--red); border: 3px solid var(--ink); padding: 8px 12px; margin-bottom: 18px; box-shadow: 4px 4px 0 var(--shadow); }
