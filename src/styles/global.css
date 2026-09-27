@@ -39,6 +39,8 @@ a.footer-link:hover { color: var(--green); text-decoration: underline; }
 .avatar { position: relative; width: 30px; height: 30px; flex: none; }
 .avatar > div { position: absolute; border: 3px solid var(--ink); }
 .intro { margin: 0; font-size: 15px; line-height: 1.65; color: var(--text-soft); text-wrap: pretty; }
+/* Pegada al logo: la barra separa sus bloques 30px, aquí basta con 16px. */
+.sidebar-menu > .intro { margin-top: -14px; }
 
 .label-pixel { font-family: var(--pixel); font-size: 10px; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.5px; }
 
@@ -202,6 +204,7 @@ section { margin-bottom: 64px; }
   .nav a { font-size: 15px; padding: 6px 8px; }
   .side-map { padding-top: 14px; }
   .side-foot { margin-top: 0; }
+  .sidebar-menu > .intro { margin-top: 0; }
   .main-col { border-left: 0; }
   .main { padding: 36px 20px 60px; }
   .footer { margin: 0 20px; }
