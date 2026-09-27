@@ -1,4 +1,6 @@
 ---
+import Analytics from '../components/Analytics.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 import PixelIcon from '../components/PixelIcon.astro';
 import SideMap from '../components/SideMap.astro';
 import { getLang, languages, path, translatePath, useTranslations, type Lang } from '../i18n';
@@ -48,6 +50,7 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'jorge.dev' : `${titl
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
+    <Analytics />
     <script is:inline>
       // Tema claro/oscuro antes de pintar (sin destello): lo elegido, o si no, lo del sistema.
       (() => {
@@ -216,5 +219,6 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'jorge.dev' : `${titl
       </main>
     </div>
     )}
+    <ConsentBanner lang={lang} />
   </body>
 </html>

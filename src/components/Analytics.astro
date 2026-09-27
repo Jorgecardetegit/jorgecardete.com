@@ -1,0 +1,45 @@
+---
+// Va en el <head>, antes que cualquier otra etiqueta: fija Consent Mode v2
+// (todo denegado salvo lo que el visitante ya aceptara) y después carga GTM.
+// Sin PUBLIC_GTM_ID no se carga GTM, pero dataLayer y PostHog siguen funcionando.
+const gtmId = import.meta.env.PUBLIC_GTM_ID ?? '';
+---
+<script is:inline define:vars={{ gtmId }}>
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    functionality_storage: 'granted',
+    security_storage: 'granted',
+    wait_for_update: 500,
+  });
+  gtag('set', 'ads_data_redaction', true);
+  gtag('set', 'url_passthrough', true);
+  // Misma clave y versión que src/lib/consent.ts.
+  try {
+    const saved = JSON.parse(localStorage.getItem('jorge.dev:consent') || 'null');
+    if (saved && saved.v === 1) {
+      const ads = saved.ads ? 'granted' : 'denied';
+      gtag('consent', 'update', {
+        analytics_storage: saved.analytics ? 'granted' : 'denied',
+        ad_storage: ads, ad_user_data: ads, ad_personalization: ads,
+      });
+    }
+  } catch {}
+  if (gtmId) {
+    dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtm.js?id=' + gtmId;
+    document.head.appendChild(s);
+  }
+</script>
+<script>
+  import { initAnalytics } from '../lib/analytics';
+  import { autotrack } from '../lib/autotrack';
+  initAnalytics();
+  autotrack();
+</script>

@@ -1,0 +1,105 @@
+---
+// Banner de cookies propio. Aceptar y rechazar tienen el mismo peso (lo pide
+// la AEPD) y "Configurar" separa analítica y publicidad. Cualquier enlace o
+// botón con data-consent-open lo vuelve a abrir.
+import { path, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const text = {
+  es: {
+    title: 'Cookies',
+    body: 'Uso cookies de analítica para saber qué se lee y de publicidad para medir mis campañas. Si las rechazas, solo cuento visitas de forma anónima, sin guardar nada en tu navegador.',
+    policy: 'Política de cookies',
+    accept: 'Aceptar todo',
+    reject: 'Rechazar',
+    configure: 'Configurar',
+    save: 'Guardar',
+    analytics: 'Analítica',
+    analyticsHint: 'PostHog y Google Analytics: páginas vistas, lectura y clics.',
+    ads: 'Publicidad',
+    adsHint: 'Google Ads, Meta, LinkedIn, TikTok, Reddit, X y Microsoft: medir y optimizar campañas.',
+  },
+  en: {
+    title: 'Cookies',
+    body: 'I use analytics cookies to learn what gets read and advertising cookies to measure my campaigns. If you reject them, I only count visits anonymously, without storing anything in your browser.',
+    policy: 'Cookie policy',
+    accept: 'Accept all',
+    reject: 'Reject',
+    configure: 'Settings',
+    save: 'Save',
+    analytics: 'Analytics',
+    analyticsHint: 'PostHog and Google Analytics: page views, reading and clicks.',
+    ads: 'Advertising',
+    adsHint: 'Google Ads, Meta, LinkedIn, TikTok, Reddit, X and Microsoft: measuring and optimising campaigns.',
+  },
+}[lang];
+---
+<section class="consent" role="dialog" aria-labelledby="consent-title" aria-describedby="consent-body" hidden>
+  <h2 class="consent-title" id="consent-title">{text.title}</h2>
+  <p class="consent-body" id="consent-body">{text.body} <a href={path('cookies', lang)}>{text.policy}</a>.</p>
+  <form class="consent-prefs" hidden>
+    <label><input type="checkbox" name="analytics" /> <span><strong>{text.analytics}</strong> {text.analyticsHint}</span></label>
+    <label><input type="checkbox" name="ads" /> <span><strong>{text.ads}</strong> {text.adsHint}</span></label>
+  </form>
+  <div class="consent-actions">
+    <button type="button" data-choice="reject">{text.reject}</button>
+    <button type="button" data-choice="configure">{text.configure}</button>
+    <button type="button" data-choice="save" hidden>{text.save}</button>
+    <button type="button" data-choice="accept">{text.accept}</button>
+  </div>
+</section>
+
+<script>
+  import { readConsent, saveConsent } from '../lib/consent';
+
+  const banner = document.querySelector<HTMLElement>('.consent')!;
+  const prefs = banner.querySelector<HTMLFormElement>('.consent-prefs')!;
+  const save = banner.querySelector<HTMLButtonElement>('[data-choice="save"]')!;
+  const configure = banner.querySelector<HTMLButtonElement>('[data-choice="configure"]')!;
+
+  const open = (withPrefs = false) => {
+    const current = readConsent();
+    prefs.analytics.checked = current?.analytics ?? false;
+    prefs.ads.checked = current?.ads ?? false;
+    prefs.hidden = save.hidden = !withPrefs;
+    configure.hidden = withPrefs;
+    banner.hidden = false;
+  };
+  const decide = (analytics: boolean, ads: boolean) => {
+    saveConsent({ analytics, ads });
+    banner.hidden = true;
+  };
+
+  banner.addEventListener('click', (e) => {
+    const choice = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-choice]')?.dataset.choice;
+    if (choice === 'accept') decide(true, true);
+    else if (choice === 'reject') decide(false, false);
+    else if (choice === 'configure') open(true);
+    else if (choice === 'save') decide(prefs.analytics.checked, prefs.ads.checked);
+  });
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('[data-consent-open]')) return;
+    e.preventDefault();
+    open(true);
+  });
+
+  if (!readConsent()) open();
+</script>
+
+<style>
+  .consent { position: fixed; z-index: 50; right: 16px; bottom: 16px; left: 16px; max-width: 460px; margin-left: auto; padding: 18px 20px; background: var(--card); color: var(--ink); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .consent[hidden] { display: none; }
+  .consent-title { margin: 0 0 8px; font-family: var(--pixel); font-size: 12px; }
+  .consent-body { margin: 0 0 14px; font-size: 14.5px; line-height: 1.55; color: var(--text-soft); }
+  .consent-prefs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .consent-prefs[hidden] { display: none; }
+  .consent-prefs label { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; color: var(--text-soft); cursor: pointer; }
+  .consent-prefs strong { color: var(--ink); }
+  .consent-prefs input { margin-top: 3px; accent-color: var(--green); }
+  .consent-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .consent-actions button { flex: 1 1 auto; padding: 8px 12px; font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ink); background: var(--bg); border: 2px solid var(--ink); border-radius: 3px; cursor: pointer; }
+  .consent-actions button:hover { box-shadow: 3px 3px 0 var(--shadow); }
+  .consent-actions button[hidden] { display: none; }
+  .consent-actions [data-choice='accept'], .consent-actions [data-choice='reject'] { flex-basis: 30%; }
+</style>

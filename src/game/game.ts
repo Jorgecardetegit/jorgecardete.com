@@ -455,6 +455,7 @@ export function startGame(root: HTMLElement) {
     player.vx = player.vy = 0;
     keys.left = keys.right = keys.jump = false;
     house.room.showModal();
+    window.dispatchEvent(new CustomEvent('game:room', { detail: house.sign.dataset.room }));
   }
   function leaveRoom() {
     if (state !== 'room') return;
@@ -725,6 +726,7 @@ export function startGame(root: HTMLElement) {
       keys.left = keys.right = keys.jump = false;
       root.querySelector<HTMLElement>('.win-coins')!.textContent = String(collected);
       setTimeout(() => winDialog.showModal(), 700);
+      window.dispatchEvent(new CustomEvent('game:win', { detail: collected }));
     }
     if (won) flagDrop = Math.min(80, flagDrop + 1.2);
 

@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { dateFormat, path, type Lang } from '../i18n';
+import { getBlogSlug } from '../lib/blog';
 import { blogPosting, breadcrumbs } from '../lib/seo';
 
 interface Props { post: CollectionEntry<'blog'>; lang: Lang }
@@ -34,7 +35,7 @@ const text = {
     </p>
 
     <div class="post-body">
-      <div class="prose"><Content /></div>
+      <div class="prose" data-read-slug={getBlogSlug(post)}><Content /></div>
 
       {toc.length > 1 && (
         <aside class="toc" aria-label={text.tocLabel}>
