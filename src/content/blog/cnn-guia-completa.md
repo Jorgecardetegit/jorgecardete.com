@@ -5,11 +5,23 @@ date: 2024-02-07
 tags: [deep-learning, cnn, machine-learning]
 icon: "🧠"
 order: 1
-cover: "/blog/covers/cnn-guia-completa.jpg"
+cover: "/blog/covers/cnn-guia-completa.png"
 topic: vision
 ---
 
 *Exploring the power of CNNs in image analysis. Publicado originalmente en [The Deep Hub](https://medium.com/thedeephub/convolutional-neural-networks-a-comprehensive-guide-5cc0b5eae175).*
+
+![Convolutional Neural Networks](/blog/covers/cnn-guia-completa.png)
+
+### Table of contents
+
+1. [How do CNNs work?](#how-do-cnns-work)
+2. [Convolutional layers](#convolutional-layers)
+3. [Pooling layers](#pooling-layers)
+4. [Flattening layers](#flattening-layers)
+5. [CNN recap](#cnn-recap)
+6. [Activation functions](#activation-functions-in-convolutional-neural-networks)
+7. [Bibliography](#bibliography)
 
 **Convolutional Neural Networks**, commonly referred to as **CNNs** are a specialized type of neural network designed to process and classify images.
 
