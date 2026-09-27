@@ -44,7 +44,8 @@ const morePages = [
   { href: path('topics', lang), label: t('footer.topics') },
   { href: 'https://github.com/Jorgecardetegit/Jorgecardetegit.github.io', label: t('footer.source') },
 ].map((p) => ({ ...p, current: p.href === Astro.url.pathname }));
-const fullTitle = title === 'Inicio' || title === 'Home' ? 'jorge.dev' : `${title} · jorge.dev`;
+const siteTitle = "Jorge Cardete's web";
+const fullTitle = title === 'Inicio' || title === 'Home' ? siteTitle : `${title} · ${siteTitle}`;
 ---
 <!doctype html>
 <html lang={lang}>
@@ -74,6 +75,7 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? 'jorge.dev' : `${titl
     {alternates.map((a) => <link rel="alternate" hreflang={a.code} href={a.href} />)}
     <link rel="alternate" hreflang="x-default" href={alternates.find((a) => a.code === 'es')!.href} />
     <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
     <meta property="og:title" content={fullTitle} />
