@@ -16,6 +16,7 @@ const text = {
 ---
 <Base title={post.data.title} description={post.data.description} type="article">
   <article>
+    <a class="post-back" href={path('blog', lang)}>{text.back}</a>
     <h1 class="hero" style="font-size:clamp(32px,4.5vw,46px);">{post.data.title}</h1>
     <p class="post-date" style="margin-bottom:32px;">
       <time datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
@@ -37,10 +38,13 @@ const text = {
         </aside>
       )}
     </div>
-
-    <p style="margin-top:48px;"><a href={path('blog', lang)}>{text.back}</a></p>
   </article>
 </Base>
+
+<style>
+  .post-back { display: inline-block; margin-bottom: 22px; font-family: var(--mono); font-size: 13px; font-weight: 500; text-decoration: none; }
+  .post-back:hover { text-decoration: underline; }
+</style>
 
 {toc.length > 1 && (
   <script>
