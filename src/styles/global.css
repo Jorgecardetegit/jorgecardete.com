@@ -13,7 +13,7 @@
   --shadow: rgba(31, 29, 26, 0.9);
   --mono: 'JetBrains Mono', monospace;
   --pixel: 'Press Start 2P', monospace;
-  --display: 'Bricolage Grotesque', sans-serif;
+  --display: 'Outfit', sans-serif;
 }
 html, body { margin: 0; padding: 0; background: var(--bg); }
 /* Sin rebote elástico: al pasarse de arriba o abajo el sidebar no se separa del resto. */
