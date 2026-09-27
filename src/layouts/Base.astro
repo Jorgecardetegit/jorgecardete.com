@@ -42,7 +42,7 @@ const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
 const morePages = [
   { href: path('resume', lang), label: t('footer.resume') },
   { href: path('topics', lang), label: t('footer.topics') },
-  { href: 'https://github.com/Jorgecardetegit/Jorgecardetegit.github.io', label: t('footer.source') },
+  { href: 'https://github.com/Jorgecardetegit/jorgecardete.com', label: t('footer.source') },
 ].map((p) => ({ ...p, current: p.href === Astro.url.pathname }));
 const siteTitle = "Jorge Cardete's web";
 const fullTitle = title === 'Inicio' || title === 'Home' ? siteTitle : `${title} · ${siteTitle}`;
