@@ -28,7 +28,7 @@ const text = {
 }[lang];
 ---
 <Base title={text.title} description={text.description}>
-  <h1 class="hero">{text.title}</h1>
+  <h1 class="hero topics-title">{text.title}</h1>
   <p class="para">{text.description}</p>
 
   {letters.map((letter) => (
@@ -47,6 +47,7 @@ const text = {
 </Base>
 
 <style>
+  .topics-title { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: -1.5px; }
   .tletter { margin: 36px 0 0; }
   .tletter-title { margin: 0 0 16px; font-family: var(--pixel); font-size: 14px; line-height: 1.2; color: var(--ink); }
   .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
