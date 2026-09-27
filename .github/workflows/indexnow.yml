@@ -1,0 +1,19 @@
+name: IndexNow
+
+# Vercel marca cada despliegue en GitHub; al terminar bien el de producción,
+# se avisa a los buscadores compatibles con IndexNow.
+on:
+  deployment_status:
+
+jobs:
+  ping:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/indexnow.mjs
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
