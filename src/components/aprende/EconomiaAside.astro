@@ -1,0 +1,77 @@
+---
+// Columna derecha de la pestaña Economía: las preguntas (el menú), cuánto depende la elegida del
+// Gobierno y de dónde salen los datos. EconomiaVista sincroniza la selección.
+import { generado, preguntas } from '../../data/politica/economia';
+import { fecha } from '../../lib/politica';
+
+const niveles = ['Poco', 'En parte', 'Mucho'];
+---
+<section class="ap-card ap-panel ea" data-aside="economia" hidden>
+  <header class="ap-card-head"><h2 class="ap-card-title">Economía</h2></header>
+  <ol class="ea-list" role="tablist" aria-label="Temas de economía">
+    {preguntas.map((p, k) => (
+      <li>
+        <button type="button" role="tab" aria-selected={k === 0 ? 'true' : 'false'} aria-controls={`ec-${p.id}`} data-ec-tema={p.id}>
+          <span>{p.tema}</span>
+          <small>{p.pregunta}</small>
+        </button>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<section class="ap-card ap-panel" data-aside="economia" hidden>
+  {preguntas.map((p, k) => (
+    <div class="ea-ctrl" data-ec-ctrl={p.id} hidden={k > 0}>
+      <header class="ap-card-head"><h2 class="ap-card-title">¿Cuánto depende del Gobierno?</h2></header>
+      <span class="ea-meter" role="img" aria-label={niveles[p.control - 1]}>
+        {niveles.map((n, i) => <span class:list={['ea-meter-s', { on: i < p.control, cur: i === p.control - 1 }]}>{n}</span>)}
+      </span>
+      <div class="ea-col gob">
+        <h3><span aria-hidden="true">🏛️</span> Gobierno de España</h3>
+        <ul>{p.palancas.gobierno.map((t) => <li>{t}</li>)}</ul>
+      </div>
+      {p.palancas.otros && (
+        <div class="ea-col otros">
+          <h3><span aria-hidden="true">🗺️</span> Comunidades y ayuntamientos</h3>
+          <ul>{p.palancas.otros.map((t) => <li>{t}</li>)}</ul>
+        </div>
+      )}
+      <div class="ea-col fuera">
+        <h3><span aria-hidden="true">🌍</span> Viene de fuera</h3>
+        <ul>{p.palancas.fuera.map((t) => <li>{t}</li>)}</ul>
+      </div>
+    </div>
+  ))}
+</section>
+
+<section class="ap-card ap-panel" data-aside="economia" hidden>
+  <header class="ap-card-head"><h2 class="ap-card-title">Sobre los datos</h2></header>
+  <p class="ea-note">Eurostat, que mide igual a todos los países (por eso alguna cifra difiere unas décimas del INE), descargado el {fecha(generado, { day: 'numeric', month: 'long', year: 'numeric' })}. El salario mínimo, del BOE. La UE va al lado porque muchas cifras dependen más de Europa, la energía o el Banco Central Europeo que del Gobierno.</p>
+</section>
+
+<style>
+  .ea-list { list-style: none; margin: 0 -8px; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+  .ea-list button { display: flex; flex-direction: column; width: 100%; padding: 7px 8px; font: inherit; text-align: left; color: var(--ink); background: none; border: 0; border-radius: 8px; cursor: pointer; }
+  .ea-list button:hover { background: var(--panel-2); }
+  .ea-list button span { font-size: 14px; }
+  .ea-list button small { font-size: 12px; color: var(--muted); }
+  .ea-list button[aria-selected='true'] { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .ea-list button[aria-selected='true'] span { font-weight: 600; color: var(--accent); }
+  .ea-ctrl[hidden] { display: none; }
+  .ea-ctrl { display: flex; flex-direction: column; gap: 10px; }
+  .ea-ctrl .ap-card-head { margin-bottom: 0; }
+  .ea-meter { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
+  .ea-meter-s { padding: 5px 6px; font-size: 12px; font-weight: 600; text-align: center; color: var(--muted); background: var(--panel-2); }
+  .ea-meter-s:first-child { border-radius: 999px 0 0 999px; }
+  .ea-meter-s:last-child { border-radius: 0 999px 999px 0; }
+  .ea-meter-s.on { color: var(--bg); background: color-mix(in srgb, var(--accent) 55%, var(--panel-2)); }
+  .ea-meter-s.cur { background: var(--accent); }
+  .ea-col { padding-left: 10px; border-left: 3px solid var(--c); }
+  .ea-col.gob { --c: var(--accent); }
+  .ea-col.otros { --c: var(--gold); }
+  .ea-col.fuera { --c: var(--muted); }
+  .ea-col h3 { margin: 0 0 4px; font-size: 13px; font-weight: 700; color: var(--ink); }
+  .ea-col ul { margin: 0; padding-left: 16px; font-size: 13px; line-height: 1.45; color: var(--text-soft); }
+  .ea-note { font-size: 13px !important; color: var(--muted) !important; }
+</style>

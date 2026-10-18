@@ -5,6 +5,7 @@ import CalendarioCard from '../../../components/aprende/CalendarioCard.astro';
 import ComoVotar from '../../../components/aprende/ComoVotar.astro';
 import MapaEspana from '../../../components/aprende/MapaEspana.astro';
 import MapaFicha from '../../../components/aprende/MapaFicha.astro';
+import EconomiaAside from '../../../components/aprende/EconomiaAside.astro';
 import EconomiaVista from '../../../components/aprende/EconomiaVista.astro';
 import EventoFicha from '../../../components/aprende/EventoFicha.astro';
 import GobiernosVista from '../../../components/aprende/GobiernosVista.astro';
@@ -196,10 +197,6 @@ const jsonLd = [
 
     <section class="ap-view ap-panel scroll" data-view-panel="economia" aria-label="Economía" hidden>
       <div class="pad">
-        <header class="vhead">
-          <h2 class="ap-view-title">Cómo ha ido la economía</h2>
-          <p class="ap-view-sub">Las preguntas que se hace cualquiera, respondidas con datos oficiales desde 2004 y con Europa al lado. Elige un tema.</p>
-        </header>
         <EconomiaVista />
       </div>
     </section>
@@ -361,9 +358,10 @@ const jsonLd = [
     <MapaFicha />
     <EventoFicha />
     <TemasAside />
+    <EconomiaAside />
 
     {/* Lo general (calendario, cámaras, cifras), en las pestañas que no tienen columna propia. */}
-    <div class="aside-group" data-aside="partidos historia diputados votaciones votar economia">
+    <div class="aside-group" data-aside="partidos historia diputados votaciones votar">
     <CalendarioCard />
 
     <section class="ap-card ap-panel">

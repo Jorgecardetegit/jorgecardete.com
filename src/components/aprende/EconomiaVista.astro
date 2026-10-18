@@ -1,9 +1,8 @@
 ---
-// Vista de economía: un botón por tema y, del elegido, la pregunta, la respuesta en una frase,
-// tres cifras (el primer año, 2018 y hoy) con la UE al lado, una sola gráfica (España frente a
-// la UE) con una franja debajo de quién gobernaba, y cuánto depende el tema del Gobierno: un
-// medidor y qué lo mueve, separando Gobierno, comunidades y lo que viene de fuera. Los matices,
-// la tabla y la fuente quedan plegados en «Saber más».
+// Vista de economía: del tema elegido, la pregunta, la respuesta en una frase, una cifra por cada
+// presidente que llega y la de hoy, con la UE al lado, y una sola gráfica (España frente a la UE)
+// con una franja debajo de quién gobernaba. Los matices, la tabla y la fuente quedan plegados en
+// «Saber más». El menú y «cuánto depende del Gobierno» van en la columna derecha (EconomiaAside).
 import { generado, preguntas, sacudidas, type Pregunta } from '../../data/politica/economia';
 import { gobiernos } from '../../data/politica/linea-temporal';
 import { fecha, partidoById } from '../../lib/politica';
@@ -35,7 +34,6 @@ const gobiernoEn = (a: number) => tramos.find((t) => a >= t.desde && a < t.hasta
 // 2004, 2011 y 2018: los años en que llega un presidente nuevo.
 const llegada = (a: number) => tramos.find((t) => Math.floor(t.desde) === a && t.desde > X0 - 0.01);
 const llegadas = tramos.filter((t) => t.desde >= X0).map((t) => Math.floor(t.desde));
-const niveles = ['Poco', 'En parte', 'Mucho'];
 // '2025' → 2025; '2026-09' → 2026,7; '2026-Q2' → 2026,4.
 const momento = (p: string) => (p.includes('Q') ? Number(p.slice(0, 4)) + (Number(p.slice(-1)) - 0.5) / 4 : p.length > 4 ? Number(p.slice(0, 4)) + (Number(p.slice(5)) - 0.5) / 12 : Number(p));
 const periodo = (p: string) =>
@@ -107,11 +105,12 @@ function vista(p: Pregunta, L: Lienzo) {
 }
 ---
 <div class="ec">
-  <div class="ec-temas" role="tablist" aria-label="Temas de economía">
-    {preguntas.map((p, k) => (
-      <button type="button" class="ec-tema" role="tab" aria-selected={k === 0 ? 'true' : 'false'} aria-controls={`ec-${p.id}`} data-ec-tema={p.id}>{p.tema}</button>
-    ))}
-  </div>
+  <label class="ec-pick">
+    <span>Tema</span>
+    <select data-ec-select>
+      {preguntas.map((p) => <option value={p.id}>{p.tema}</option>)}
+    </select>
+  </label>
 
   {preguntas.map((p, k) => {
     const anios = [...new Set([...Object.keys(p.es), ...Object.keys(p.ue ?? {})])].sort();
@@ -196,31 +195,6 @@ function vista(p: Pregunta, L: Lienzo) {
           })}
         </figure>
 
-        <section class="ec-ctrl" aria-label="Cuánto depende del Gobierno">
-          <header class="ec-ctrl-h">
-            <h4>¿Cuánto depende del Gobierno?</h4>
-            <span class="ec-meter" role="img" aria-label={`${niveles[p.control - 1]}`}>
-              {niveles.map((n, i) => <span class:list={['ec-meter-s', { on: i < p.control, cur: i === p.control - 1 }]}>{n}</span>)}
-            </span>
-          </header>
-          <div class="ec-cols">
-            <div class="ec-col gob">
-              <h5><span aria-hidden="true">🏛️</span> Lo que hace el Gobierno de España</h5>
-              <ul>{p.palancas.gobierno.map((t) => <li>{t}</li>)}</ul>
-            </div>
-            {p.palancas.otros && (
-              <div class="ec-col otros">
-                <h5><span aria-hidden="true">🗺️</span> Comunidades y ayuntamientos</h5>
-                <ul>{p.palancas.otros.map((t) => <li>{t}</li>)}</ul>
-              </div>
-            )}
-            <div class="ec-col fuera">
-              <h5><span aria-hidden="true">🌍</span> Viene de fuera</h5>
-              <ul>{p.palancas.fuera.map((t) => <li>{t}</li>)}</ul>
-            </div>
-          </div>
-        </section>
-
         <details class="ec-more">
           <summary>Saber más: qué mide, matices y los datos año a año</summary>
           <p>{p.que}</p>
@@ -242,19 +216,23 @@ function vista(p: Pregunta, L: Lienzo) {
     );
   })}
 
-  <p class="ec-note">Debajo de cada gráfica, quién gobernaba. Un Gobierno influye en la economía, pero no la controla: muchas cifras dependen más de Europa, de los precios de la energía o del Banco Central Europeo, y por eso la UE aparece al lado. Datos de Eurostat, que mide igual a todos los países (por eso algunas cifras difieren unas décimas de las del INE), descargados el {fecha(generado, { day: 'numeric', month: 'long', year: 'numeric' })}. El salario mínimo sale del BOE.</p>
 </div>
 
 <script>
-  // Temas: muestran su panel.
+  // Temas: el menú de la columna derecha (EconomiaAside) y el desplegable de pantallas estrechas
+  // eligen el panel y «cuánto depende del Gobierno».
   const temas = [...document.querySelectorAll<HTMLButtonElement>('[data-ec-tema]')];
   const paneles = [...document.querySelectorAll<HTMLElement>('[data-ec-panel]')];
-  for (const t of temas) {
-    t.addEventListener('click', () => {
-      for (const x of temas) x.setAttribute('aria-selected', String(x === t));
-      for (const p of paneles) p.hidden = p.dataset.ecPanel !== t.dataset.ecTema;
-    });
-  }
+  const ctrls = [...document.querySelectorAll<HTMLElement>('[data-ec-ctrl]')];
+  const ecSelect = document.querySelector<HTMLSelectElement>('[data-ec-select]')!;
+  const eligeEc = (id: string) => {
+    for (const x of temas) x.setAttribute('aria-selected', String(x.dataset.ecTema === id));
+    for (const p of paneles) p.hidden = p.dataset.ecPanel !== id;
+    for (const c of ctrls) c.hidden = c.dataset.ecCtrl !== id;
+    ecSelect.value = id;
+  };
+  for (const t of temas) t.addEventListener('click', () => eligeEc(t.dataset.ecTema!));
+  ecSelect.addEventListener('change', () => eligeEc(ecSelect.value));
   // Al pasar por un año: raya vertical y los valores de ese año.
   for (const fig of document.querySelectorAll<HTMLElement>('.ec-plot')) {
     const svg = fig.querySelector('svg')!;
@@ -282,10 +260,9 @@ function vista(p: Pregunta, L: Lienzo) {
 
 <style>
   .ec { display: flex; flex-direction: column; gap: 16px; }
-  .ec-temas { display: flex; flex-wrap: wrap; gap: 6px; }
-  .ec-tema { padding: 7px 14px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--text-soft); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; cursor: pointer; }
-  .ec-tema:hover { color: var(--ink); border-color: var(--accent); }
-  .ec-tema[aria-selected='true'] { color: var(--bg); background: var(--ink); border-color: var(--ink); }
+  .ec-pick { display: none; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .ec-pick select { flex: 1; min-width: 0; padding: 8px 10px; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
+  @media (max-width: 1180px) { .ec-pick { display: flex; } }
 
   .ec-panel { display: flex; flex-direction: column; gap: 14px; }
   .ec-panel[hidden] { display: none; }
@@ -303,23 +280,6 @@ function vista(p: Pregunta, L: Lienzo) {
   .ec-gob { opacity: .85; }
   .ec-gob-t { font-size: 12px; font-weight: 700; fill: #fff; pointer-events: none; }
 
-  .ec-ctrl { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
-  .ec-ctrl-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
-  .ec-ctrl-h h4 { margin: 0; font-family: var(--display); font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: var(--ink); }
-  .ec-meter { display: grid; grid-template-columns: repeat(3, minmax(74px, 1fr)); gap: 3px; }
-  .ec-meter-s { padding: 5px 10px; font-size: 12.5px; font-weight: 600; text-align: center; color: var(--muted); background: var(--panel-2); }
-  .ec-meter-s:first-child { border-radius: 999px 0 0 999px; }
-  .ec-meter-s:last-child { border-radius: 0 999px 999px 0; }
-  .ec-meter-s.on { color: var(--bg); background: color-mix(in srgb, var(--accent) 55%, var(--panel-2)); }
-  .ec-meter-s.cur { background: var(--accent); }
-  .ec-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
-  .ec-col { padding: 10px 12px; border-radius: 10px; background: var(--panel-2); border-top: 3px solid var(--c); }
-  .ec-col.gob { --c: var(--accent); }
-  .ec-col.otros { --c: var(--gold); }
-  .ec-col.fuera { --c: var(--muted); }
-  .ec-col h5 { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: var(--ink); }
-  .ec-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
-  .ec-col li { padding: 3px 9px; font-size: 12.5px; line-height: 1.4; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; }
   .ec-cifra-ue { font-family: var(--mono); font-size: 12px; color: var(--text-soft); }
 
   .ec-fig { margin: 0; padding: 12px 14px 8px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
@@ -368,7 +328,6 @@ function vista(p: Pregunta, L: Lienzo) {
   .ec-table th[scope='row'], .ec-table thead th:first-child { text-align: left; font-weight: 400; color: var(--muted); }
   .ec-table thead th { position: sticky; top: 0; background: var(--panel); font-weight: 600; color: var(--muted); }
   .ec-src { font-size: 12.5px; color: var(--muted); }
-  .ec-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
 
   @media (max-width: 560px) {
     .ec-q { font-size: 23px; }
