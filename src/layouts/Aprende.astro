@@ -1,17 +1,19 @@
 ---
-// Panel de un área de /aprende/: navegación a la izquierda, contenido en el centro y
-// datos a la derecha (slot «aside»). En la portada, las pestañas cambian de vista sin
-// recargar; en las lecciones, llevan de vuelta a la portada con esa vista abierta.
+// Panel de Política en España: navegación a la izquierda, contenido en el centro y datos a la
+// derecha (slot «aside»). El eje son las elecciones (partidos, diputados, votaciones); la
+// teoría («Cómo funciona») queda como referencia plegada.
+//
+// `view` indica qué pestaña está activa. En la portada las tres primeras son botones que
+// cambian de vista sin recargar; en «Cómo funciona» aparecen además sus subvistas.
 import Base from './Base.astro';
 import type { LearnArea } from '../data/learn';
+import diputadosData from '../data/politica/diputados.json';
+import { partidos } from '../data/politica/partidos';
 import { areaPath, lessonPath, readingMinutes, type Lesson } from '../lib/learn';
+import { diputadoPath, partidoPath } from '../lib/politica';
 import '../styles/aprende.css';
 
-const views = [
-  { id: 'poderes', label: 'Poderes' },
-  { id: 'mapa', label: 'Mapa' },
-  { id: 'lecciones', label: 'Lecciones' },
-] as const;
+type Mode = 'elecciones' | 'como-funciona' | 'pagina';
 
 interface Props {
   title: string;
@@ -19,70 +21,113 @@ interface Props {
   jsonLd?: Record<string, unknown>[];
   area: LearnArea;
   lessons: Lesson[];
-  /** Lección abierta (en su página). */
+  mode?: Mode;
+  /** Pestaña principal activa en páginas de detalle (partido, diputado, lección). */
+  section?: 'partidos' | 'diputados' | 'votaciones' | 'como-funciona';
+  /** Lección o partido abiertos, para resaltarlos en la navegación. */
   current?: string;
-  /** En la portada: vista inicial y pestañas como botones. */
-  home?: boolean;
 }
 
-const { title, description, jsonLd, area, lessons, current, home = false } = Astro.props;
-const searchText = (l: Lesson) =>
-  [l.data.title, l.data.description, l.data.summary, ...l.data.keyPoints].join(' ').toLowerCase();
+const { title, description, jsonLd, area, lessons, mode = 'pagina', section, current } = Astro.props;
+const base = areaPath(area.id);
+const comoFunciona = `${base}como-funciona/`;
+
+const tabs = [
+  { id: 'partidos', label: 'Partidos' },
+  { id: 'diputados', label: 'Diputados' },
+  { id: 'votaciones', label: 'Votaciones' },
+] as const;
+const subtabs = [
+  { id: 'poderes', label: 'Poderes' },
+  { id: 'mapa', label: 'Mapa' },
+  { id: 'lecciones', label: 'Lecciones' },
+] as const;
+
+const escanos = new Map<string, number>();
+for (const d of diputadosData.diputados) if (d.partido) escanos.set(d.partido, (escanos.get(d.partido) ?? 0) + 1);
+const navPartidos = [...partidos].sort((a, b) => (escanos.get(b.id) ?? 0) - (escanos.get(a.id) ?? 0));
+const searchLesson = (l: Lesson) => [l.data.title, l.data.description, l.data.summary, ...l.data.keyPoints].join(' ');
+const leccionAbierta = lessons.some((l) => l.id === current) || mode === 'como-funciona';
 ---
 <Base title={title} description={description} jsonLd={jsonLd} translated={false} bare>
   <div class="ap" style={`--accent: ${area.color}`}>
     <aside class="ap-left ap-panel" data-ap-left>
       <header class="ap-brand">
-        <a class="ap-logo" href={areaPath(area.id)} aria-hidden="true" tabindex="-1">{area.icon}</a>
+        <a class="ap-logo" href={base} aria-hidden="true" tabindex="-1">{area.icon}</a>
         <div class="ap-brand-text">
-          <a class="ap-title" href={areaPath(area.id)}>{area.title}</a>
+          <a class="ap-title" href={base}>{area.title}</a>
           <a class="ap-home" href="/">jorge.dev · aprende</a>
         </div>
-        <button type="button" class="ap-menu" aria-expanded="false" data-ap-menu>Lecciones</button>
+        <button type="button" class="ap-menu" aria-expanded="false" data-ap-menu>Menú</button>
       </header>
-      <p class="ap-desc">{area.description}</p>
+      <p class="ap-desc">Todo lo que necesitas para votar el 29 de noviembre: quién es quién, qué ha votado cada uno y cómo funciona el sistema.</p>
       <label class="ap-search">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-        <input type="search" placeholder="Busca: investidura, IVA, 155..." aria-label="Buscar en las lecciones" data-ap-search />
+        <input type="search" placeholder="Busca un partido, diputado o tema" aria-label="Buscar" data-ap-search />
       </label>
 
       <div class="ap-left-scroll">
-        <nav aria-label="Lecciones">
-          {area.sections.map((section) => {
-            const items = lessons.filter((l) => l.data.section === section.id);
-            return (
-              <div class="ap-sec">
-                <div class="ap-sec-title">
-                  {section.title}
-                  {items.length > 0 && <span class="ap-count">{items.length}</span>}
-                  {section.status === 'soon' && <span class="ap-soon">pronto</span>}
-                </div>
-                {items.length > 0 ? (
-                  <ol class="ap-list">
-                    {items.map((lesson) => (
-                      <li data-search={searchText(lesson)}>
-                        <a href={lessonPath(lesson)} aria-current={lesson.id === current ? 'page' : undefined} data-lesson-link={lesson.id}>
-                          <span class="ap-dot" aria-hidden="true" />
-                          <span class="ap-num">{String(lessons.indexOf(lesson) + 1).padStart(2, '0')}</span>
-                          <span class="ap-lt">{lesson.data.title}</span>
-                          <span class="ap-min">{readingMinutes(lesson)}′</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ol>
-                ) : (
-                  <p class="ap-sec-desc">{section.description}</p>
-                )}
-              </div>
-            );
-          })}
-          <p class="ap-noresults" hidden data-ap-noresults>Ninguna lección habla de eso todavía.</p>
+        <nav aria-label="Secciones">
+          <div class="ap-sec" data-sec>
+            <div class="ap-sec-title">Partidos <span class="ap-count">{partidos.length}</span></div>
+            <ol class="ap-list ap-list-parties">
+              {navPartidos.map((p) => (
+                <li data-search={`${p.siglas} ${p.nombre} ${p.lider.nombre} ${p.ambito}`}>
+                  <a href={partidoPath(p.id)} aria-current={p.id === current ? 'page' : undefined}>
+                    <span class="ap-swatch" style={`background: ${p.color}`} aria-hidden="true" />
+                    <span class="ap-lt">{p.siglas === p.nombre ? p.nombre : `${p.siglas} · ${p.nombre}`}</span>
+                    <span class="ap-min" title="Diputados al disolverse las Cortes">{escanos.get(p.id) ?? '—'}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div class="ap-sec ap-sec-results" data-sec hidden data-ap-deputies>
+            <div class="ap-sec-title">Diputados</div>
+            <ol class="ap-list ap-list-parties">
+              {diputadosData.diputados.map((d) => (
+                <li data-search={`${d.nombre} ${d.provincia}`} hidden>
+                  <a href={diputadoPath(d.id)}>
+                    <span class="ap-swatch" style={`background: ${partidos.find((p) => p.id === d.partido)?.color ?? 'var(--muted)'}`} aria-hidden="true" />
+                    <span class="ap-lt">{d.nombre}</span>
+                    <span class="ap-min">{d.provincia}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div class="ap-sec" data-sec>
+            <div class="ap-sec-title">Próximamente</div>
+            <ul class="ap-soon-list">
+              <li><strong>Qué ha pasado</strong> · línea temporal desde 2011</li>
+              <li><strong>Temas</strong> · qué propone y qué ha votado cada partido, tema a tema</li>
+            </ul>
+          </div>
+
+          <details class="ap-sec ap-theory" data-sec open={leccionAbierta}>
+            <summary class="ap-sec-title">Cómo funciona <span class="ap-count">{lessons.length} lecciones</span></summary>
+            <ol class="ap-list">
+              {lessons.map((lesson, i) => (
+                <li data-search={searchLesson(lesson)}>
+                  <a href={lessonPath(lesson)} aria-current={lesson.id === current ? 'page' : undefined} data-lesson-link={lesson.id}>
+                    <span class="ap-dot" aria-hidden="true" />
+                    <span class="ap-num">{String(i + 1).padStart(2, '0')}</span>
+                    <span class="ap-lt">{lesson.data.title}</span>
+                    <span class="ap-min">{readingMinutes(lesson)}′</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </details>
+          <p class="ap-noresults" hidden data-ap-noresults>Nada coincide con eso.</p>
         </nav>
       </div>
 
       <footer class="ap-foot">
         <div class="ap-progress">
-          <span><strong data-ap-read>0</strong> de {lessons.length} leídas</span>
+          <span><strong data-ap-read>0</strong> de {lessons.length} lecciones leídas</span>
           <span class="ap-bar"><i data-ap-bar /></span>
         </div>
         <div class="ap-foot-row">
@@ -96,13 +141,21 @@ const searchText = (l: Lesson) =>
     </aside>
 
     <main class="ap-main">
-      <nav class="ap-top" aria-label="Vistas" role={home ? 'tablist' : undefined}>
-        {views.map((v, i) =>
-          home ? (
-            <button type="button" class="ap-tab" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-view-tab={v.id}>{v.label}</button>
+      <nav class="ap-top" aria-label="Vistas">
+        {tabs.map((t, i) =>
+          mode === 'elecciones' ? (
+            <button type="button" class="ap-tab" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-view-tab={t.id}>{t.label}</button>
           ) : (
-            <a class="ap-tab" href={`${areaPath(area.id)}#${v.id}`}>{v.label}</a>
+            <a class="ap-tab" href={`${base}#${t.id}`} aria-current={section === t.id ? 'page' : undefined}>{t.label}</a>
           ),
+        )}
+        <a class="ap-tab ap-tab-soft" href={comoFunciona} aria-current={mode === 'como-funciona' || section === 'como-funciona' ? 'page' : undefined}>Cómo funciona</a>
+        {mode === 'como-funciona' && (
+          <span class="ap-subtabs" role="tablist" aria-label="Vistas de Cómo funciona">
+            {subtabs.map((t, i) => (
+              <button type="button" class="ap-subtab" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-view-tab={t.id}>{t.label}</button>
+            ))}
+          </span>
         )}
         <span class="ap-countdown" data-ap-countdown>Elecciones generales: <strong>29 de noviembre de 2026</strong></span>
       </nav>
@@ -118,7 +171,7 @@ const searchText = (l: Lesson) =>
 <script>
   import { readLessons } from '../lib/learn-progress';
 
-  // Leídas: punto verde en la lista, contador y barra.
+  // Lecciones leídas: punto verde en la lista, contador y barra.
   const read = readLessons();
   const links = [...document.querySelectorAll<HTMLElement>('[data-lesson-link]')];
   for (const a of links) a.classList.toggle('is-read', read.has(a.dataset.lessonLink!));
@@ -129,29 +182,42 @@ const searchText = (l: Lesson) =>
   document.querySelector('[data-ap-read]')!.textContent = String(done);
   document.querySelector<HTMLElement>('[data-ap-bar]')!.style.width = `${links.length ? (done / links.length) * 100 : 0}%`;
 
-  // Buscador: filtra la lista por título, resumen y puntos clave.
+  // Buscador: filtra partidos y lecciones, y muestra los diputados que coinciden.
   const search = document.querySelector<HTMLInputElement>('[data-ap-search]')!;
-  const items = [...document.querySelectorAll<HTMLElement>('[data-search]')];
+  const sections = [...document.querySelectorAll<HTMLElement>('[data-sec]')];
+  const deputies = document.querySelector<HTMLElement>('[data-ap-deputies]')!;
   const empty = document.querySelector<HTMLElement>('[data-ap-noresults]')!;
   const normalize = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+  const theory = document.querySelector<HTMLDetailsElement>('.ap-theory');
+  const theoryOpen = theory?.open ?? false;
   search.addEventListener('input', () => {
     const q = normalize(search.value);
     let shown = 0;
-    for (const li of items) {
-      li.hidden = q !== '' && !normalize(li.dataset.search!).includes(q);
-      if (!li.hidden) shown++;
+    for (const sec of sections) {
+      const items = [...sec.querySelectorAll<HTMLElement>('[data-search]')];
+      let visible = 0;
+      for (const li of items) {
+        const match = q !== '' && normalize(li.dataset.search!).includes(q);
+        // Los diputados solo aparecen al buscar; el resto se ve siempre que no haya búsqueda.
+        li.hidden = sec === deputies ? !match || visible >= 12 : q !== '' && !match;
+        if (!li.hidden) visible++;
+      }
+      sec.hidden = q !== '' && (items.length === 0 || visible === 0);
+      if (sec === deputies && q === '') sec.hidden = true;
+      shown += visible;
     }
-    empty.hidden = shown > 0;
+    if (theory) theory.open = q !== '' ? true : theoryOpen;
+    empty.hidden = q === '' || shown > 0;
   });
 
   // Cuenta atrás hasta el 29 de noviembre de 2026 (hora peninsular).
   const countdown = document.querySelector('[data-ap-countdown]')!;
   const days = Math.ceil((new Date('2026-11-29T09:00:00+01:00').getTime() - Date.now()) / 86_400_000);
-  if (days > 1) countdown.innerHTML = `Elecciones generales del 29-N: faltan <strong>${days} días</strong>`;
-  else if (days === 1) countdown.innerHTML = 'Elecciones generales: <strong>mañana</strong>';
-  else if (days === 0) countdown.innerHTML = 'Elecciones generales: <strong>hoy</strong>';
+  if (days > 1) countdown.innerHTML = `29-N: faltan <strong>${days} días</strong>`;
+  else if (days === 1) countdown.innerHTML = '29-N: <strong>mañana</strong>';
+  else if (days === 0) countdown.innerHTML = '29-N: <strong>hoy</strong>';
 
-  // Móvil: la lista de lecciones se abre y cierra con un botón.
+  // Móvil: la navegación se abre y cierra con un botón.
   const left = document.querySelector<HTMLElement>('[data-ap-left]')!;
   const menu = document.querySelector<HTMLButtonElement>('[data-ap-menu]')!;
   menu.addEventListener('click', () => {

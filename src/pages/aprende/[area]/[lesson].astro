@@ -46,7 +46,7 @@ const jsonLd = [
   ]),
 ];
 ---
-<Aprende title={lesson.data.title} description={lesson.data.description} jsonLd={jsonLd} area={area} lessons={lessons} current={lesson.id}>
+<Aprende title={lesson.data.title} description={lesson.data.description} jsonLd={jsonLd} area={area} lessons={lessons} current={lesson.id} section="como-funciona">
   <article class="reader ap-panel" data-lesson={lesson.id} data-reader>
     <header class="reader-head">
       <div class="reader-meta">
@@ -70,7 +70,7 @@ const jsonLd = [
         {next ? (
           <a class="is-next" href={lessonPath(next)}><span>Siguiente →</span><strong>{next.data.icon} {next.data.title}</strong></a>
         ) : (
-          <a class="is-next" href={areaPath(area.id)}><span>Has terminado ✓</span><strong>Volver al panel</strong></a>
+          <a class="is-next" href={`${areaPath(area.id)}como-funciona/`}><span>Has terminado ✓</span><strong>Volver a Cómo funciona</strong></a>
         )}
       </nav>
     </footer>
