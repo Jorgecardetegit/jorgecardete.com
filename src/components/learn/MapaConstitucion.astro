@@ -1,0 +1,44 @@
+---
+// Los once bloques de la Constitución, cada uno con un ancho proporcional a sus artículos.
+const titles = [
+  { name: 'Preliminar', from: 1, to: 9, text: 'Los principios: qué es España, la soberanía, las lenguas, la bandera, los partidos.', color: 'gold' },
+  { name: 'I', from: 10, to: 55, text: 'Derechos y deberes: libertades, igualdad, educación, huelga, vivienda, salud.', color: 'green' },
+  { name: 'II', from: 56, to: 65, text: 'La Corona.', color: 'purple' },
+  { name: 'III', from: 66, to: 96, text: 'Las Cortes Generales: Congreso, Senado y cómo se hacen las leyes.', color: 'terracotta' },
+  { name: 'IV', from: 97, to: 107, text: 'El Gobierno y la Administración.', color: 'red' },
+  { name: 'V', from: 108, to: 116, text: 'Relaciones Gobierno–Cortes: investidura, moción de censura, disolución.', color: 'red' },
+  { name: 'VI', from: 117, to: 127, text: 'El Poder Judicial.', color: 'terracotta' },
+  { name: 'VII', from: 128, to: 136, text: 'Economía y Hacienda: impuestos y presupuestos.', color: 'gold' },
+  { name: 'VIII', from: 137, to: 158, text: 'Organización territorial: municipios, provincias y comunidades autónomas.', color: 'purple' },
+  { name: 'IX', from: 159, to: 165, text: 'El Tribunal Constitucional.', color: 'green' },
+  { name: 'X', from: 166, to: 169, text: 'Cómo se reforma la Constitución.', color: 'muted' },
+].map((t) => ({ ...t, articles: t.to - t.from + 1 }));
+---
+<figure class="mconst">
+  <div class="mconst-bar" aria-hidden="true">
+    {titles.map((t) => <div class="mconst-seg" style={`flex-grow: ${t.articles}; --c: var(--${t.color})`}>{t.articles >= 9 ? t.name : ''}</div>)}
+  </div>
+  <ol class="mconst-list">
+    {titles.map((t) => (
+      <li style={`--c: var(--${t.color})`}>
+        <span class="mconst-name">{t.name === 'Preliminar' ? 'Título preliminar' : `Título ${t.name}`}</span>
+        <span class="mconst-arts">art. {t.from}–{t.to}</span>
+        <span class="mconst-text">{t.text}</span>
+      </li>
+    ))}
+  </ol>
+  <figcaption>169 artículos repartidos en once bloques. La barra de arriba muestra cuánto ocupa cada uno: los derechos (Título I) son casi un tercio del texto.</figcaption>
+</figure>
+
+<style>
+  .mconst { margin: 32px 0; padding: 20px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .mconst-bar { display: flex; height: 40px; border: 3px solid var(--ink); margin-bottom: 18px; }
+  .mconst-seg { display: grid; place-items: center; min-width: 0; overflow: hidden; font-family: var(--pixel); font-size: 9px; color: #1f1d1a; background: var(--c); }
+  .mconst-seg + .mconst-seg { border-left: 2px solid var(--ink); }
+  .mconst-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px 18px; }
+  .mconst-list li { display: grid; grid-template-columns: auto 1fr; gap: 0 8px; padding-left: 12px; border-left: 6px solid var(--c); font-size: 14px; line-height: 1.45; margin: 0; }
+  .mconst-name { font-family: var(--display); font-weight: 800; }
+  .mconst-arts { justify-self: end; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .mconst-text { grid-column: 1 / -1; color: var(--text-soft); }
+  .mconst figcaption { margin-top: 16px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+</style>
