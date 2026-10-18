@@ -1,0 +1,303 @@
+---
+// Mapa de España por provincias, dibujado al compilar (SVG, sin librerías en el navegador).
+// Capas: partido más votado en 2023, voto a un partido, diputados que elige cada provincia
+// y participación. Al pulsar una provincia se rellena la ficha `[data-mapa-ficha]`.
+//
+// `partido` fija la capa de voto a ese partido y oculta los controles (ficha de partido).
+import { feature } from 'topojson-client';
+import { geoConicConformal, geoPath } from 'd3-geo';
+import atlas from 'es-atlas/es/provinces.json';
+import diputadosData from '../../data/politica/diputados.json';
+import { partidos } from '../../data/politica/partidos';
+import { provincias } from '../../data/politica/provincias';
+import resultados from '../../data/politica/resultados-2023.json';
+import { diputadoPath } from '../../lib/politica';
+
+interface Props { partido?: string; ficha?: boolean }
+const { partido: fijo, ficha = true } = Astro.props;
+
+const W = 800;
+const H = 620;
+type Geo = { type: 'Feature'; id: string; properties: { name: string }; geometry: unknown };
+const todas = (feature(atlas as never, (atlas as never as { objects: { provinces: never } }).objects.provinces) as unknown as { features: Geo[] }).features.filter((f) => f.id !== '54');
+const canarias = todas.filter((f) => f.id === '35' || f.id === '38');
+const resto = todas.filter((f) => !canarias.includes(f));
+
+// Península, Baleares, Ceuta y Melilla en el marco principal; Canarias, en un recuadro abajo a la izquierda.
+const principal = geoConicConformal().parallels([37, 43]).rotate([3.5, 0]).fitExtent([[150, 8], [W - 8, H - 8]], { type: 'FeatureCollection', features: resto } as never);
+const recuadro = { x: 8, y: H - 168, w: 250, h: 160 };
+const islas = geoConicConformal().parallels([27, 29]).rotate([15.5, 0]).fitExtent([[recuadro.x + 8, recuadro.y + 24], [recuadro.x + recuadro.w - 8, recuadro.y + recuadro.h - 8]], { type: 'FeatureCollection', features: canarias } as never);
+const pathPrincipal = geoPath(principal).digits(1);
+const pathIslas = geoPath(islas).digits(1);
+
+const color = new Map(partidos.map((p) => [p.id, p.color]));
+const siglas = new Map(partidos.map((p) => [p.id, p.siglas]));
+const res = resultados.provincias as Record<string, { participacion: number; validos: number; candidaturas: { siglas: string; partido: string | null; votos: number; escanos: number; pct: number }[] }>;
+const porIne = new Map(provincias.map((p) => [p.ine, p]));
+const diputadosPorProvincia = Map.groupBy(diputadosData.diputados, (d) => d.provincia);
+
+const maxDip = Math.max(...provincias.map((p) => p.diputados));
+const partMin = Math.min(...Object.values(res).map((r) => r.participacion));
+const partMax = Math.max(...Object.values(res).map((r) => r.participacion));
+const pctDe = (ine: string, id: string) => res[ine].candidaturas.filter((c) => c.partido === id).reduce((s, c) => s + c.pct, 0);
+
+const formas = todas.map((f) => {
+  const prov = porIne.get(f.id)!;
+  const r = res[f.id];
+  const gana = r.candidaturas[0];
+  const d23 = r.candidaturas.reduce((s, c) => s + c.escanos, 0);
+  const path = canarias.includes(f) ? pathIslas : pathPrincipal;
+  return {
+    ine: f.id,
+    d: path(f as never) ?? '',
+    // Ceuta y Melilla no se verían a esta escala: llevan además un círculo pulsable.
+    punto: f.id === '51' || f.id === '52' ? path.centroid(f as never) : null,
+    nombre: prov.nombre,
+    datos: {
+      nombre: prov.nombre,
+      ccaa: prov.ccaa,
+      d26: prov.diputados,
+      d23,
+      sen: prov.senadores,
+      part: r.participacion,
+      cands: r.candidaturas.map((c) => [c.partido ? siglas.get(c.partido) : c.siglas, c.partido, c.pct, c.escanos, c.siglas]),
+      dips: (diputadosPorProvincia.get(prov.congreso) ?? []).map((d) => [d.nombre, diputadoPath(d.id), d.partido]),
+    },
+    // Rellenos de cada capa, calculados aquí para que el cambio de capa sea instantáneo.
+    capas: {
+      ganador: { c: color.get(gana.partido ?? '') ?? '#9a9a9a', s: Math.round(35 + Math.min(1, (gana.pct - 20) / 30) * 65) },
+      diputados: { s: Math.round(12 + 88 * Math.sqrt(prov.diputados / maxDip)) },
+      participacion: { s: Math.round(12 + 88 * ((r.participacion - partMin) / (partMax - partMin))) },
+    },
+    pcts: Object.fromEntries(partidos.map((p) => [p.id, pctDe(f.id, p.id)])),
+  };
+});
+
+const conVoto = partidos.filter((p) => formas.some((f) => f.pcts[p.id] > 0));
+const ganadores = [...new Set(formas.map((f) => res[f.ine].candidaturas[0].partido))].map((id) => partidos.find((p) => p.id === id)!).filter(Boolean);
+const maxPct = Object.fromEntries(conVoto.map((p) => [p.id, Math.max(...formas.map((f) => f.pcts[p.id]))]));
+// La escala de cada partido va de su peor a su mejor provincia, para que se vean las diferencias.
+const minPct = Object.fromEntries(conVoto.map((p) => [p.id, Math.min(...formas.map((f) => f.pcts[p.id]))]));
+const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[id]) / (maxPct[id] - minPct[id] || 1)));
+---
+<div class="mapa" data-mapa data-fijo={fijo ?? ''}>
+  {!fijo && (
+    <div class="mapa-tools">
+      <div class="mapa-seg" role="group" aria-label="Qué mostrar en el mapa">
+        <button type="button" aria-pressed="true" data-capa="ganador">Más votado en 2023</button>
+        <button type="button" aria-pressed="false" data-capa="partido">Voto a un partido</button>
+        <button type="button" aria-pressed="false" data-capa="diputados">Diputados que elige</button>
+        <button type="button" aria-pressed="false" data-capa="participacion">Participación</button>
+      </div>
+      <select class="mapa-select" aria-label="Partido" data-partido hidden>
+        {conVoto.map((p) => <option value={p.id}>{p.siglas}</option>)}
+      </select>
+    </div>
+  )}
+
+  <div class="mapa-svgwrap">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Mapa de España por provincias">
+      <rect class="mapa-recuadro" x={recuadro.x} y={recuadro.y} width={recuadro.w} height={recuadro.h} rx="10" />
+      <text class="mapa-recuadro-t" x={recuadro.x + 10} y={recuadro.y + 16}>Canarias</text>
+      {formas.flatMap((f) => (f.punto ? ['path', 'circle'] : ['path']).map((tag) => ({ f, tag }))).map(({ f, tag }) => {
+        const Tag = tag as 'path';
+        return (
+        <Tag
+          d={tag === 'path' ? f.d : undefined}
+          cx={tag === 'circle' ? f.punto![0].toFixed(1) : undefined}
+          cy={tag === 'circle' ? f.punto![1].toFixed(1) : undefined}
+          r={tag === 'circle' ? 7 : undefined}
+          class:list={['prov', { punto: tag === 'circle' }]}
+          tabindex={f.punto && tag === 'path' ? '-1' : '0'}
+          role="button"
+          aria-label={f.nombre}
+          data-ine={f.ine}
+          data-g-c={f.capas.ganador.c}
+          data-g-s={f.capas.ganador.s}
+          data-d-s={f.capas.diputados.s}
+          data-p-s={f.capas.participacion.s}
+          data-pcts={JSON.stringify(f.pcts)}
+          style={fijo
+            ? `--fill: color-mix(in srgb, ${color.get(fijo)} ${tonoPartido(fijo, f.pcts[fijo])}%, var(--panel-2))`
+            : `--fill: color-mix(in srgb, ${f.capas.ganador.c} ${f.capas.ganador.s}%, var(--panel-2))`}
+        >
+          <title>{f.nombre}{fijo ? `: ${f.pcts[fijo].toLocaleString('es-ES')} %` : ''}</title>
+        </Tag>
+        );
+      })}
+    </svg>
+  </div>
+
+  <div class="mapa-legend" data-legend>
+    {fijo ? (
+      <span class="lg-grad" style={`--c: ${color.get(fijo)}`}><i />Del {minPct[fijo].toLocaleString('es-ES')} % (su peor provincia) al {maxPct[fijo].toLocaleString('es-ES')} % (la mejor), en 2023</span>
+    ) : (
+      <>
+        <span data-lg="ganador">{ganadores.map((p) => <b class="pt" style={`--pc: ${p.color}`}>{p.siglas}</b>)}<small>Más intenso cuanto mayor fue su porcentaje</small></span>
+        <span data-lg="partido" hidden class="lg-grad" data-lg-partido><i />De su peor a su mejor provincia</span>
+        <span data-lg="diputados" hidden class="lg-grad" style="--c: var(--accent)"><i />De 1 a {maxDip} diputados</span>
+        <span data-lg="participacion" hidden class="lg-grad" style="--c: var(--accent)"><i />Del {partMin.toLocaleString('es-ES')} % al {partMax.toLocaleString('es-ES')} %</span>
+      </>
+    )}
+  </div>
+
+  <script type="application/json" data-mapa-datos set:html={JSON.stringify({
+    provs: Object.fromEntries(formas.map((f) => [f.ine, f.datos])),
+    colores: Object.fromEntries(color),
+    maxPct,
+    minPct,
+    fuente: resultados.fuente,
+  })} />
+</div>
+
+{ficha && !fijo && (
+  <div class="mapa-ficha" data-mapa-ficha>
+    <p class="mapa-hint">Pulsa una provincia para ver cómo votó en 2023, cuántos diputados elige el 29-N y quiénes la representaban.</p>
+  </div>
+)}
+
+<script>
+  type Prov = { nombre: string; ccaa: string; d26: number; d23: number; sen: number; part: number; cands: [string, string | null, number, number, string][]; dips: [string, string, string | null][] };
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-mapa]')) {
+    const datos = JSON.parse(root.querySelector('[data-mapa-datos]')!.textContent!) as { provs: Record<string, Prov>; colores: Record<string, string>; maxPct: Record<string, number>; minPct: Record<string, number>; fuente: string };
+    const paths = [...root.querySelectorAll<SVGElement>('.prov')];
+    const fichaEl = root.parentElement?.querySelector<HTMLElement>('[data-mapa-ficha]');
+    const select = root.querySelector<HTMLSelectElement>('[data-partido]');
+    const botones = [...root.querySelectorAll<HTMLButtonElement>('[data-capa]')];
+    let capa = 'ganador';
+
+    const pinta = () => {
+      const partido = select?.value ?? '';
+      for (const p of paths) {
+        let fill = '';
+        if (capa === 'ganador') fill = `color-mix(in srgb, ${p.dataset.gC} ${p.dataset.gS}%, var(--panel-2))`;
+        else if (capa === 'diputados') fill = `color-mix(in srgb, var(--accent) ${p.dataset.dS}%, var(--panel-2))`;
+        else if (capa === 'participacion') fill = `color-mix(in srgb, var(--accent) ${p.dataset.pS}%, var(--panel-2))`;
+        else {
+          const v = (JSON.parse(p.dataset.pcts!) as Record<string, number>)[partido] ?? 0;
+          const t = (v - datos.minPct[partido]) / (datos.maxPct[partido] - datos.minPct[partido] || 1);
+          fill = `color-mix(in srgb, ${datos.colores[partido]} ${Math.round(8 + 92 * t)}%, var(--panel-2))`;
+        }
+        p.style.setProperty('--fill', fill);
+      }
+      for (const lg of root.querySelectorAll<HTMLElement>('[data-lg]')) lg.hidden = lg.dataset.lg !== capa;
+      const lgPartido = root.querySelector<HTMLElement>('[data-lg-partido]');
+      if (lgPartido && partido) {
+        lgPartido.style.setProperty('--c', datos.colores[partido]);
+        lgPartido.lastChild!.textContent = ` Del ${datos.minPct[partido].toLocaleString('es-ES')} % (su peor provincia) al ${datos.maxPct[partido].toLocaleString('es-ES')} % (la mejor)`;
+      }
+      if (select) select.hidden = capa !== 'partido';
+    };
+
+    for (const b of botones) {
+      b.addEventListener('click', () => {
+        capa = b.dataset.capa!;
+        for (const x of botones) x.setAttribute('aria-pressed', String(x === b));
+        pinta();
+      });
+    }
+    select?.addEventListener('change', pinta);
+
+    const fmt = (n: number) => n.toLocaleString('es-ES');
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+    const abre = (ine: string | null) => {
+      for (const p of paths) p.classList.toggle('on', p.dataset.ine === ine);
+      if (!fichaEl) return;
+      if (!ine) {
+        fichaEl.innerHTML = '<p class="mapa-hint">Pulsa una provincia para ver cómo votó en 2023, cuántos diputados elige el 29-N y quiénes la representaban.</p>';
+        return;
+      }
+      const p = datos.provs[ine];
+      const cambio = p.d26 - p.d23;
+      const barras = p.cands
+        .filter((c) => c[2] >= 1)
+        .map(([s, id, pct, esc_]) => `<span style="flex:${pct};background:${id ? datos.colores[id] : 'var(--line)'}" title="${esc(s)}: ${fmt(pct)} %"></span>`)
+        .join('');
+      const filas = p.cands
+        .map(([s, id, pct, escanos, original]) => `<li><b class="pt" style="--pc:${id ? datos.colores[id] : 'var(--muted)'}">${esc(s)}</b>${original.toLowerCase() !== s.toLowerCase() && id ? `<small>${esc(original)}</small>` : ''}<span>${fmt(pct)} %</span><strong>${escanos ? `${escanos} esc.` : ''}</strong></li>`)
+        .join('');
+      const dips = p.dips.map(([n, url, id]) => `<li><a href="${url}"><i style="background:${id ? datos.colores[id] : 'var(--muted)'}"></i>${esc(n)}</a></li>`).join('');
+      fichaEl.innerHTML = `
+        <div class="mf-head">
+          <h3>${esc(p.nombre)}</h3><span>${esc(p.ccaa)}</span>
+          <button type="button" class="mf-close" data-mf-close>✕ Cerrar</button>
+        </div>
+        <div class="mf-stats">
+          <div><strong>${p.d26}</strong><span>diputados el 29-N${cambio ? ` (${cambio > 0 ? '+' : ''}${cambio} respecto a 2023)` : ''}</span></div>
+          <div><strong>${p.sen}</strong><span>senadores</span></div>
+          <div><strong>${fmt(p.part)} %</strong><span>participación en 2023</span></div>
+        </div>
+        <div class="mf-bar" aria-hidden="true">${barras}</div>
+        <div class="mf-cols">
+          <div><h4>Resultado de 2023</h4><ol class="mf-res">${filas}</ol></div>
+          <div><h4>Sus diputados en la legislatura</h4><ul class="mf-dips">${dips}</ul></div>
+        </div>
+        <p class="mf-src">Fuente: ${esc(datos.fuente)}.</p>`;
+      fichaEl.querySelector('[data-mf-close]')?.addEventListener('click', () => abre(null));
+    };
+
+    for (const p of paths) {
+      const go = () => abre(p.classList.contains('on') ? null : p.dataset.ine!);
+      p.addEventListener('click', go);
+      p.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          go();
+        }
+      });
+    }
+    if (!root.dataset.fijo) pinta();
+  }
+</script>
+
+<style>
+  .mapa { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .mapa-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .mapa-seg { display: flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--panel-2); border-radius: 999px; }
+  .mapa-seg button { padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
+  .mapa-seg button[aria-pressed='true'] { color: var(--ink); background: var(--panel); box-shadow: var(--panel-shadow); }
+  .mapa-select { padding: 6px 12px; font: inherit; font-size: 13px; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; }
+  .mapa-select[hidden] { display: none; }
+  .mapa-svgwrap { min-height: 0; }
+  .mapa svg { display: block; width: 100%; height: auto; max-height: 100%; }
+  .prov { fill: var(--fill); stroke: var(--panel); stroke-width: 0.8; cursor: pointer; transition: fill .25s, opacity .2s; outline: none; }
+  .prov:hover, .prov:focus-visible { stroke: var(--ink); stroke-width: 1.6; }
+  .prov.on { stroke: var(--ink); stroke-width: 2.4; }
+  .prov.punto { stroke: var(--ink); stroke-width: 1; }
+  svg:has(.prov.on) .prov:not(.on) { opacity: .55; }
+  .mapa-recuadro { fill: none; stroke: var(--line); stroke-dasharray: 4 4; }
+  .mapa-recuadro-t { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+  .mapa-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12px; color: var(--muted); }
+  .mapa-legend > span { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .mapa-legend > span[hidden] { display: none; }
+  .mapa-legend .pt { font-size: 12px; color: var(--ink); }
+  .lg-grad i { display: inline-block; width: 90px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 8%, var(--panel-2)), var(--c)); }
+
+  .mapa-ficha { font-size: 14px; }
+  .mapa-ficha :global(.mapa-hint) { margin: 0; color: var(--muted); }
+  .mapa-ficha :global(.mf-head) { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; }
+  .mapa-ficha :global(.mf-head h3) { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
+  .mapa-ficha :global(.mf-head span) { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .mapa-ficha :global(.mf-close) { margin-left: auto; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); background: none; border: 0; cursor: pointer; }
+  .mapa-ficha :global(.mf-stats) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+  .mapa-ficha :global(.mf-stats div) { display: flex; flex-direction: column; padding: 8px 10px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
+  .mapa-ficha :global(.mf-stats strong) { font-family: var(--display); font-size: 22px; font-weight: 800; color: var(--accent); }
+  .mapa-ficha :global(.mf-stats span) { font-size: 12px; line-height: 1.35; color: var(--muted); }
+  .mapa-ficha :global(.mf-bar) { display: flex; height: 14px; gap: 1px; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .mapa-ficha :global(.mf-cols) { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; }
+  .mapa-ficha :global(h4) { margin: 0 0 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); }
+  .mapa-ficha :global(.mf-res) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+  .mapa-ficha :global(.mf-res li) { display: grid; grid-template-columns: minmax(0, 1fr) auto 52px; align-items: baseline; gap: 4px 10px; font-size: 13px; }
+  .mapa-ficha :global(.mf-res small) { grid-column: 1; grid-row: 2; font-size: 11px; color: var(--muted); margin-top: -2px; }
+  .mapa-ficha :global(.mf-res span) { font-family: var(--mono); font-size: 12px; text-align: right; }
+  .mapa-ficha :global(.mf-res strong) { font-family: var(--mono); font-size: 12px; text-align: right; }
+  .mapa-ficha :global(.mf-dips) { list-style: none; margin: 0; padding: 0; columns: 2 150px; column-gap: 12px; font-size: 13px; line-height: 1.6; }
+  .mapa-ficha :global(.mf-dips a) { display: flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 400; text-decoration: none; }
+  .mapa-ficha :global(.mf-dips a:hover) { color: var(--accent); }
+  .mapa-ficha :global(.mf-dips i) { flex: none; width: 8px; height: 8px; border-radius: 2px; }
+  .mapa-ficha :global(.mf-src) { margin: 10px 0 0; font-size: 11.5px; color: var(--muted); }
+  @media (max-width: 640px) {
+    .mapa-ficha :global(.mf-cols) { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

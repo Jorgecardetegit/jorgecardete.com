@@ -23,7 +23,7 @@ interface Props {
   lessons: Lesson[];
   mode?: Mode;
   /** Pestaña principal activa en páginas de detalle (partido, diputado, lección). */
-  section?: 'partidos' | 'diputados' | 'votaciones' | 'como-funciona';
+  section?: 'partidos' | 'mapa' | 'diputados' | 'votaciones' | 'como-funciona';
   /** Lección o partido abiertos, para resaltarlos en la navegación. */
   current?: string;
 }
@@ -34,6 +34,7 @@ const comoFunciona = `${base}como-funciona/`;
 
 const tabs = [
   { id: 'partidos', label: 'Partidos' },
+  { id: 'mapa', label: 'Mapa' },
   { id: 'diputados', label: 'Diputados' },
   { id: 'votaciones', label: 'Votaciones' },
 ] as const;

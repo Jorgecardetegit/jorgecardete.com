@@ -2,6 +2,7 @@
 import Aprende from '../../../layouts/Aprende.astro';
 import AfinidadMatriz from '../../../components/aprende/AfinidadMatriz.astro';
 import CalendarioCard from '../../../components/aprende/CalendarioCard.astro';
+import MapaEspana from '../../../components/aprende/MapaEspana.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
 import { getArea } from '../../../data/learn';
 import { elecciones, revisadoPartidos } from '../../../data/politica/partidos';
@@ -88,6 +89,18 @@ const jsonLd = [
         <h2 class="ap-view-title sub">Con quién vota cada partido</h2>
         <p class="ap-view-sub">Lo que han hecho, más allá de lo que dicen: coincidencias en las votaciones de esta legislatura.</p>
         <AfinidadMatriz orden={conDiputados} />
+      </div>
+    </section>
+
+    <section class="ap-view ap-panel scroll" data-view-panel="mapa" aria-label="Mapa por provincias" hidden>
+      <div class="pad">
+        <header class="vhead">
+          <h2 class="ap-view-title">España, provincia a provincia</h2>
+          <p class="ap-view-sub">Cada provincia es una circunscripción y reparte sus propios diputados. Cambia de capa y pulsa una provincia para ver su resultado de 2023 y quién la representaba.</p>
+        </header>
+        <div class="mapa-layout">
+          <MapaEspana />
+        </div>
       </div>
     </section>
 
@@ -324,6 +337,10 @@ const jsonLd = [
 
 <style>
   .scroll { overflow-y: auto; }
+  /* Mapa y ficha: uno al lado del otro si hay sitio, si no uno encima del otro. */
+  .mapa-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .mapa-layout :global(.mapa svg) { max-height: 62vh; }
+  .mapa-layout :global(.mapa-ficha) { padding-top: 14px; border-top: 1px solid var(--panel-line); }
   .pad { padding: 18px 20px 26px; }
   .vhead { margin-bottom: 14px; }
   .ap-view-title.sub { margin-top: 30px; }
