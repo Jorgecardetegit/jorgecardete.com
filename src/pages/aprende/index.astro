@@ -2,50 +2,57 @@
 import Base from '../../layouts/Base.astro';
 import { areas } from '../../data/learn';
 import { areaPath, getLessons } from '../../lib/learn';
+import '../../styles/aprende.css';
 
 const cards = await Promise.all(
   areas.map(async (area) => ({ area, lessons: await getLessons(area.id, area.sections.map((s) => s.id)) })),
 );
 const description =
-  'Lo que voy aprendiendo, explicado para que lo entienda cualquiera: con esquemas, ejemplos y siempre con fuentes.';
+  'Lo que voy aprendiendo, explicado para que lo entienda cualquiera: con esquemas, mapas, ejemplos y siempre con fuentes.';
 ---
-<Base title="Aprende" description={description} translated={false}>
-  <h1 class="hero">Aprende</h1>
-  <p class="lead learn-lead">{description}</p>
+<Base title="Aprende" description={description} translated={false} bare>
+  <div class="hub">
+    <header class="hub-head">
+      <a class="hub-back" href="/">← jorge.dev</a>
+      <h1>Aprende</h1>
+      <p>{description}</p>
+    </header>
 
-  <div class="areas">
-    {cards.map(({ area, lessons }) => (
-      <a class="area" href={areaPath(area.id)} style={`--area: ${area.color}`}>
-        <div class="area-cover" aria-hidden="true">{area.icon}</div>
-        <div class="area-body">
-          <h2 class="area-title">{area.title}</h2>
-          <p class="area-desc">{area.description}</p>
-          <ul class="area-sections">
-            {area.sections.map((s) => (
-              <li class:list={{ soon: s.status === 'soon' }}>
-                {s.title}{s.status === 'soon' && <span> · pronto</span>}
-              </li>
-            ))}
+    <div class="hub-grid">
+      {cards.map(({ area, lessons }) => (
+        <a class="hub-card ap-panel" href={areaPath(area.id)} style={`--accent: ${area.color}`}>
+          <span class="hub-icon" aria-hidden="true">{area.icon}</span>
+          <h2>{area.title}</h2>
+          <p>{area.description}</p>
+          <ul>
+            {area.sections.map((s) => <li class:list={{ soon: s.status === 'soon' }}>{s.title}{s.status === 'soon' && ' · pronto'}</li>)}
           </ul>
-          <span class="area-count">{lessons.length} lecciones →</span>
-        </div>
-      </a>
-    ))}
+          <span class="hub-cta">Abrir el panel · {lessons.length} lecciones →</span>
+        </a>
+      ))}
+      <div class="hub-card hub-next ap-panel">
+        <span class="hub-icon" aria-hidden="true">🌱</span>
+        <h2>Más temas, pronto</h2>
+        <p>Cada vez que aprenda algo a fondo, tendrá aquí su propio panel.</p>
+      </div>
+    </div>
   </div>
 </Base>
 
 <style>
-  .learn-lead { max-width: 640px; }
-  .areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; max-width: 960px; }
-  .area { display: flex; flex-direction: column; overflow: hidden; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, box-shadow .15s; }
-  .area:hover, .area:focus-visible { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--shadow); color: var(--ink); }
-  .area-cover { display: grid; place-items: center; aspect-ratio: 16 / 7; font-size: 56px; background: var(--area); border-bottom: 3px solid var(--ink); }
-  .area-body { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; }
-  .area-title { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
-  .area:hover .area-title { color: var(--green); }
-  .area-desc { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-soft); }
-  .area-sections { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 4px 0 0; padding: 0; }
-  .area-sections li { font-family: var(--mono); font-size: 12px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 8px; }
-  .area-sections li.soon { border-style: dashed; border-color: var(--line); color: var(--muted); }
-  .area-count { margin-top: 4px; padding-top: 12px; border-top: 1.5px dashed var(--line); font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--green); }
+  .hub { max-width: 1040px; margin: 0 auto; padding: 48px 20px 80px; }
+  .hub-back { font-family: var(--mono); font-size: 13px; font-weight: 500; text-decoration: none; }
+  .hub-head h1 { margin: 18px 0 8px; font-family: var(--display); font-size: clamp(40px, 6vw, 60px); font-weight: 800; letter-spacing: -1.6px; line-height: 1; }
+  .hub-head p { max-width: 620px; margin: 0 0 36px; font-size: 18px; line-height: 1.55; color: var(--text-soft); }
+  .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .hub-card { display: flex; flex-direction: column; gap: 10px; padding: 22px; color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, border-color .15s; }
+  a.hub-card:hover { color: var(--ink); border-color: var(--accent); transform: translateY(-3px); }
+  .hub-icon { display: grid; place-items: center; width: 48px; height: 48px; font-size: 26px; background: var(--accent); border-radius: 12px; }
+  .hub-card h2 { margin: 4px 0 0; font-family: var(--display); font-size: 23px; font-weight: 800; letter-spacing: -0.4px; }
+  .hub-card p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-soft); }
+  .hub-card ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 4px 0 0; padding: 0; }
+  .hub-card li { padding: 3px 10px; font-size: 12.5px; background: var(--panel-2); border-radius: 999px; }
+  .hub-card li.soon { color: var(--muted); background: none; border: 1px dashed var(--line); }
+  .hub-cta { margin-top: auto; padding-top: 12px; font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent); }
+  .hub-next { --accent: var(--panel-2); border-style: dashed; box-shadow: none; background: transparent; }
 </style>
