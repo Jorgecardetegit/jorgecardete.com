@@ -1,0 +1,51 @@
+---
+import Base from '../../layouts/Base.astro';
+import { areas } from '../../data/learn';
+import { areaPath, getLessons } from '../../lib/learn';
+
+const cards = await Promise.all(
+  areas.map(async (area) => ({ area, lessons: await getLessons(area.id, area.sections.map((s) => s.id)) })),
+);
+const description =
+  'Lo que voy aprendiendo, explicado para que lo entienda cualquiera: con esquemas, ejemplos y siempre con fuentes.';
+---
+<Base title="Aprende" description={description} translated={false}>
+  <h1 class="hero">Aprende</h1>
+  <p class="lead learn-lead">{description}</p>
+
+  <div class="areas">
+    {cards.map(({ area, lessons }) => (
+      <a class="area" href={areaPath(area.id)} style={`--area: ${area.color}`}>
+        <div class="area-cover" aria-hidden="true">{area.icon}</div>
+        <div class="area-body">
+          <h2 class="area-title">{area.title}</h2>
+          <p class="area-desc">{area.description}</p>
+          <ul class="area-sections">
+            {area.sections.map((s) => (
+              <li class:list={{ soon: s.status === 'soon' }}>
+                {s.title}{s.status === 'soon' && <span> · pronto</span>}
+              </li>
+            ))}
+          </ul>
+          <span class="area-count">{lessons.length} lecciones →</span>
+        </div>
+      </a>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .learn-lead { max-width: 640px; }
+  .areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; max-width: 960px; }
+  .area { display: flex; flex-direction: column; overflow: hidden; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, box-shadow .15s; }
+  .area:hover, .area:focus-visible { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--shadow); color: var(--ink); }
+  .area-cover { display: grid; place-items: center; aspect-ratio: 16 / 7; font-size: 56px; background: var(--area); border-bottom: 3px solid var(--ink); }
+  .area-body { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; }
+  .area-title { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
+  .area:hover .area-title { color: var(--green); }
+  .area-desc { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-soft); }
+  .area-sections { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 4px 0 0; padding: 0; }
+  .area-sections li { font-family: var(--mono); font-size: 12px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 8px; }
+  .area-sections li.soon { border-style: dashed; border-color: var(--line); color: var(--muted); }
+  .area-count { margin-top: 4px; padding-top: 12px; border-top: 1.5px dashed var(--line); font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--green); }
+</style>

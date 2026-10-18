@@ -1,0 +1,32 @@
+---
+// Una tarjeta de <Comparar>. `color` es uno de la paleta del sitio.
+interface Props {
+  titulo: string;
+  icono?: string;
+  subtitulo?: string;
+  color?: 'green' | 'terracotta' | 'gold' | 'purple' | 'red';
+}
+const { titulo, icono, subtitulo, color = 'green' } = Astro.props;
+---
+<section class="lado" style={`--c: var(--${color})`}>
+  <header class="lado-head">
+    {icono && <span class="lado-icon" aria-hidden="true">{icono}</span>}
+    <div>
+      <div class="lado-title">{titulo}</div>
+      {subtitulo && <div class="lado-sub">{subtitulo}</div>}
+    </div>
+  </header>
+  <div class="lado-body"><slot /></div>
+</section>
+
+<style>
+  .lado { margin: 0; min-width: 0; background: var(--card); border: 3px solid var(--ink); border-top: 10px solid var(--c); border-radius: 4px; box-shadow: 4px 4px 0 var(--shadow); padding: 14px 16px 4px; }
+  .lado-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .lado-icon { font-size: 26px; line-height: 1; }
+  .lado-title { font-family: var(--display); font-size: 19px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.2; }
+  .lado-sub { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .lado-body { font-size: 15px; line-height: 1.6; color: var(--text-soft); }
+  .lado-body :global(p) { margin: 0 0 10px; }
+  .lado-body :global(ul) { margin: 0 0 10px; padding-left: 18px; }
+  .lado-body :global(li) { margin-bottom: 4px; }
+</style>

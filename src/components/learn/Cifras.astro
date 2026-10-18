@@ -1,0 +1,8 @@
+---
+// Fila de números grandes que resumen algo de un vistazo; cada uno es un <Cifra>.
+---
+<div class="cifras"><slot /></div>
+
+<style>
+  .cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 28px 0; }
+</style>

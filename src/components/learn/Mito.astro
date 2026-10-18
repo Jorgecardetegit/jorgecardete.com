@@ -1,0 +1,31 @@
+---
+// Una creencia muy extendida frente a lo que dice de verdad la ley.
+interface Props { mito: string }
+const { mito } = Astro.props;
+---
+<div class="mito">
+  <div class="mito-row is-false">
+    <span class="mito-tag">✗ Mito</span>
+    <p>{mito}</p>
+  </div>
+  <div class="mito-row is-true">
+    <span class="mito-tag">✓ Realidad</span>
+    <div><slot /></div>
+  </div>
+</div>
+
+<style>
+  .mito { margin: 28px 0; border: 3px solid var(--ink); border-radius: 4px; box-shadow: 4px 4px 0 var(--shadow); overflow: hidden; }
+  .mito-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 14px 18px; font-size: 16px; line-height: 1.6; }
+  .mito-row p, .mito-row :global(p) { margin: 0; }
+  .mito-row :global(p + p) { margin-top: 10px; }
+  .is-false { background: var(--card); color: var(--text-soft); }
+  .is-false p { text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+  .is-true { background: var(--bg); border-top: 2px dashed var(--line); }
+  .mito-tag { font-family: var(--mono); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  .is-false .mito-tag { color: var(--red); }
+  .is-true .mito-tag { color: var(--green); }
+  @media (max-width: 560px) {
+    .mito-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  }
+</style>

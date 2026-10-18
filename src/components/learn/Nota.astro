@@ -1,0 +1,25 @@
+---
+// Recuadro dentro de una lección: la idea clave, un dato, un error común o un ejemplo.
+interface Props { tipo?: 'clave' | 'dato' | 'ojo' | 'ejemplo'; titulo?: string }
+const { tipo = 'dato', titulo } = Astro.props;
+
+const kinds = {
+  clave: { icon: '🔑', label: 'La clave', color: 'var(--green)' },
+  dato: { icon: '💡', label: 'Dato', color: 'var(--gold)' },
+  ojo: { icon: '⚠️', label: 'Ojo', color: 'var(--terracotta)' },
+  ejemplo: { icon: '🧪', label: 'Ejemplo', color: 'var(--purple)' },
+};
+const kind = kinds[tipo];
+---
+<aside class="nota" style={`--c: ${kind.color}`}>
+  <div class="nota-label"><span aria-hidden="true">{kind.icon}</span>{titulo ?? kind.label}</div>
+  <div class="nota-body"><slot /></div>
+</aside>
+
+<style>
+  .nota { margin: 28px 0; padding: 14px 20px 2px; background: var(--card); border: 3px solid var(--ink); border-left: 10px solid var(--c); border-radius: 4px; box-shadow: 4px 4px 0 var(--shadow); }
+  .nota-label { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+  .nota-body { font-size: 16px; line-height: 1.65; }
+  .nota-body :global(p) { margin: 0 0 12px; }
+  .nota-body :global(ul) { margin: 0 0 12px; }
+</style>

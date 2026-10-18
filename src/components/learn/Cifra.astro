@@ -1,0 +1,15 @@
+---
+// Un número grande con su explicación debajo, dentro de <Cifras>.
+interface Props { valor: string; etiqueta: string; color?: 'green' | 'terracotta' | 'gold' | 'purple' | 'red' }
+const { valor, etiqueta, color = 'green' } = Astro.props;
+---
+<div class="cifra" style={`--c: var(--${color})`}>
+  <div class="cifra-valor">{valor}</div>
+  <div class="cifra-etiqueta">{etiqueta}</div>
+</div>
+
+<style>
+  .cifra { background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 3px 3px 0 var(--shadow); padding: 14px 16px; }
+  .cifra-valor { font-family: var(--display); font-size: 36px; font-weight: 800; line-height: 1; letter-spacing: -1px; color: var(--c); }
+  .cifra-etiqueta { margin-top: 8px; font-size: 14px; line-height: 1.4; color: var(--text-soft); }
+</style>

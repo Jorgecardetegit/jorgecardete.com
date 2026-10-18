@@ -1,0 +1,8 @@
+---
+// Tarjetas una al lado de otra para comparar (Congreso frente a Senado...); cada una es un <Lado>.
+---
+<div class="comparar"><slot /></div>
+
+<style>
+  .comparar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 28px 0; }
+</style>

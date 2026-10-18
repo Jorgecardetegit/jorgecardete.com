@@ -1,0 +1,25 @@
+---
+// Un paso dentro de <Pasos>. `quien` es el órgano que actúa (Congreso, Rey...);
+// `final` marca el desenlace y quita la línea que lo une al siguiente.
+interface Props { titulo: string; quien?: string; final?: boolean }
+const { titulo, quien, final = false } = Astro.props;
+---
+<li class:list={['paso', { final }]}>
+  <div class="paso-head">
+    <strong class="paso-title">{titulo}</strong>
+    {quien && <span class="paso-quien">{quien}</span>}
+  </div>
+  <div class="paso-body"><slot /></div>
+</li>
+
+<style>
+  .paso { counter-increment: paso; position: relative; margin: 0; padding: 0 0 22px 56px; }
+  .paso::before { content: counter(paso); position: absolute; left: 0; top: -2px; display: grid; place-items: center; width: 36px; height: 36px; font-family: var(--pixel); font-size: 12px; color: var(--bg); background: var(--green); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--shadow); }
+  .paso.final::before { content: '✓'; font-family: var(--mono); font-size: 18px; font-weight: 700; background: var(--gold); color: var(--ink); }
+  .paso:not(:last-child)::after { content: ''; position: absolute; left: 17px; top: 38px; bottom: 2px; border-left: 3px dotted var(--line); }
+  .paso-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-height: 34px; }
+  .paso-title { font-family: var(--display); font-size: 18px; font-weight: 700; letter-spacing: -0.2px; }
+  .paso-quien { font-family: var(--mono); font-size: 12px; color: var(--purple); border: 1.5px solid currentColor; border-radius: 999px; padding: 2px 9px; }
+  .paso-body { font-size: 16px; line-height: 1.65; color: var(--text-soft); }
+  .paso-body :global(p) { margin: 4px 0 0; }
+</style>

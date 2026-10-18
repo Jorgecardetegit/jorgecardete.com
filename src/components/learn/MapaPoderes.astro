@@ -1,0 +1,66 @@
+---
+// Esquema de quién elige a quién: la ciudadanía vota a las Cortes, el Congreso elige
+// al presidente y, aparte, los jueces, el Tribunal Constitucional y el Rey.
+---
+<figure class="poderes" aria-label="Esquema de los poderes del Estado">
+  <div class="pnode pueblo">
+    <span class="pnode-icon" aria-hidden="true">🗳️</span>
+    <div><strong>La ciudadanía</strong><span>Mayores de 18 con nacionalidad española</span></div>
+  </div>
+
+  <div class="parrow"><span>votan, como máximo cada 4 años</span></div>
+
+  <div class="pnode cortes">
+    <div class="pnode-tag">PODER LEGISLATIVO</div>
+    <span class="pnode-icon" aria-hidden="true">🏛️</span>
+    <div><strong>Cortes Generales</strong><span>Congreso + Senado. Aprueban las leyes y los presupuestos y vigilan al Gobierno.</span></div>
+  </div>
+
+  <div class="parrow two-way">
+    <span>↓ el Congreso elige al presidente</span>
+    <span>↑ y puede echarlo (moción de censura)</span>
+  </div>
+
+  <div class="pnode gobierno">
+    <div class="pnode-tag">PODER EJECUTIVO</div>
+    <span class="pnode-icon" aria-hidden="true">🏢</span>
+    <div><strong>Gobierno</strong><span>Presidente y ministros. Gobiernan el día a día y hacen cumplir las leyes.</span></div>
+  </div>
+
+  <div class="pside">
+    <div class="pnode judicial">
+      <div class="pnode-tag">PODER JUDICIAL</div>
+      <span class="pnode-icon" aria-hidden="true">⚖️</span>
+      <div><strong>Jueces y tribunales</strong><span>Aplican las leyes en cada caso. Son independientes: nadie puede darles órdenes.</span></div>
+    </div>
+    <div class="pnode tc">
+      <span class="pnode-icon" aria-hidden="true">📜</span>
+      <div><strong>Tribunal Constitucional</strong><span>Árbitro final: anula las leyes que van contra la Constitución.</span></div>
+    </div>
+    <div class="pnode rey">
+      <span class="pnode-icon" aria-hidden="true">👑</span>
+      <div><strong>El Rey</strong><span>Jefe del Estado. Firma y representa, pero no decide.</span></div>
+    </div>
+  </div>
+  <figcaption>Los tres poderes están separados para que ninguno acumule todo el poder. Las Cortes son el centro: son lo único que eliges directamente.</figcaption>
+</figure>
+
+<style>
+  .poderes { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin: 32px 0; padding: 22px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .pnode { position: relative; display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg); border: 3px solid var(--ink); border-left: 10px solid var(--c, var(--ink)); border-radius: 4px; }
+  .pnode strong { display: block; font-family: var(--display); font-size: 18px; font-weight: 800; letter-spacing: -0.2px; line-height: 1.2; }
+  .pnode span:not(.pnode-icon) { display: block; margin-top: 3px; font-size: 14.5px; line-height: 1.45; color: var(--text-soft); }
+  .pnode-icon { flex: none; font-size: 28px; line-height: 1; }
+  .pnode-tag { position: absolute; top: -11px; right: 12px; padding: 2px 8px; font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: .5px; color: var(--ink); background: var(--bg); border: 2px solid var(--ink); }
+  .pueblo { --c: var(--gold); }
+  .cortes { --c: var(--green); }
+  .gobierno { --c: var(--purple); }
+  .judicial { --c: var(--terracotta); }
+  .tc { --c: var(--red); }
+  .rey { --c: var(--muted); }
+  .parrow { display: flex; flex-wrap: wrap; gap: 2px 18px; padding: 14px 0 14px; margin-left: 40px; border-left: 3px solid var(--ink); font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  .parrow span { padding-left: 12px; }
+  .pside { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 26px; padding-top: 22px; border-top: 2px dashed var(--line); }
+  .pside .pnode { align-items: flex-start; }
+  .poderes figcaption { margin-top: 18px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+</style>

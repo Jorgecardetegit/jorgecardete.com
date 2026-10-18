@@ -19,4 +19,23 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+// Lecciones de /aprende/: una carpeta por área en /knowledge (knowledge/politica/cortes.mdx
+// se publica en /aprende/politica/cortes/). Áreas y bloques en src/data/learn.ts.
+const lessons = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './knowledge' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    // Bloque del área al que pertenece y posición dentro de él.
+    section: z.string(),
+    order: z.number(),
+    icon: z.string(),
+    // «En una frase»: lo que debería quedarte aunque no leas nada más.
+    summary: z.string(),
+    keyPoints: z.array(z.string()).min(1),
+    sources: z.array(z.object({ title: z.string(), url: z.string().url() })).default([]),
+    updated: z.coerce.date(),
+  }),
+});
+
+export const collections = { blog, lessons };

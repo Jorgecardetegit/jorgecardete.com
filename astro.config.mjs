@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 
@@ -22,6 +23,8 @@ export default defineConfig({
     routing: { prefixDefaultLocale: false },
   },
   integrations: [
+    // Lecciones de /aprende/: Markdown con componentes visuales (knowledge/**/*.mdx).
+    mdx(),
     sitemap({
       i18n: { defaultLocale: 'es', locales: { es: 'es-ES', en: 'en-US' } },
       // Landings de campaña y páginas legales fuera del sitemap.
