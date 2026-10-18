@@ -12,10 +12,10 @@ import { fecha, partidoById } from '../../lib/politica';
 // G es el alto de la franja de quién gobernaba, debajo de los años.
 interface Lienzo { id: string; W: number; H: number; G: number; M: { l: number; r: number; t: number; b: number }; anios: number[]; etiquetas: boolean }
 const lienzos: Lienzo[] = [
-  { id: 'ancho', W: 720, H: 300, G: 30, M: { l: 58, r: 74, t: 30, b: 28 }, anios: [2011, 2014, 2018, 2022, 2026], etiquetas: true },
-  { id: 'movil', W: 360, H: 260, G: 26, M: { l: 50, r: 62, t: 14, b: 24 }, anios: [2011, 2018, 2026], etiquetas: false },
+  { id: 'ancho', W: 720, H: 300, G: 30, M: { l: 58, r: 74, t: 30, b: 28 }, anios: [2004, 2008, 2011, 2014, 2018, 2022, 2026], etiquetas: true },
+  { id: 'movil', W: 360, H: 260, G: 26, M: { l: 50, r: 62, t: 14, b: 24 }, anios: [2004, 2011, 2018, 2026], etiquetas: false },
 ];
-const X0 = 2011;
+const X0 = 2004;
 const X1 = 2026.9;
 
 // Un tramo por presidente (la franja no distingue minoría, coalición o en funciones).
@@ -32,8 +32,9 @@ const tramos = gobiernos.reduce<{ desde: number; hasta: number; presidente: stri
 const siglas = (id: string) => partidoById.get(id)?.siglas ?? id.toUpperCase();
 const colorDe = (id: string) => partidoById.get(id)?.color ?? 'var(--muted)';
 const gobiernoEn = (a: number) => tramos.find((t) => a >= t.desde && a < t.hasta) ?? tramos.at(-1)!;
-// 2011 y 2018: los años en que llega un presidente nuevo.
-const llegada = (a: number) => tramos.find((t) => Math.floor(t.desde) === a && t.desde > X0 + 0.01);
+// 2004, 2011 y 2018: los años en que llega un presidente nuevo.
+const llegada = (a: number) => tramos.find((t) => Math.floor(t.desde) === a && t.desde > X0 - 0.01);
+const llegadas = tramos.filter((t) => t.desde >= X0).map((t) => Math.floor(t.desde));
 const niveles = ['Poco', 'En parte', 'Mucho'];
 // '2025' → 2025; '2026-09' → 2026,7; '2026-Q2' → 2026,4.
 const momento = (p: string) => (p.includes('Q') ? Number(p.slice(0, 4)) + (Number(p.slice(-1)) - 0.5) / 4 : p.length > 4 ? Number(p.slice(0, 4)) + (Number(p.slice(5)) - 0.5) / 12 : Number(p));
@@ -61,13 +62,14 @@ const ordenada = (s: Record<string, number>) => Object.entries(s).sort(([a], [b]
 const marca = (p: Pregunta, v: number) => (Math.abs(v) >= 10000 ? `${(v / 1000).toLocaleString('es-ES')} mil` : p.fmt(v).replace(/,0+(?=\D|$)/, ''));
 const fin = (p: Pregunta, v: number) => (Math.abs(v) >= 10000 ? `${Math.round(v / 1000).toLocaleString('es-ES')} mil €` : p.fmt(v));
 
-// Las tres cifras: el primer año, 2018 y hoy.
+// Las cifras: el año en que llega cada presidente (y el primero con datos, si es posterior) y hoy.
+// Mismo trato para todos: ninguno se compara solo con el anterior.
 function cifras(p: Pregunta) {
-  const primero = Object.keys(p.es).sort()[0];
+  const primero = Number(Object.keys(p.es).sort()[0]);
+  const anios = [...new Set([primero, ...llegadas.filter((a) => a > primero)])].sort((a, b) => a - b);
   return [
-    { etiqueta: primero, valor: p.es[primero], ue: p.ue?.[primero] ?? null, a: Number(primero) },
-    { etiqueta: '2018', valor: p.es[2018], ue: p.ue?.[2018] ?? null, a: 2018 },
-    { etiqueta: `Hoy · ${periodo(p.hoy.periodo)}`, valor: p.hoy.valor, ue: p.hoy.ue, a: momento(p.hoy.periodo) },
+    ...anios.map((a) => ({ etiqueta: String(a), valor: p.es[a], ue: p.ue?.[a] ?? null, a, hoy: false })),
+    { etiqueta: `Hoy · ${periodo(p.hoy.periodo)}`, valor: p.hoy.valor, ue: p.hoy.ue, a: momento(p.hoy.periodo), hoy: true },
   ];
 }
 
@@ -119,11 +121,11 @@ function vista(p: Pregunta, L: Lienzo) {
         <p class="ec-a">{p.respuesta}</p>
 
         <ul class="ec-cifras">
-          {cifras(p).map((c, i) => {
-            const nuevo = i < 2 ? llegada(c.a) : undefined;
-            const g = i === 2 ? gobiernoEn(c.a) : undefined;
+          {cifras(p).map((c) => {
+            const nuevo = c.hoy ? undefined : llegada(c.a);
+            const g = c.hoy ? gobiernoEn(c.a) : undefined;
             return (
-            <li class:list={['ec-cifra', { hoy: i === 2 }]}>
+            <li class:list={['ec-cifra', { hoy: c.hoy }]}>
               <span class="ec-cifra-t">{c.etiqueta}</span>
               {nuevo && <span class="ec-cifra-gob"><i style={`background: ${colorDe(nuevo.partido)}`} />Llega {nuevo.presidente} ({siglas(nuevo.partido)})</span>}
               {g && <span class="ec-cifra-gob"><i style={`background: ${colorDe(g.partido)}`} />Gobierna {g.presidente} ({siglas(g.partido)})</span>}
@@ -290,7 +292,7 @@ function vista(p: Pregunta, L: Lienzo) {
   .ec-q { margin: 6px 0 0; font-family: var(--display); font-size: 28px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.15; color: var(--ink); }
   .ec-a { margin: 0; max-width: 62ch; font-size: 17px; line-height: 1.55; color: var(--ink); }
 
-  .ec-cifras { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .ec-cifras { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
   .ec-cifra { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
   .ec-cifra.hoy { border-color: var(--ink); }
   .ec-cifra-t { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
@@ -371,7 +373,7 @@ function vista(p: Pregunta, L: Lienzo) {
   @media (max-width: 560px) {
     .ec-q { font-size: 23px; }
     .ec-a { font-size: 15.5px; }
-    .ec-cifras { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .ec-cifras { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); gap: 6px; }
     .ec-cifra { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; padding: 8px 12px; }
     .ec-cifra strong { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 22px; white-space: nowrap; }
     .ec-cifra-ue { grid-column: 1; }

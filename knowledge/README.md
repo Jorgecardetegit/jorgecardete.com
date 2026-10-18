@@ -59,7 +59,7 @@ El panel (`/aprende/politica/`) gira en torno a las elecciones: partidos, diputa
 | `src/data/politica/votaciones-manuales.json` | Votaciones clave que el Congreso publica solo como imagen | A mano, con fuente en cada una |
 | `src/data/politica/gobiernos.ts` | Los gobiernos desde 1975, uno por investidura: cómo llegó (votación), con quién gobernó, qué hizo por áreas y cómo terminó | A mano; fechas y votaciones de Wikipedia (artículo de cada gobierno y tabla de investiduras) |
 | `src/data/politica/programas-2023.ts` | Qué propuso cada partido en su programa del 23-J, tema a tema, con la página del PDF | A mano, leyendo los programas (enlaces en el propio archivo) |
-| `src/data/politica/economia.json` | Indicadores económicos de España y la UE desde 2011 y las últimas cifras mensuales (pestaña «Economía»); los textos y el salario mínimo, en `economia.ts` | `node scripts/aprende/economia.mjs` (API de Eurostat) |
+| `src/data/politica/economia.json` | Indicadores económicos de España y la UE desde 2004 y las últimas cifras mensuales (pestaña «Economía»); los textos y el salario mínimo, en `economia.ts` | `node scripts/aprende/economia.mjs` (API de Eurostat) |
 
 Los JSON de origen son los de [datos abiertos del Congreso](https://www.congreso.es/es/opendata) (diputados y votaciones por sesión). Criterio de partidos: escaño en el Congreso al disolverse las Cortes o eurodiputados.
 

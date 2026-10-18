@@ -1,4 +1,4 @@
-// Genera src/data/politica/economia.json con los indicadores económicos de España desde 2011,
+// Genera src/data/politica/economia.json con los indicadores económicos de España desde 2004,
 // junto a la media de la UE, a partir de la API de Eurostat.
 // Eurostat usa la misma metodología para todos los países, así que España y la UE se comparan
 // sin ajustes. Uso:
@@ -11,13 +11,14 @@ import { setDefaultAutoSelectFamilyAttemptTimeout } from 'node:net';
 setDefaultAutoSelectFamilyAttemptTimeout(5000);
 
 const API = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data';
-const DESDE = 2011;
+const DESDE = 2004;
 
 // Series anuales. `con` es la referencia con la que se compara España (null: ninguna).
 const anuales = [
   { id: 'pib', dataset: 'nama_10_gdp', filtros: { unit: 'CLV_PCH_PRE', na_item: 'B1GQ' } },
   { id: 'renta', dataset: 'tepsr_wc310', filtros: {} },
-  { id: 'paro', dataset: 'une_rt_a', filtros: { age: 'Y15-74', sex: 'T', unit: 'PC_ACT' } },
+  // une_rt_a solo llega a 2009; lfsa_urgan es la misma tasa de la EPA y empieza antes.
+  { id: 'paro', dataset: 'lfsa_urgan', filtros: { citizen: 'TOTAL', age: 'Y15-74', sex: 'T', unit: 'PC' } },
   { id: 'inflacion', dataset: 'prc_hicp_aind', filtros: { unit: 'RCH_A_AVG', coicop: 'CP00' } },
   { id: 'vivienda', dataset: 'prc_hpi_a', filtros: { purchase: 'TOTAL', unit: 'I15_A_AVG' } },
   { id: 'deuda', dataset: 'gov_10dd_edpt1', filtros: { na_item: 'GD', unit: 'PC_GDP', sector: 'S13' } },

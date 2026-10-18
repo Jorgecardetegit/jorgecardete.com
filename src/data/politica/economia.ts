@@ -1,6 +1,6 @@
-// Cómo ha ido la economía desde 2011, contado como las preguntas que se haría cualquiera. Cada
+// Cómo ha ido la economía desde 2004, contado como las preguntas que se haría cualquiera. Cada
 // pregunta tiene una respuesta en una frase (calculada con los datos, para que se actualice sola),
-// tres cifras (el primer año, 2018 y hoy), la media de la UE al lado y la serie para la gráfica.
+// una cifra por cada presidente que llega (2004, 2011 y 2018) y la de hoy, la media de la UE al lado y la serie para la gráfica.
 // Las cifras salen de Eurostat (economia.json, generado con scripts/aprende/economia.mjs) salvo el
 // salario mínimo, que se fija cada año por real decreto. Sin juicios sobre quién lo hizo mejor.
 import datos from './economia.json';
@@ -58,6 +58,7 @@ const paroPeor = extremo(paro.es, (a, b) => a > b);
 // cifra con la que acabó el año. Y descontada la inflación (IPCA de España), en euros del último
 // año con inflación anual.
 const smi: Serie = {
+  2004: 490.8, 2005: 513, 2006: 540.9, 2007: 570.6, 2008: 600, 2009: 624, 2010: 633.3,
   2011: 641.4, 2012: 641.4, 2013: 645.3, 2014: 645.3, 2015: 648.6, 2016: 655.2, 2017: 707.7, 2018: 735.9,
   2019: 900, 2020: 950, 2021: 965, 2022: 1000, 2023: 1080, 2024: 1134, 2025: 1184, 2026: 1221,
 };
@@ -70,7 +71,8 @@ const smiReal: Serie = Object.fromEntries(
     return [a, Math.round(smi[a] * f)];
   }),
 );
-const smiGanancia = Math.round((smi[ultimoIpc] / smiReal[2018] - 1) * 100);
+// Cuánto ganó en poder de compra con cada presidente, de su llegada a la del siguiente (o a hoy).
+const smiTramo = (desde: number, hasta: number | string) => `${n(Math.round((smiReal[hasta] / smiReal[desde] - 1) * 100))} %`;
 
 // Renta de los hogares: índice 2008 = 100 → diferencia en % con 2008.
 const renta = { es: mapa(ind.renta.es as Serie, (v) => Math.round((v - 100) * 10) / 10), ue: mapa(ind.renta.ref as Serie, (v) => Math.round((v - 100) * 10) / 10) };
@@ -115,7 +117,7 @@ export const preguntas: Pregunta[] = [
   },
   {
     id: 'sueldo', tema: 'Sueldo mínimo', pregunta: '¿Ha subido el sueldo mínimo?',
-    respuesta: `El sueldo mínimo es hoy de ${n(smi[ultimo(smi).a])} € al mes en 14 pagas; en 2018 era de ${n(smi[2018])} €. Aun descontando lo que han subido los precios, en ${ultimoIpc} daba para comprar un ${smiGanancia} % más que en 2018.`,
+    respuesta: `El sueldo mínimo es hoy de ${n(smi[ultimo(smi).a])} € al mes en 14 pagas. Descontando lo que han subido los precios, subió un ${smiTramo(2004, 2011)} entre 2004 y 2011, un ${smiTramo(2011, 2018)} entre 2011 y 2018 y un ${smiTramo(2018, ultimoIpc)} entre 2018 y ${ultimoIpc}.`,
     eje: 'Euros al mes, en 14 pagas',
     es: smi, ue: smiReal, ref: `Descontada la subida de precios (€ de ${ultimoIpc})`, hoy: anual(smi, null), fmt: (v) => `${n(v)} €`,
     que: 'El salario mínimo interprofesional: lo menos que se puede pagar por una jornada completa, en euros brutos al mes y 14 pagas. La línea discontinua lo traduce a euros de hoy para ver cuánto ha subido de verdad.',
@@ -196,7 +198,7 @@ export const preguntas: Pregunta[] = [
   },
   {
     id: 'deuda', tema: 'Deuda', pregunta: '¿Debe más el Estado?',
-    respuesta: `Las administraciones deben ${n(deudaHoy.v)} € por cada 100 € que produce el país en un año. En 2011 debían ${n(deuda.es[2011])} €; la media de la UE es de ${n(deuda.ue[deudaHoy.a])} €.`,
+    respuesta: `Las administraciones deben ${n(deudaHoy.v)} € por cada 100 € que produce el país en un año. En 2004 debían ${n(deuda.es[2004])} €, en 2011 ${n(deuda.es[2011])} € y en 2018 ${n(deuda.es[2018])} €. La media de la UE es hoy de ${n(deuda.ue[deudaHoy.a])} €.`,
     eje: 'Lo que deben las administraciones por cada 100 € que produce el país en un año (% del PIB)',
     ...deuda, ref: 'UE', hoy: anual(deuda.es, deuda.ue), fmt: pct(1),
     linea: { valor: 60, texto: 'Referencia europea: 60' },
@@ -230,6 +232,7 @@ export const preguntas: Pregunta[] = [
 
 // Lo que vino de fuera y se ve en casi todas las gráficas.
 export const sacudidas = [
+  { anio: 2008, texto: 'Crisis financiera' },
   { anio: 2012, texto: 'Crisis del euro' },
   { anio: 2020, texto: 'Pandemia' },
   { anio: 2022, texto: 'Guerra de Ucrania' },
