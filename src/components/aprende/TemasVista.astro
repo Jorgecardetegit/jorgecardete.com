@@ -1,8 +1,7 @@
 ---
-// Vista de temas: para cada uno, quién decide, con quién coincide cada partido al votar sobre
-// ese tema, todas sus votaciones con la posición de cada partido, lo que propuso cada uno en su
-// programa de 2023 (para contrastarlo con lo que votó) y, cuando se publiquen, lo que propone para
-// el 29-N.
+// Vista de temas: para cada uno, quién decide en una línea y tres subpestañas para no verlo todo a
+// la vez: qué han votado los partidos, qué proponen (el 29-N cuando se publique y, mientras, 2023)
+// y con quién coincide cada uno al votar sobre ese tema.
 import AfinidadMatriz from './AfinidadMatriz.astro';
 import { temas, temasDe } from '../../data/politica/temas';
 import { programas2023, propuestas2023, sinPrograma2023 } from '../../data/politica/programas-2023';
@@ -36,51 +35,23 @@ const vistas = temas.map((tema) => {
     ))}
   </div>
 
-  {vistas.map(({ tema, votos, datos }, i) => (
+  {vistas.map(({ tema, votos, datos }, i) => {
+    const con2023 = orden2023.filter((id) => propuestas2023[tema.id]?.[id]);
+    const conPropuesta = orden.filter((id) => tema.propuestas[id]);
+    return (
     <section class="tv-panel" data-tema-panel={tema.id} hidden={i !== 0} aria-label={tema.nombre}>
-      <h3 class="tv-title"><span aria-hidden="true">{tema.icono}</span> {tema.nombre}</h3>
+      <header class="tv-head">
+        <h3 class="tv-title"><span aria-hidden="true">{tema.icono}</span> {tema.nombre}</h3>
+        <p class="tv-decide"><b>Quién decide:</b> {tema.quienDecide} {tema.lecciones.map((l) => <a href={`/aprende/politica/${l.slug}/`}>{l.texto} →</a>)}</p>
+      </header>
 
-      <div class="tv-decide">
-        <div class="tv-label">Quién decide</div>
-        <p>{tema.quienDecide}</p>
-        <p class="tv-lessons">{tema.lecciones.map((l) => <a href={`/aprende/politica/${l.slug}/`}>Lección: {l.texto} →</a>)}</p>
+      <div class="tv-subs" role="tablist" aria-label={`Qué ver de ${tema.nombre}`}>
+        <button type="button" role="tab" aria-selected="true" data-sub="votado">Votaciones <small>{votos.length}</small></button>
+        <button type="button" role="tab" aria-selected="false" data-sub="proponen">Propuestas</button>
+        {votos.length >= 3 && <button type="button" role="tab" aria-selected="false" data-sub="coincide">Coincidencias</button>}
       </div>
 
-      <div class="tv-block">
-        <div class="tv-label">Qué proponen para el 29-N</div>
-        {Object.keys(tema.propuestas).length === 0 ? (
-          <p class="tv-muted">Los partidos aún no han publicado sus programas. Se añadirán aquí todos a la vez cuando salgan, para comparar a todos con el mismo material.</p>
-        ) : (
-          <ul class="tv-props">
-            {orden.filter((id) => tema.propuestas[id]).map((id) => (
-              <li><span class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</span> {tema.propuestas[id].texto} <a href={tema.propuestas[id].fuente}>programa</a></li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div class="tv-block">
-        <div class="tv-label">Qué propusieron en 2023 <span class="tv-count">programas de las generales del 23-J</span></div>
-        <div class="tv-h23">
-          {orden2023.filter((id) => propuestas2023[tema.id]?.[id]).map((id) => (
-            <div class="tv-h23-p">
-              <span class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</span>
-              <ul>
-                {propuestas2023[tema.id][id].map((x) => (
-                  <li>{x.t} <a href={`${programas2023[id].url}#page=${x.p}`} target="_blank" rel="noopener" title={`${programas2023[id].titulo}, página ${x.p} del PDF`}>pág. {x.p}</a></li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <p class="tv-muted small">
-          Medidas concretas de cada programa, con su página. Si un partido no aparece, no hemos encontrado una propuesta concreta sobre este tema en su programa.
-          {' '}{programas2023.podemos.nota} {Object.values(sinPrograma2023).join(' ')} Los programas en {[...new Set(traducidos)].join(' y ')} están traducidos. El de Junts enlaza a una copia de Betevé porque el partido ya no lo tiene en su web.
-        </p>
-      </div>
-
-      <div class="tv-block">
-        <div class="tv-label">Qué han votado <span class="tv-count">{votos.length} votaciones</span></div>
+      <div class="tv-sub" data-sub-panel="votado">
         {votos.length > 0 ? (
           <>
             <div class="tv-grid-scroll">
@@ -93,7 +64,7 @@ const vistas = temas.map((tema) => {
                 </thead>
                 <tbody data-more-list>
                   {votos.map((v, j) => (
-                    <tr hidden={j >= 12}>
+                    <tr hidden={j >= 8}>
                       <th scope="row">
                         <span class="tv-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)}{v.tipo === 'propuesta' ? ` (${proponentes(v).texto})` : ''} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
                         <span class="tv-vt">{tituloCorto(v)}</span>
@@ -111,27 +82,64 @@ const vistas = temas.map((tema) => {
                 </tbody>
               </table>
             </div>
-            {votos.length > 12 && <button type="button" class="tv-more" data-more>Ver las {votos.length}</button>}
-            <p class="tv-muted small">En una enmienda a la totalidad, votar «sí» es querer tumbar el texto. «½»: el partido se dividió.</p>
+            {votos.length > 8 && <button type="button" class="tv-more" data-more>Ver las {votos.length}</button>}
+            <p class="tv-muted small">S: sí · N: no · A: abstención · ½: el partido se dividió. En una enmienda a la totalidad, «sí» es querer tumbar el texto.</p>
           </>
         ) : (
           <p class="tv-muted">No hay votaciones clave sobre este tema en la legislatura.</p>
         )}
       </div>
 
+      <div class="tv-sub" data-sub-panel="proponen" hidden>
+        {conPropuesta.length === 0 ? (
+          <p class="tv-pending"><b>29-N:</b> aún no hay programas. Se añadirán todos a la vez cuando se publiquen. Mientras, lo que propuso cada uno en 2023:</p>
+        ) : (
+          <ul class="tv-props">
+            {conPropuesta.map((id) => (
+              <li><span class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</span> {tema.propuestas[id].texto} <a href={tema.propuestas[id].fuente}>programa</a></li>
+            ))}
+          </ul>
+        )}
+        <ul class="tv-h23">
+          {con2023.map((id) => {
+            const lista = propuestas2023[tema.id][id];
+            const item = (x: (typeof lista)[number]) => <li>{x.t} <a href={`${programas2023[id].url}#page=${x.p}`} target="_blank" rel="noopener" title={`${programas2023[id].titulo}, página ${x.p} del PDF`}>p.{x.p}</a></li>;
+            return (
+              <li class="tv-h23-p">
+                <span class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</span>
+                <ul>{lista.slice(0, 2).map(item)}</ul>
+                {lista.length > 2 && (
+                  <details class="tv-h23-more"><summary>{lista.length - 2} más</summary><ul>{lista.slice(2).map(item)}</ul></details>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+        <details class="tv-fine">
+          <summary>Sobre estos programas</summary>
+          <p>
+            Programas de las generales de 2023, con la página de cada medida. Si un partido no aparece, no hemos encontrado una propuesta concreta sobre este tema.
+            {' '}{programas2023.podemos.nota} {Object.values(sinPrograma2023).join(' ')} Los programas en {[...new Set(traducidos)].join(' y ')} están traducidos. El de Junts enlaza a una copia de Betevé porque el partido ya no lo tiene en su web.
+          </p>
+        </details>
+      </div>
+
       {votos.length >= 3 && (
-        <div class="tv-block">
-          <div class="tv-label">Con quién coincide cada partido en este tema</div>
+        <div class="tv-sub" data-sub-panel="coincide" hidden>
           <AfinidadMatriz
             orden={orden}
             datos={datos}
-            pie={`Porcentaje de las ${votos.length} votaciones de «${tema.nombre}» en que la mayoría de dos partidos votó lo mismo. «—»: menos de tres votaciones comparables.`}
+            pie={`En cuántas de las ${votos.length} votaciones de este tema votó lo mismo la mayoría de cada par de partidos (%). «—»: menos de tres comparables.`}
           />
         </div>
       )}
     </section>
-  ))}
-  <p class="tv-muted small">Cada votación se asigna a un tema por palabras clave de su título, con una regla fija igual para todas. Algunas encajan en varios temas y otras en ninguno; todas están en la pestaña Votaciones.</p>
+    );
+  })}
+  <details class="tv-fine">
+    <summary>Cómo se asignan las votaciones a cada tema</summary>
+    <p>Por palabras clave de su título, con una regla fija igual para todas. Algunas encajan en varios temas y otras en ninguno; todas están en la pestaña Votaciones.</p>
+  </details>
 </div>
 
 <script>
@@ -142,7 +150,17 @@ const vistas = temas.map((tema) => {
       c.addEventListener('click', () => {
         for (const x of chips) x.setAttribute('aria-selected', String(x === c));
         for (const p of panels) p.hidden = p.dataset.temaPanel !== c.dataset.tema;
+        c.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
       });
+    }
+    for (const panel of panels) {
+      const subs = [...panel.querySelectorAll<HTMLButtonElement>('[data-sub]')];
+      for (const b of subs) {
+        b.addEventListener('click', () => {
+          for (const x of subs) x.setAttribute('aria-selected', String(x === b));
+          for (const sp of panel.querySelectorAll<HTMLElement>('[data-sub-panel]')) sp.hidden = sp.dataset.subPanel !== b.dataset.sub;
+        });
+      }
     }
     for (const button of root.querySelectorAll<HTMLButtonElement>('[data-more]')) {
       const body = button.previousElementSibling!.querySelector('[data-more-list]')!;
@@ -156,29 +174,42 @@ const vistas = temas.map((tema) => {
 
 <style>
   .tv { display: flex; flex-direction: column; gap: 14px; }
-  .tv-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tv-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; cursor: pointer; }
+  .tv-chips { display: flex; gap: 6px; margin: 0 -4px; padding: 2px 4px 6px; overflow-x: auto; scrollbar-width: thin; mask-image: linear-gradient(to right, #000 92%, transparent); }
+  .tv-chip { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; cursor: pointer; }
   .tv-chip small { font-family: var(--mono); font-size: 11px; font-weight: 400; color: var(--muted); }
   .tv-chip:hover { border-color: var(--accent); }
   .tv-chip[aria-selected='true'] { color: #fff; background: var(--accent); border-color: var(--accent); }
   .tv-chip[aria-selected='true'] small { color: rgba(255, 255, 255, .8); }
   .tv-panel[hidden] { display: none; }
-  .tv-panel { display: flex; flex-direction: column; gap: 18px; }
-  .tv-title { margin: 6px 0 0; font-family: var(--display); font-size: 26px; font-weight: 800; letter-spacing: -0.6px; }
-  .tv-label { margin-bottom: 8px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .7px; text-transform: uppercase; color: var(--accent); }
-  .tv-count { margin-left: 6px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
-  .tv-decide { padding: 12px 14px; background: var(--bg); border: 1px solid var(--panel-line); border-left: 4px solid var(--accent); border-radius: 10px; }
-  .tv-decide p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--text-soft); }
-  .tv-lessons { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px !important; font-size: 13px; }
-  .tv-lessons a { font-weight: 600; text-decoration: none; }
+  .tv-panel { display: flex; flex-direction: column; gap: 14px; }
+  .tv-head { display: flex; flex-direction: column; gap: 4px; }
+  .tv-title { margin: 6px 0 0; font-family: var(--display); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .tv-decide { margin: 0; max-width: 760px; font-size: 13.5px; line-height: 1.5; color: var(--text-soft); }
+  .tv-decide b { font-weight: 600; color: var(--ink); }
+  .tv-decide a { margin-left: 6px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .tv-subs { display: flex; flex-wrap: wrap; gap: 2px; padding: 3px; align-self: flex-start; background: var(--panel-2); border-radius: 999px; }
+  .tv-subs button { padding: 7px 14px; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
+  .tv-subs button:hover { color: var(--ink); }
+  .tv-subs button[aria-selected='true'] { color: var(--bg); background: var(--ink); }
+  @media (max-width: 520px) { .tv-subs { flex-wrap: nowrap; } .tv-subs button { padding: 7px 10px; font-size: 12.5px; white-space: nowrap; } }
+  .tv-subs small { font-family: var(--mono); font-size: 11px; font-weight: 400; opacity: .75; }
+  .tv-sub[hidden] { display: none; }
   .tv-muted { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
   .tv-muted.small { font-size: 12.5px; margin-top: 6px; }
-  .tv-h23 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+  .tv-pending { margin: 0 0 10px; font-size: 13.5px; color: var(--muted); }
+  .tv-pending b { color: var(--ink); }
+  .tv-h23 { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 8px; }
   .tv-h23-p { padding: 10px 12px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
-  .tv-h23-p ul { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; line-height: 1.45; color: var(--text-soft); }
+  .tv-h23-p ul { margin: 6px 0 0; padding-left: 16px; font-size: 13.5px; line-height: 1.45; color: var(--text-soft); }
   .tv-h23-p li + li { margin-top: 4px; }
-  .tv-h23-p a { font-family: var(--mono); font-size: 11px; white-space: nowrap; color: var(--muted); text-decoration: none; }
+  .tv-h23-p a { font-family: var(--mono); font-size: 10.5px; white-space: nowrap; color: var(--muted); text-decoration: none; }
   .tv-h23-p a:hover { color: var(--accent); }
+  .tv-h23-more summary { margin-top: 6px; font-size: 12px; font-weight: 600; color: var(--accent); cursor: pointer; list-style: none; }
+  .tv-h23-more summary::before { content: '+ '; }
+  .tv-h23-more[open] summary { display: none; }
+  .tv-fine { font-size: 12.5px; color: var(--muted); }
+  .tv-fine summary { cursor: pointer; font-weight: 600; }
+  .tv-fine p { margin: 6px 0 0; line-height: 1.5; max-width: 760px; }
   .tv-props { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
   .tv-grid-scroll { overflow-x: auto; }
   .tv-grid { width: 100%; border-collapse: collapse; }
