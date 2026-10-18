@@ -1,5 +1,6 @@
 ---
 import Aprende from '../../../layouts/Aprende.astro';
+import CalendarioCard from '../../../components/aprende/CalendarioCard.astro';
 import MapaMosaico from '../../../components/aprende/MapaMosaico.astro';
 import PoderesLienzo from '../../../components/aprende/PoderesLienzo.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
@@ -7,7 +8,7 @@ import { getArea } from '../../../data/learn';
 import { competencias, niveles, type Nivel } from '../../../data/politica/competencias';
 import { escanosFuente, escanosPorProvincia } from '../../../data/politica/escanos';
 import { instituciones } from '../../../data/politica/poderes';
-import { getLessons, learnPath, lessonPath, lessonSlug, readingMinutes } from '../../../lib/learn';
+import { areaPath, getLessons, learnPath, lessonPath, lessonSlug, readingMinutes } from '../../../lib/learn';
 import { breadcrumbs } from '../../../lib/seo';
 
 const area = getArea('politica')!;
@@ -15,15 +16,6 @@ const lessons = await getLessons(area.id, area.sections.map((s) => s.id));
 const bySlug = new Map(lessons.map((l) => [lessonSlug(l), l]));
 const lessonsFor = (slugs: string[]) => slugs.map((s) => bySlug.get(s)!).filter(Boolean);
 
-const calendario = [
-  { fecha: '2026-10-06', label: 'Convocatoria en el BOE' },
-  { fecha: '2026-11-13', label: 'Empieza la campaña' },
-  { fecha: '2026-11-19', label: 'Último día para pedir el voto por correo' },
-  { fecha: '2026-11-24', label: 'Prohibido publicar encuestas' },
-  { fecha: '2026-11-29', label: 'Votación, de 9 a 20 h' },
-  { fecha: '2026-12-23', label: 'Se constituyen las nuevas Cortes' },
-];
-const dia = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
 const porNivel = (Object.keys(niveles) as Nivel[])
   .map((n) => ({ label: niveles[n].label, valor: competencias.filter((c) => c.quien.includes(n)).length, href: `${learnPath}politica/territorio/#quién-se-encarga-de-qué` }))
@@ -33,11 +25,12 @@ const site = Astro.site!;
 const jsonLd = [
   breadcrumbs([
     { name: 'Aprende', url: new URL(learnPath, site) },
-    { name: area.title, url: new URL(Astro.url.pathname, site) },
+    { name: area.title, url: new URL(areaPath(area.id), site) },
+    { name: 'Cómo funciona', url: new URL(Astro.url.pathname, site) },
   ]),
 ];
 ---
-<Aprende title={area.title} description={area.description} jsonLd={jsonLd} area={area} lessons={lessons} home>
+<Aprende title={`Cómo funciona · ${area.title}`} description="Cómo funciona el sistema político español: quién elige a quién, el mapa de circunscripciones y 14 lecciones desde cero." jsonLd={jsonLd} area={area} lessons={lessons} mode="como-funciona">
   <div class="ap-stage">
     <section class="ap-view ap-panel" data-view-panel="poderes" aria-label="Quién elige a quién">
       <header class="ap-view-head">
@@ -139,19 +132,7 @@ const jsonLd = [
   </div>
 
   <Fragment slot="aside">
-    <section class="ap-card ap-panel">
-      <header class="ap-card-head">
-        <h2 class="ap-card-title">Calendario del 29-N</h2>
-      </header>
-      <ol class="cal">
-        {calendario.map((c) => (
-          <li data-date={c.fecha}>
-            <span class="cal-date">{dia.format(new Date(c.fecha))}</span>
-            <span>{c.label}</span>
-          </li>
-        ))}
-      </ol>
-    </section>
+    <CalendarioCard />
 
     <RankCard
       titulo="Diputados por provincia"
@@ -219,14 +200,6 @@ const jsonLd = [
     b.addEventListener('click', () => document.dispatchEvent(new Event('ap:reset')));
   }
 
-  // Calendario: lo ya pasado se atenúa y lo siguiente se resalta.
-  const today = new Date().toISOString().slice(0, 10);
-  const dates = [...document.querySelectorAll<HTMLElement>('[data-date]')];
-  const next = dates.find((d) => d.dataset.date! >= today);
-  for (const d of dates) {
-    d.classList.toggle('is-past', d.dataset.date! < today);
-    d.classList.toggle('is-next', d === next);
-  }
 </script>
 
 <style>
@@ -253,11 +226,4 @@ const jsonLd = [
   .prov-dots { display: inline-flex; flex-wrap: wrap; gap: 2px; max-width: 220px; margin-left: 8px; vertical-align: middle; }
   .prov-dots :global(i) { width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
 
-  .cal { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-  .cal li { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; padding: 5px 6px; margin: 0 -6px; border-radius: 8px; font-size: 13.5px; line-height: 1.35; }
-  .cal-date { font-family: var(--mono); font-size: 12px; color: var(--muted); }
-  .cal li.is-past { opacity: .45; }
-  .cal li.is-past span:last-child { text-decoration: line-through; }
-  .cal li.is-next { background: color-mix(in srgb, var(--accent) 12%, transparent); font-weight: 600; }
-  .cal li.is-next .cal-date { color: var(--accent); }
 </style>
