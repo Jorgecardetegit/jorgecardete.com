@@ -1,0 +1,36 @@
+---
+// Dos ejes que ayudan a ordenar el debate político en España. A propósito no se
+// coloca a ningún partido: eso va en la sección de partidos, con sus propuestas y votos.
+---
+<figure class="ejes">
+  <div class="ejes-plane" role="img" aria-label="Plano con dos ejes: económico de izquierda a derecha y territorial de arriba abajo">
+    <span class="ejes-label top">Más autogobierno de las comunidades, hasta la independencia</span>
+    <span class="ejes-label bottom">Más poder del Estado central, hasta la recentralización</span>
+    <span class="ejes-label left">Más Estado: más impuestos y más servicios públicos</span>
+    <span class="ejes-label right">Más mercado: menos impuestos y más iniciativa privada</span>
+    <div class="ejes-grid" aria-hidden="true"></div>
+  </div>
+  <ul class="ejes-more">
+    <li><strong>Eje social:</strong> más progresista o más conservador en temas como el aborto, la eutanasia, la familia o la inmigración.</li>
+    <li><strong>Eje europeo:</strong> más integración en la UE o más soberanía nacional.</li>
+  </ul>
+  <figcaption>Cada partido ocupa una posición distinta en cada eje, y no siempre coinciden: se puede ser de izquierdas en economía y centralista, o de derechas y nacionalista. Aquí no colocamos a nadie. Eso lo verás en la sección de partidos, a partir de lo que proponen y votan.</figcaption>
+</figure>
+
+<style>
+  .ejes { margin: 32px 0; padding: 20px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .ejes-plane { position: relative; display: grid; grid-template-columns: minmax(70px, 1fr) minmax(160px, 2fr) minmax(70px, 1fr); grid-template-rows: auto minmax(160px, 1fr) auto; gap: 8px; align-items: center; }
+  .ejes-label { font-family: var(--mono); font-size: 12px; line-height: 1.35; color: var(--text-soft); }
+  .ejes-label.top { grid-column: 2; grid-row: 1; text-align: center; color: var(--purple); }
+  .ejes-label.bottom { grid-column: 2; grid-row: 3; text-align: center; color: var(--purple); }
+  .ejes-label.left { grid-column: 1; grid-row: 2; text-align: right; color: var(--terracotta); }
+  .ejes-label.right { grid-column: 3; grid-row: 2; color: var(--terracotta); }
+  /* El plano: un cuadrado con los dos ejes cruzados en el centro. */
+  .ejes-grid { position: relative; grid-column: 2; grid-row: 2; justify-self: center; width: 100%; max-width: 280px; aspect-ratio: 1; background: var(--bg); border: 2px dashed var(--line); }
+  .ejes-grid::before, .ejes-grid::after { content: ''; position: absolute; background: var(--ink); }
+  .ejes-grid::before { left: 50%; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; }
+  .ejes-grid::after { top: 50%; left: 0; right: 0; height: 3px; margin-top: -1.5px; }
+  .ejes-more { margin: 18px 0 0; padding-left: 20px; font-size: 14.5px; line-height: 1.6; color: var(--text-soft); }
+  .ejes-more li { margin-bottom: 4px; }
+  .ejes figcaption { margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+</style>

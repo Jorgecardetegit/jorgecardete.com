@@ -3,6 +3,7 @@ import CalculadoraDHondt from './CalculadoraDHondt.astro';
 import Cifra from './Cifra.astro';
 import Cifras from './Cifras.astro';
 import Comparar from './Comparar.astro';
+import EjesIdeologicos from './EjesIdeologicos.astro';
 import EscanosProvincias from './EscanosProvincias.astro';
 import Hemiciclo from './Hemiciclo.astro';
 import Lado from './Lado.astro';
@@ -16,4 +17,4 @@ import Pasos from './Pasos.astro';
 import PiramideNormas from './PiramideNormas.astro';
 import QuienHaceQue from './QuienHaceQue.astro';
 
-export const lessonComponents = { CalculadoraDHondt, Cifra, Cifras, Comparar, EscanosProvincias, Hemiciclo, Lado, MapaConstitucion, MapaPoderes, Mito, Niveles, Nota, Paso, Pasos, PiramideNormas, QuienHaceQue };
+export const lessonComponents = { CalculadoraDHondt, Cifra, Cifras, Comparar, EjesIdeologicos, EscanosProvincias, Hemiciclo, Lado, MapaConstitucion, MapaPoderes, Mito, Niveles, Nota, Paso, Pasos, PiramideNormas, QuienHaceQue };
