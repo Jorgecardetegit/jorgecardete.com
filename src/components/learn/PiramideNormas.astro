@@ -1,0 +1,38 @@
+---
+// Jerarquía de normas: cada nivel no puede contradecir a los de arriba.
+const levels = [
+  { name: 'Constitución', who: 'Aprobada en referéndum', example: 'La norma suprema', color: 'red' },
+  { name: 'Leyes', who: 'Cortes Generales', example: 'Ley orgánica, ley ordinaria. Los parlamentos autonómicos hacen las suyas, en sus competencias', color: 'terracotta' },
+  { name: 'Normas del Gobierno con fuerza de ley', who: 'Gobierno, con control de las Cortes', example: 'Decreto-ley y decreto legislativo', color: 'gold' },
+  { name: 'Reglamentos', who: 'Gobierno y ministerios (o gobiernos autonómicos)', example: 'Real decreto, orden ministerial', color: 'purple' },
+  { name: 'Ordenanzas municipales', who: 'Ayuntamientos', example: 'Terrazas, ruido, aparcamiento, limpieza', color: 'green' },
+];
+---
+<figure class="piramide">
+  <div class="piramide-eu">
+    <strong>🇪🇺 Derecho de la Unión Europea</strong>
+    <span>En las materias europeas se aplica por delante de las leyes españolas.</span>
+  </div>
+  <ol class="piramide-levels">
+    {levels.map((l, i) => (
+      <li style={`--c: var(--${l.color}); --w: ${48 + i * 13}%`}>
+        <strong>{l.name}</strong>
+        <span class="piramide-who">{l.who}</span>
+        <span class="piramide-ex">{l.example}</span>
+      </li>
+    ))}
+  </ol>
+  <figcaption>Cuanto más arriba, más difícil de aprobar y de cambiar. Una norma no puede contradecir a las que están por encima: si lo hace, un tribunal la anula o la deja sin aplicar.</figcaption>
+</figure>
+
+<style>
+  .piramide { margin: 32px 0; padding: 20px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .piramide-eu { display: flex; flex-direction: column; gap: 2px; width: min(100%, 420px); margin: 0 auto 14px; padding: 8px 12px; text-align: center; border: 2px dashed var(--ink); border-radius: 3px; font-size: 14px; line-height: 1.4; }
+  .piramide-eu span { color: var(--text-soft); font-size: 13px; }
+  .piramide-levels { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .piramide-levels li { display: flex; flex-direction: column; align-items: center; gap: 1px; width: max(var(--w), 240px); max-width: 100%; margin: 0; padding: 9px 12px; text-align: center; background: var(--c); border: 3px solid var(--ink); color: #1f1d1a; }
+  .piramide-levels strong { font-family: var(--display); font-size: 16.5px; font-weight: 800; line-height: 1.2; }
+  .piramide-who { font-family: var(--mono); font-size: 11.5px; }
+  .piramide-ex { font-size: 13px; line-height: 1.35; }
+  .piramide figcaption { margin-top: 16px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+</style>
