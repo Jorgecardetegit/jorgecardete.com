@@ -12,6 +12,8 @@ interface Props {
   description?: string;
   type?: 'website' | 'article';
   sidebar?: boolean;
+  /** Sin barra lateral ni cabecera: la página ocupa toda la pantalla (paneles de /aprende/). */
+  bare?: boolean;
   /** Imagen para redes (ruta en /public); con ella la tarjeta se muestra grande. */
   image?: string;
   /** Fuera de buscadores: landings de campaña y páginas legales. */
@@ -30,6 +32,7 @@ const {
   description = t('site.description'),
   type = 'website',
   sidebar = true,
+  bare = false,
   image,
   noindex = false,
   jsonLd = [],
@@ -103,7 +106,9 @@ const fullTitle = title === 'Inicio' || title === 'Home' ? siteTitle : `${title}
     <slot name="head" />
   </head>
   <body>
-    {sidebar ? (
+    {bare ? (
+      <slot />
+    ) : sidebar ? (
     <div class="shell">
       <aside class="sidebar">
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="sidebar-menu" aria-label={t('sidebar.menu')}>
