@@ -178,23 +178,22 @@ const jsonLd = [
       </div>
     </section>
 
-    <section class="ap-view ap-panel scroll" data-view-panel="historia" aria-label="Qué ha pasado" hidden>
+    <section class="ap-view ap-panel scroll" data-view-panel="historia" aria-label="Historia" hidden>
       <div class="pad">
-        <header class="vhead">
-          <h2 class="ap-view-title">Qué ha pasado desde 1975</h2>
-          <p class="ap-view-sub">Desde la muerte de Franco, los hechos que cambiaron quién gobierna, qué leyes rigen o el contexto en que vamos a votar, contados sin adjetivos y con fuente. Pulsa uno para ver el detalle.</p>
+        <header class="vhead vhead-row">
+          <div>
+            <h2 class="ap-view-title" data-hv-sub="hechos">Qué ha pasado desde 1975</h2>
+            <h2 class="ap-view-title" data-hv-sub="gobiernos" hidden>Qué ha hecho cada gobierno</h2>
+            <p class="ap-view-sub" data-hv-sub="hechos">Desde la muerte de Franco, los hechos que cambiaron quién gobierna, qué leyes rigen o el contexto en que vamos a votar, contados sin adjetivos y con fuente. Pulsa uno para ver el detalle.</p>
+            <p class="ap-view-sub" data-hv-sub="gobiernos" hidden>Todos los gobiernos desde la muerte de Franco, uno por investidura: si un presidente repite, cada mandato va por separado. Pulsa uno para leer cómo llegó, con quién gobernó, qué hizo y cómo terminó.</p>
+          </div>
+          <div class="pv-toggle" role="group" aria-label="Cómo ver la historia">
+            <button type="button" aria-pressed="true" data-hv="hechos">Qué ha pasado</button>
+            <button type="button" aria-pressed="false" data-hv="gobiernos">Gobiernos</button>
+          </div>
         </header>
-        <LineaTemporal />
-      </div>
-    </section>
-
-    <section class="ap-view ap-panel scroll" data-view-panel="gobiernos" aria-label="Gobiernos" hidden>
-      <div class="pad">
-        <header class="vhead">
-          <h2 class="ap-view-title">Qué ha hecho cada gobierno</h2>
-          <p class="ap-view-sub">Todos los gobiernos desde la muerte de Franco, uno por investidura: si un presidente repite, cada mandato va por separado. Pulsa uno para leer cómo llegó, con quién gobernó, qué hizo y cómo terminó.</p>
-        </header>
-        <GobiernosVista />
+        <div data-hv-view="hechos"><LineaTemporal /></div>
+        <div data-hv-view="gobiernos" hidden><GobiernosVista /></div>
       </div>
     </section>
 
@@ -435,8 +434,17 @@ const jsonLd = [
     for (const el of document.querySelectorAll<HTMLElement>('[data-pv-view]')) el.hidden = el.dataset.pvView !== como;
     for (const el of document.querySelectorAll<HTMLElement>('[data-pv-sub]')) el.hidden = el.dataset.pvSub !== como;
   };
+  // En Historia, «Qué ha pasado» (la línea temporal) o «Gobiernos». #gobiernos abre los gobiernos.
+  const hvBotones = [...document.querySelectorAll<HTMLButtonElement>('[data-hv]')];
+  const verHistoria = (como: string) => {
+    for (const b of hvBotones) b.setAttribute('aria-pressed', String(b.dataset.hv === como));
+    for (const el of document.querySelectorAll<HTMLElement>('[data-hv-view]')) el.hidden = el.dataset.hvView !== como;
+    for (const el of document.querySelectorAll<HTMLElement>('[data-hv-sub]')) el.hidden = el.dataset.hvSub !== como;
+  };
   const open = (view: string) => {
     verPartidos(view === 'mapa' ? 'mapa' : 'lista');
+    verHistoria(view === 'gobiernos' ? 'gobiernos' : 'hechos');
+    if (view === 'gobiernos') view = 'historia';
     if (view === 'mapa' || !panels.some((p) => p.dataset.viewPanel === view)) view = 'partidos';
     for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.viewTab === view));
     for (const p of panels) p.hidden = p.dataset.viewPanel !== view;
@@ -447,6 +455,13 @@ const jsonLd = [
       verPartidos(b.dataset.pv!);
       document.dispatchEvent(new Event('ap:reset'));
       history.replaceState(null, '', b.dataset.pv === 'mapa' ? '#mapa' : location.pathname);
+    });
+  }
+  for (const b of hvBotones) {
+    b.addEventListener('click', () => {
+      verHistoria(b.dataset.hv!);
+      document.dispatchEvent(new Event('ap:reset'));
+      history.replaceState(null, '', b.dataset.hv === 'gobiernos' ? '#gobiernos' : '#historia');
     });
   }
   for (const t of tabs) {
@@ -541,7 +556,7 @@ const jsonLd = [
   .vhead-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 16px; }
   .afi-head { align-items: center; margin-bottom: 10px; }
   .sen-note { margin-top: 8px !important; font-size: 13px !important; color: var(--muted) !important; }
-  [data-pv-view][hidden], [data-pv-sub][hidden] { display: none; }
+  [data-pv-view][hidden], [data-pv-sub][hidden], [data-hv-view][hidden], [data-hv-sub][hidden] { display: none; }
   .pv-toggle { display: inline-flex; flex: none; gap: 2px; padding: 3px; background: var(--panel-2); border-radius: 999px; }
   .pv-toggle button { padding: 7px 15px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
   .pv-toggle button:hover { color: var(--ink); }

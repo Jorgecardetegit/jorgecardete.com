@@ -102,7 +102,7 @@ const jsonLd = [
     {hechos.length > 0 && (
       <section class="block">
         <h2>En la línea temporal <span class="count">· {hechos.length}</span></h2>
-        <p class="muted">Los hechos de este periodo, con su fuente, en <a href="/aprende/politica/#historia">Qué ha pasado</a>.</p>
+        <p class="muted">Los hechos de este periodo, con su fuente, en <a href="/aprende/politica/#historia">Historia</a>.</p>
         <ol class="events">
           {hechos.map((e) => (
             <li style={`--c: ${categorias[e.categoria].color}`} class:list={{ clave: e.clave }}>
