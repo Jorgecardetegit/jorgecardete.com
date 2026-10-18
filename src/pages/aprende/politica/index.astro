@@ -33,8 +33,8 @@ const tiposFiltro = ['investidura', 'ley', 'decreto', 'totalidad', 'veto', 'prop
 const tipoLabel = (t: string) => (t === 'investidura' ? 'Investidura' : tipos[t as keyof typeof tipos]?.label ?? t);
 const tipoPlural = (t: string) => (t === 'investidura' ? 'Investiduras' : tipos[t as keyof typeof tipos]?.plural ?? t);
 
-// Resumen de una votación en una frase: solo los partidos que se salieron de la posición más
-// repetida; el resto se agrupa como «el resto». En enmiendas y vetos, «sí» es apoyar la enmienda.
+// Resumen de una votación en una frase: qué partidos votaron sí, no y abstención (o «Todos» si
+// coincidieron). En enmiendas y vetos, «sí» es apoyar la enmienda.
 type Pos = 'S' | 'N' | 'A';
 const posTexto = (tipo: string): Record<Pos, string> =>
   tipo === 'totalidad' ? { S: 'Apoyan la enmienda', N: 'En contra de la enmienda', A: 'Abstención' }
@@ -50,7 +50,7 @@ function resumen(v: (typeof lista)[number]) {
   }
   const orden = (['S', 'N', 'A'] as Pos[]).filter((p) => grupos[p].length);
   const mayor = [...orden].sort((a, b) => grupos[b].length - grupos[a].length)[0];
-  return { grupos, mayor, resto: orden.filter((p) => p !== mayor), textos: posTexto(v.tipo) };
+  return { grupos, mayor, orden, resto: orden.filter((p) => p !== mayor), textos: posTexto(v.tipo) };
 }
 const pctEsc = (n: number) => `${(n / 350) * 100}%`;
 
@@ -234,16 +234,12 @@ const jsonLd = [
                     <span class="vtitle">{tituloCorto(v)}</span>
                     {(() => {
                       if (!v.partidos) return <span class="vwho muted">Sin desglose por partido</span>;
-                      const { grupos, mayor, resto, textos } = resumen(v);
+                      const { grupos, mayor, resto, orden, textos } = resumen(v);
                       const nombres = (p: Pos) => grupos[p].map((x, k) => <>{k > 0 && ', '}<span class="pt" style={`--pc: ${partidoById.get(x.id)!.color}`}>{partidoById.get(x.id)!.siglas}{x.div && <em> (dividido)</em>}</span></>);
                       return (
                         <span class="vwho">
-                          {resto.length === 0 ? <span class={`c-${mayor}`}>Todos: {textos[mayor].toLowerCase()}</span> : (
-                            <>
-                              {resto.map((p) => <span class="vwho-g"><b class={`c-${p}`}>{textos[p]}:</b> {nombres(p)}</span>)}
-                              <span class="vwho-g vwho-rest">El resto: <b class={`c-${mayor}`}>{textos[mayor].toLowerCase()}</b>{grupos[mayor].some((x) => x.div) && <> ({grupos[mayor].filter((x) => x.div).map((x) => partidoById.get(x.id)!.siglas).join(', ')} dividido)</>}</span>
-                            </>
-                          )}
+                          {resto.length === 0 ? <span class={`c-${mayor}`}>Todos: {textos[mayor].toLowerCase()}</span>
+                            : orden.map((p) => <span class="vwho-g"><b class={`c-${p}`}>{textos[p]}:</b> {nombres(p)}</span>)}
                         </span>
                       );
                     })()}
@@ -495,7 +491,6 @@ const jsonLd = [
   .vwho .pt { font-weight: 500; }
   .vwho .pt em { font-style: normal; color: var(--muted); }
   .vwho-g b { font-weight: 600; }
-  .vwho-rest { color: var(--muted); }
   .vbar-wrap { display: flex; flex-direction: column; gap: 4px; }
   .vbar { display: flex; height: 10px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
   .vbar i { display: block; height: 100%; }
