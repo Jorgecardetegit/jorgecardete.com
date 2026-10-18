@@ -1,0 +1,179 @@
+---
+// Página de un gobierno: cómo llegó, con quién gobernó, qué hizo por áreas, cómo terminó y los
+// hechos de la línea temporal de ese periodo. En la legislatura actual, también las leyes que
+// aprobó el Congreso (datos abiertos).
+import Aprende from '../../../../layouts/Aprende.astro';
+import { getArea } from '../../../../data/learn';
+import { duracion, gobiernoPath, gobiernos, llegadaTexto, ordinal, revisadoGobiernos, type Gobierno } from '../../../../data/politica/gobiernos';
+import { categorias, eventos } from '../../../../data/politica/linea-temporal';
+import { getLessons, learnPath } from '../../../../lib/learn';
+import { fecha, partidoById, partidoPath, tituloCorto, votaciones } from '../../../../lib/politica';
+import { breadcrumbs } from '../../../../lib/seo';
+
+export function getStaticPaths() {
+  return gobiernos.map((g, i) => ({ params: { id: g.id }, props: { g, prev: gobiernos[i - 1] ?? null, next: gobiernos[i + 1] ?? null } }));
+}
+
+interface Props { g: Gobierno; prev: Gobierno | null; next: Gobierno | null }
+const { g, prev, next } = Astro.props;
+const area = getArea('politica')!;
+const lessons = await getLessons(area.id, area.sections.map((s) => s.id));
+
+const color = g.color ?? partidoById.get(g.partido)?.color ?? 'var(--muted)';
+const o = ordinal(g);
+const largo = (iso: string) => fecha(iso, { day: 'numeric', month: 'long', year: 'numeric' });
+const dentro = (iso: string) => iso >= g.desde && (!g.hasta || iso < g.hasta);
+const hechos = eventos.filter((e) => dentro(e.fecha.length === 7 ? `${e.fecha}-15` : e.fecha));
+const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { month: 'long', year: 'numeric' }) : fecha(iso));
+// Leyes con votación final en el Congreso: solo hay datos completos de la XV legislatura, así que
+// la lista solo sale en el gobierno que nace en ella.
+const leyes = g.legislatura === 'XV'
+  ? votaciones.clave.filter((v) => v.tipo === 'ley' && v.resultado === 'aprobada' && dentro(v.fecha)).sort((a, b) => b.fecha.localeCompare(a.fecha))
+  : [];
+const l = g.llegada;
+const pct = (n = 0) => `${(n / 350) * 100}%`;
+const mayoriaAbs = l.si != null && l.si >= 176;
+
+const site = Astro.site!;
+const jsonLd = [
+  breadcrumbs([
+    { name: 'Aprende', url: new URL(learnPath, site) },
+    { name: area.title, url: new URL('/aprende/politica/', site) },
+    { name: g.nombre, url: new URL(Astro.url.pathname, site) },
+  ]),
+];
+---
+<Aprende title={g.nombre} description={`${g.nombre} (${fecha(g.desde, { year: 'numeric' })}–${g.hasta ? fecha(g.hasta, { year: 'numeric' }) : 'hoy'}): cómo llegó, con quién gobernó, qué hizo y cómo terminó.`} jsonLd={jsonLd} area={area} lessons={lessons} section="gobiernos" current={g.id}>
+  <article class="ap-panel page" style={`--pc: ${color}`}>
+    <header class="phead">
+      <div class="phead-band" aria-hidden="true"></div>
+      <p class="kicker"><a href="/aprende/politica/#gobiernos">Gobiernos</a> · {g.legislatura.startsWith('C') ? g.legislatura : `Legislatura ${g.legislatura}`}</p>
+      <h1>{g.presidente}<span>{o.de > 1 ? `${o.n}.º de sus ${o.de} gobiernos` : g.nombre} · {largo(g.desde)} – {g.hasta ? largo(g.hasta) : 'hoy'}</span></h1>
+      <p class="lead">{g.resumen}</p>
+      <div class="facts">
+        <div><span>Partido</span><strong>{partidoById.get(g.partido) ? <a href={partidoPath(g.partido)}>{g.siglas}</a> : g.siglas}</strong><small>{g.forma}</small></div>
+        <div><span>Duración</span><strong>{duracion(g)}</strong><small>{g.hasta ? 'hasta que tomó posesión el siguiente, incluido el tiempo en funciones' : 'sigue en funciones hasta la próxima investidura'}</small></div>
+        <div><span>{llegadaTexto(g)}</span><strong>{l.si != null ? `${l.si} votos a favor` : 'Sin votación'}</strong><small>{largo(l.fecha)}</small></div>
+      </div>
+    </header>
+
+    <section class="block">
+      <h2>Cómo llegó</h2>
+      {l.si != null && (
+        <div class="vote">
+          <div class="vote-bar" role="img" aria-label={`${l.si} a favor, ${l.no} en contra, ${l.abst} abstenciones`}>
+            <i class="s" style={`width: ${pct(l.si)}`} /><i class="n" style={`width: ${pct(l.no)}`} /><i class="a" style={`width: ${pct(l.abst)}`} />
+            <span class="vote-mark" aria-hidden="true"></span>
+          </div>
+          <p class="vote-num"><b class="c-s">{l.si} sí</b> · <b class="c-n">{l.no} no</b> · <b class="c-a">{l.abst} abstenciones</b> · la línea marca la mayoría absoluta (176)</p>
+        </div>
+      )}
+      <p class="text">
+        {l.tipo === 'designacion' && 'Antes de la Constitución de 1978 no había investidura: el presidente lo designaba el jefe del Estado. '}
+        {l.tipo === 'mocion' && 'Llegó por una moción de censura: el Congreso retira la confianza al presidente y, en la misma votación, la da a otro candidato. Necesita mayoría absoluta. '}
+        {l.tipo === 'investidura' && (mayoriaAbs ? 'Logró la mayoría absoluta (176 votos) que exige la primera votación. ' : 'No llegó a la mayoría absoluta: salió en segunda votación, donde basta con más síes que noes. ')}
+        {l.nota}
+      </p>
+      <p class="text">{g.forma}</p>
+    </section>
+
+    {g.apartados.map((a) => (
+      <section class="block">
+        <h2>{a.titulo}</h2>
+        <ul class="points">{a.puntos.map((p) => <li>{p}</li>)}</ul>
+      </section>
+    ))}
+
+    {leyes.length > 0 && (
+      <section class="block">
+        <h2>Leyes aprobadas en el Congreso <span class="count">· {leyes.length}</span></h2>
+        <p class="muted">Votaciones finales de leyes que salieron adelante, según los datos abiertos del Congreso. Cómo votó cada partido, en <a href="/aprende/politica/#votaciones">Votaciones</a>.</p>
+        <ol class="laws">
+          {leyes.map((v) => <li><span class="date">{fecha(v.fecha)}</span><span>{tituloCorto(v)}</span></li>)}
+        </ol>
+      </section>
+    )}
+
+    <section class="block">
+      <h2>Cómo terminó</h2>
+      <p class="text">{g.final}</p>
+    </section>
+
+    {hechos.length > 0 && (
+      <section class="block">
+        <h2>En la línea temporal <span class="count">· {hechos.length}</span></h2>
+        <p class="muted">Los hechos de este periodo, con su fuente, en <a href="/aprende/politica/#historia">Qué ha pasado</a>.</p>
+        <ol class="events">
+          {hechos.map((e) => (
+            <li style={`--c: ${categorias[e.categoria].color}`} class:list={{ clave: e.clave }}>
+              <span class="date">{fechaEvento(e.fecha)}</span>
+              <span><strong>{e.titulo}</strong> {e.texto}{e.fuente && <> <a href={e.fuente.url}>Fuente</a></>}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    <nav class="pager" aria-label="Otros gobiernos">
+      {prev ? <a href={gobiernoPath(prev.id)}><small>← Anterior</small>{prev.presidente}{ordinal(prev).de > 1 && ` (${ordinal(prev).n}.º)`}</a> : <span />}
+      {next ? <a class="next" href={gobiernoPath(next.id)}><small>Siguiente →</small>{next.presidente}{ordinal(next).de > 1 && ` (${ordinal(next).n}.º)`}</a> : <span />}
+    </nav>
+    <p class="muted small source">Fuentes: <a href={g.fuente.url}>{g.fuente.titulo}</a> y <a href="https://es.wikipedia.org/wiki/Investidura_(España)">histórico de investiduras</a>; las de cada hecho, en la línea temporal. Revisado el {largo(revisadoGobiernos)}.</p>
+  </article>
+</Aprende>
+
+<style>
+  .page { flex: 1; min-height: 0; overflow-y: auto; padding: 0 0 30px; }
+  .phead { position: relative; padding: 30px 32px 22px; border-bottom: 1px solid var(--panel-line); }
+  .phead-band { position: absolute; inset: 0 0 auto; height: 6px; background: var(--pc); border-radius: 16px 16px 0 0; }
+  .kicker { margin: 0 0 8px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .kicker a { font-weight: 500; text-decoration: none; }
+  h1 { margin: 0 0 12px; font-family: var(--display); font-size: clamp(32px, 4vw, 46px); font-weight: 800; line-height: 1; letter-spacing: -1.2px; }
+  h1 span { display: block; margin-top: 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.2px; color: var(--text-soft); }
+  .lead { max-width: 760px; margin: 0 0 18px; font-size: 17px; line-height: 1.6; color: var(--text-soft); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .facts > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--panel-line); border-left: 4px solid var(--pc); border-radius: 10px; }
+  .facts span { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+  .facts strong { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1.2; }
+  .facts strong a { color: inherit; }
+  .facts small { font-size: 12px; line-height: 1.4; color: var(--muted); }
+
+  .block { padding: 22px 32px 4px; max-width: 860px; }
+  .block h2 { margin: 0 0 10px; font-family: var(--display); font-size: 21px; font-weight: 800; letter-spacing: -0.4px; }
+  .count { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .text { margin: 0 0 10px; font-size: 15.5px; line-height: 1.65; color: var(--text-soft); }
+  .muted { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .small { font-size: 12.5px; }
+  .points { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15.5px; line-height: 1.6; color: var(--text-soft); }
+  .points li::marker { color: var(--pc); }
+
+  .vote { margin-bottom: 12px; max-width: 620px; }
+  .vote-bar { position: relative; display: flex; height: 14px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+  .vote-bar i { display: block; height: 100%; }
+  .s { background: var(--green); } .n { background: var(--red); } .a { background: var(--gold); }
+  .vote-mark { position: absolute; left: 50.29%; top: 0; bottom: 0; border-left: 2px dashed var(--ink); }
+  .vote-num { margin: 6px 0 0; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .c-s { color: var(--green); } .c-n { color: var(--red); } .c-a { color: color-mix(in srgb, var(--gold) 70%, var(--ink)); }
+
+  .laws, .events { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .laws li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-top: 1px solid var(--panel-line); font-size: 14.5px; line-height: 1.45; }
+  .date { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-top: 2px; }
+  .events li { position: relative; display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 9px 0 9px 16px; border-top: 1px solid var(--panel-line); font-size: 14px; line-height: 1.55; color: var(--text-soft); }
+  .events li::before { content: ''; position: absolute; left: 0; top: 15px; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .events li.clave::before { box-shadow: 0 0 0 2px var(--ink); }
+  .events strong { color: var(--ink); font-weight: 700; }
+  .events a { font-size: 12.5px; }
+
+  .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 26px 32px 6px; max-width: 860px; }
+  .pager a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; font-family: var(--display); font-size: 16px; font-weight: 800; color: var(--ink); text-decoration: none; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
+  .pager a:hover { border-color: var(--accent); }
+  .pager .next { text-align: right; }
+  .pager small { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--muted); }
+  .source { padding: 6px 32px 0; max-width: 860px; }
+
+  @media (max-width: 640px) {
+    .phead, .block { padding-left: 18px; padding-right: 18px; }
+    .pager, .source { padding-left: 18px; padding-right: 18px; }
+    .laws li, .events li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  }
+</style>

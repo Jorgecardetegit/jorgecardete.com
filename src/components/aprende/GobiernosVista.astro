@@ -1,0 +1,72 @@
+---
+// Vista de gobiernos: todos desde 1975, uno por investidura, agrupados por etapas. Cada tarjeta
+// lleva a la página del gobierno con todo lo que hizo.
+import { duracion, etapas, gobiernoPath, gobiernos, llegadaTexto, ordinal } from '../../data/politica/gobiernos';
+import { fecha, partidoById } from '../../lib/politica';
+
+const color = (g: (typeof gobiernos)[number]) => g.color ?? partidoById.get(g.partido)?.color ?? 'var(--muted)';
+const mes = (iso: string) => fecha(iso, { month: 'short', year: 'numeric' });
+const porEtapa = etapas.map((e, i) => ({
+  ...e,
+  items: gobiernos.filter((g) => g.desde >= e.desde && (i === etapas.length - 1 || g.desde < etapas[i + 1].desde)),
+}));
+const pct = (n = 0) => `${(n / 350) * 100}%`;
+---
+<div class="gv">
+  {porEtapa.map((e) => (
+    <section class="gv-etapa">
+      <h3 class="gv-etapa-t">{e.titulo}</h3>
+      <p class="gv-etapa-p">{e.texto}</p>
+      <ol class="gv-list">
+        {e.items.map((g) => {
+          const o = ordinal(g);
+          return (
+            <li>
+              <a class="gv-card" href={gobiernoPath(g.id)} style={`--pc: ${color(g)}`}>
+                <span class="gv-top">
+                  <span class="gv-fechas">{mes(g.desde)} – {g.hasta ? mes(g.hasta) : 'hoy'} · {duracion(g)}</span>
+                  <span class="gv-leg">{g.legislatura.startsWith('C') ? g.legislatura : `Legislatura ${g.legislatura}`}</span>
+                </span>
+                <span class="gv-name">{g.presidente}{o.de > 1 && <small> · {o.n}.º gobierno</small>}</span>
+                <span class="gv-forma">{g.forma}</span>
+                <span class="gv-llegada">
+                  <b>{llegadaTexto(g)}</b>
+                  {g.llegada.si != null ? (
+                    <>
+                      <span class="gv-bar" aria-hidden="true"><i class="s" style={`width: ${pct(g.llegada.si)}`} /><i class="n" style={`width: ${pct(g.llegada.no)}`} /><i class="a" style={`width: ${pct(g.llegada.abst)}`} /></span>
+                      <span class="gv-num">{g.llegada.si} sí · {g.llegada.no} no{g.llegada.abst ? ` · ${g.llegada.abst} abst.` : ''}</span>
+                    </>
+                  ) : <span class="gv-num">sin votación en el Congreso</span>}
+                </span>
+                <span class="gv-res">{g.resumen}</span>
+                <span class="gv-more">Qué hizo este gobierno →</span>
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  ))}
+</div>
+
+<style>
+  .gv { display: flex; flex-direction: column; gap: 26px; }
+  .gv-etapa-t { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
+  .gv-etapa-p { margin: 2px 0 12px; font-size: 14px; color: var(--muted); }
+  .gv-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+  .gv-card { display: flex; flex-direction: column; gap: 7px; height: 100%; padding: 14px 16px 12px; color: var(--ink); text-decoration: none; background: var(--bg); border: 1px solid var(--panel-line); border-top: 5px solid var(--pc); border-radius: 12px; transition: border-color .15s, transform .15s; }
+  .gv-card:hover { border-color: var(--pc); transform: translateY(-1px); }
+  .gv-top { display: flex; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .gv-name { font-family: var(--display); font-size: 20px; font-weight: 800; line-height: 1.15; letter-spacing: -0.3px; }
+  .gv-name small { font-family: var(--mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0; color: var(--muted); }
+  .gv-forma { font-size: 13px; line-height: 1.45; color: var(--text-soft); }
+  .gv-llegada { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px 10px; font-size: 12px; }
+  .gv-llegada b { font-family: var(--mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
+  .gv-bar { display: flex; height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+  .gv-bar .s { background: var(--green); }
+  .gv-bar .n { background: var(--red); }
+  .gv-bar .a { background: var(--gold); }
+  .gv-num { grid-column: 2; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .gv-res { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .gv-more { margin-top: auto; font-size: 13px; font-weight: 600; color: var(--accent); }
+</style>

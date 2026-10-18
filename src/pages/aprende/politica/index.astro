@@ -6,6 +6,7 @@ import MapaEspana from '../../../components/aprende/MapaEspana.astro';
 import MapaFicha from '../../../components/aprende/MapaFicha.astro';
 import EconomiaVista from '../../../components/aprende/EconomiaVista.astro';
 import EventoFicha from '../../../components/aprende/EventoFicha.astro';
+import GobiernosVista from '../../../components/aprende/GobiernosVista.astro';
 import LineaTemporal from '../../../components/aprende/LineaTemporal.astro';
 import TemasVista from '../../../components/aprende/TemasVista.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
@@ -147,6 +148,16 @@ const jsonLd = [
           <p class="ap-view-sub">Desde la muerte de Franco, los hechos que cambiaron quién gobierna, qué leyes rigen o el contexto en que vamos a votar, contados sin adjetivos y con fuente. Pulsa uno para ver el detalle.</p>
         </header>
         <LineaTemporal />
+      </div>
+    </section>
+
+    <section class="ap-view ap-panel scroll" data-view-panel="gobiernos" aria-label="Gobiernos" hidden>
+      <div class="pad">
+        <header class="vhead">
+          <h2 class="ap-view-title">Qué ha hecho cada gobierno</h2>
+          <p class="ap-view-sub">Todos los gobiernos desde la muerte de Franco, uno por investidura: si un presidente repite, cada mandato va por separado. Pulsa uno para leer cómo llegó, con quién gobernó, qué hizo y cómo terminó.</p>
+        </header>
+        <GobiernosVista />
       </div>
     </section>
 
