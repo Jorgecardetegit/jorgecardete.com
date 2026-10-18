@@ -6,7 +6,7 @@ import { partidos } from '../../data/politica/partidos';
 import { fecha } from '../../lib/politica';
 
 const W = 1000;
-const inicio = Date.UTC(2011, 0, 1);
+const inicio = Date.UTC(1975, 0, 1);
 const fin = Date.UTC(2027, 0, 1);
 const x = (iso: string) => {
   const [y, m, d = '15'] = iso.split('-');
@@ -15,26 +15,37 @@ const x = (iso: string) => {
 const color = new Map(partidos.map((p) => [p.id, p.color]));
 const orden = Object.keys(categorias) as Categoria[];
 const carril = (c: Categoria) => 72 + orden.indexOf(c) * 12;
-const anios = Array.from({ length: 16 }, (_, i) => 2011 + i);
+const anios = Array.from({ length: 52 }, (_, i) => 1975 + i);
+// El nombre del presidente, una vez por mandato seguido aunque cambie la forma de gobierno.
+const mandatos = gobiernos.reduce<{ presidente: string; desde: string; hasta: string }[]>((acc, g) => {
+  const ultimo = acc.at(-1);
+  if (ultimo?.presidente === g.presidente) ultimo.hasta = g.hasta;
+  else acc.push({ presidente: g.presidente, desde: g.desde, hasta: g.hasta });
+  return acc;
+}, []);
 const porAnio = [...Map.groupBy(eventos.map((e, i) => ({ e, i })), ({ e }) => e.fecha.slice(0, 4))].sort((a, b) => b[0].localeCompare(a[0]));
 const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { month: 'long', year: 'numeric' }) : fecha(iso, { day: 'numeric', month: 'short' }));
 ---
 <div class="lt" data-lt>
   <figure class="lt-strip">
-    <svg viewBox={`0 0 ${W} 186`} role="img" aria-label="Línea temporal de 2011 a 2026: quién gobernaba y hechos principales">
+    <svg viewBox={`0 0 ${W} 186`} role="img" aria-label="Línea temporal de 1975 a 2026: quién gobernaba y hechos principales">
       {gobiernos.map((g) => (
         <g>
-          <rect x={x(g.desde)} y="10" width={Math.max(1, x(g.hasta) - x(g.desde) - 1.5)} height="40" rx="5" style={`fill: ${color.get(g.partido)}`} class:list={['lt-gov', { funciones: g.forma.startsWith('En funciones') }]}><title>{g.presidente}: {g.forma}</title></rect>
-          {x(g.hasta) - x(g.desde) > 80 && <text x={x(g.desde) + 8} y="36" class="lt-gov-t">{g.presidente}</text>}
+          <rect x={x(g.desde)} y="10" width={Math.max(1, x(g.hasta) - x(g.desde) - 1)} height="40" rx="4" style={`fill: ${g.color ?? color.get(g.partido)}`} class:list={['lt-gov', { funciones: g.forma.startsWith('En funciones') }]}><title>{g.presidente}: {g.forma}</title></rect>
         </g>
+      ))}
+      {/* Nombre del presidente si cabe; si no, se ve al pasar el ratón por su tramo. */}
+      {mandatos.filter((m) => x(m.hasta) - x(m.desde) > 70).map((m) => (
+        <text x={x(m.desde) + 6} y="37" class="lt-gov-t">{m.presidente}</text>
       ))}
       {anios.map((a) => (
         <g>
-          <line x1={x(`${a}-01-01`)} x2={x(`${a}-01-01`)} y1="56" y2="166" class="lt-tick" />
-          <text x={x(`${a}-07-01`)} y="182" class="lt-year">{a}</text>
+          <line x1={x(`${a}-01-01`)} x2={x(`${a}-01-01`)} y1="56" y2="166" class:list={['lt-tick', { mayor: a % 5 === 0 }]} />
+          {a % 5 === 0 && <text x={x(`${a}-01-01`)} y="182" class="lt-year">{a}</text>}
         </g>
       ))}
-      {eventos.map((e, i) => (
+      {/* Los hechos clave, al final: se dibujan encima de los que caen en la misma fecha. */}
+      {eventos.map((e, i) => ({ e, i })).sort((a, b) => Number(!!a.e.clave) - Number(!!b.e.clave)).map(({ e, i }) => (
         <circle
           cx={x(e.fecha).toFixed(1)}
           cy={carril(e.categoria)}
@@ -174,7 +185,8 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
   .lt-gov.funciones { opacity: .45; }
   .lt-gov-t { font-family: var(--display); font-size: 19px; font-weight: 800; fill: #fff; pointer-events: none; }
   .lt-tick { stroke: var(--panel-line); }
-  .lt-year { font-family: var(--mono); font-size: 13px; fill: var(--muted); text-anchor: middle; }
+  .lt-year { font-family: var(--mono); font-size: 16px; fill: var(--muted); text-anchor: middle; }
+  .lt-tick:not(.mayor) { opacity: .35; }
   .lt-dot { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; transition: opacity .2s; }
   .lt-dot.clave { stroke: var(--ink); stroke-width: 1.8; }
   .lt-dot:hover, .lt-dot:focus-visible { stroke: var(--ink); stroke-width: 2.2; outline: none; }
@@ -214,6 +226,6 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
     .lt-item { grid-template-columns: minmax(0, 1fr); gap: 2px; }
     /* La franja no se lee encogida: se desliza en horizontal. */
     .lt-strip { overflow-x: auto; }
-    .lt-strip svg { min-width: 760px; }
+    .lt-strip svg { min-width: 1100px; }
   }
 </style>

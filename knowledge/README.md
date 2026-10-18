@@ -66,6 +66,6 @@ Los JSON de origen son los de [datos abiertos del Congreso](https://www.congreso
 
 1. **Cómo funciona.** 14 lecciones de teoría. Hecho.
 2. **Partidos, diputados y votaciones.** Hecho con los datos de la XV legislatura. Pendiente: programas del 29-N cuando se publiquen y candidaturas oficiales del BOE (hacia el 3 de noviembre).
-3. **Qué ha pasado.** Línea temporal desde 2011 en `src/data/politica/linea-temporal.ts`. Hecho. Cada hecho lleva fuente (BOE, Interior, medios o Wikipedia) y enlaces a lecciones y partidos; al añadir uno nuevo, verificarlo en al menos dos fuentes.
+3. **Qué ha pasado.** Línea temporal desde la muerte de Franco (1975) en `src/data/politica/linea-temporal.ts`. Hecho. Cada hecho lleva fuente (BOE, Interior, medios o Wikipedia) y enlaces a lecciones y partidos; al añadir uno nuevo, verificarlo en al menos dos fuentes.
 4. **Temas.** Hecho con las votaciones (`src/data/politica/temas.ts`: cada votación se asigna por palabras clave del título) y con lo que propuso cada partido en 2023 para contrastarlo. Pendiente: `propuestas` de cada partido con los programas del 29-N, todas a la vez cuando estén publicados.
 5. **Cuando se publiquen:** candidaturas oficiales en el BOE (hacia el 3 de noviembre) y programas electorales.
