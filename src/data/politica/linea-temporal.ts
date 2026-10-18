@@ -1,5 +1,8 @@
 // Línea temporal de la política española desde la muerte de Franco (1975). Criterio: hechos que cambiaron quién
 // gobierna, qué leyes rigen o el contexto en que se vota; contados sin adjetivos y con fuente.
+// Tribunales: entran las causas que afectan a un partido con escaño, a un Gobierno o a su entorno
+// cuando hay imputación conocida, juicio o sentencia, sea del partido que sea, y siempre con el
+// estado procesal exacto (si la sentencia no es firme, se dice).
 // Fuentes: BOE para leyes, Ministerio del Interior para elecciones, medios para lo reciente y
 // Wikipedia como lectura ampliada de los hechos más antiguos.
 export type Categoria = 'elecciones' | 'gobierno' | 'leyes' | 'economia' | 'territorio' | 'tribunales' | 'sociedad' | 'internacional';
@@ -414,6 +417,9 @@ export const eventos: Evento[] = [
   { fecha: '2025-06-26', titulo: 'El Constitucional avala la amnistía', categoria: 'tribunales',
     texto: 'Por seis votos contra cuatro, el Tribunal Constitucional rechaza el recurso del PP y declara constitucional la ley en lo esencial.',
     fuente: { titulo: 'Noticias Jurídicas', url: 'https://noticias.juridicas.com/actualidad/noticias/20367-el-constitucional-valida-las-leyes-de-amnistia/' } },
+  { fecha: '2025-07', titulo: 'Imputado el exministro Cristóbal Montoro', categoria: 'tribunales',
+    texto: 'Se conoce que un juzgado de Tarragona investiga al exministro de Hacienda de Rajoy y a su antiguo despacho, Equipo Económico, por presuntamente favorecer con cambios legales a empresas gasistas que lo contrataban. Montoro deja de ser afiliado del PP. La causa sigue en instrucción y él aún no ha declarado.',
+    fuente: { titulo: 'Vozpópuli', url: 'https://www.vozpopuli.com/espana/politica/cristobal-montoro-se-desvincula-del-pp-tras-su-imputacion-y-comunica-que-deja-de-ser-afiliado.html' }, enlaces: [P('pp', 'PP')] },
   { fecha: '2025-09-10', titulo: 'El Congreso tumba la jornada de 37,5 horas', categoria: 'leyes',
     texto: 'Las enmiendas a la totalidad de PP, Vox y Junts, con UPN, suman 178 votos y devuelven al Gobierno el proyecto para reducir la jornada laboral.',
     fuente: { titulo: 'Genbeta', url: 'https://www.genbeta.com/laboral/congreso-tumba-reduccion-jornada-laboral-a-37-5-horas-esto-que-ocurrira-a-partir-ahora' }, enlaces: [P('junts', 'Junts')] },
@@ -424,7 +430,7 @@ export const eventos: Evento[] = [
     texto: 'Un año después de la DANA, el presidente de la Generalitat Valenciana deja el cargo. Le sustituye Juanfran Pérez Llorca, del PP, con el apoyo de Vox.',
     fuente: { titulo: 'Maldita.es', url: 'https://maldita.es/malditateexplica/20251103/mazon-dimite-dana-generalitat-valenciana/' } },
   { fecha: '2025-11-20', titulo: 'Condenado el fiscal general del Estado', categoria: 'tribunales', clave: true,
-    texto: 'El Tribunal Supremo condena a Álvaro García Ortiz a dos años de inhabilitación por revelación de secretos, con dos votos particulares en contra. Dimite cuatro días después.',
+    texto: 'El Tribunal Supremo condena a Álvaro García Ortiz a dos años de inhabilitación por revelación de secretos, con dos votos particulares en contra. Lo revelado eran datos de la negociación con la Fiscalía de Alberto González Amador, pareja de Isabel Díaz Ayuso, que está pendiente de juicio por presunto fraude fiscal. García Ortiz dimite cuatro días después.',
     fuente: { titulo: 'RTVC', url: 'https://rtvc.es/el-supremo-condena-al-fiscal-general-a-2-anos-de-inhabilitacion-por-revelacion-de-secretos-20-noviembre-2025/' }, enlaces: [L('justicia', 'Lección: la Fiscalía')] },
   { fecha: '2025-11-27', titulo: 'Ábalos y Koldo García, en prisión provisional', categoria: 'tribunales',
     texto: 'El juez del Supremo los envía a prisión por riesgo de fuga, tras proponer juzgarlos por el caso de las mascarillas. Ábalos deja su escaño de diputado en enero de 2026.',
@@ -439,6 +445,9 @@ export const eventos: Evento[] = [
   { fecha: '2026-03-15', titulo: 'Castilla y León: el PP vuelve a ganar', categoria: 'elecciones',
     texto: 'El PP de Alfonso Fernández Mañueco obtiene 33 escaños, el PSOE 30 y Vox 14.',
     fuente: { titulo: 'El Español', url: 'https://www.elespanol.com/espana/20260316/resultados-elecciones-castilla-leon-2026-escrutinio-directo-pp-vox-psoe/1003744169909_10.html' } },
+  { fecha: '2026-04-06', titulo: 'Empieza el juicio del caso Kitchen', categoria: 'tribunales',
+    texto: 'La Audiencia Nacional juzga al exministro del Interior Jorge Fernández Díaz y a su número dos, Francisco Martínez, entre otros, por un presunto operativo policial para espiar al extesorero del PP Luis Bárcenas y quitarle documentación comprometedora para el partido. La Fiscalía pide 15 años para ambos; las defensas sostienen que fue una operación legal. Queda visto para sentencia el 28 de julio, sin sentencia todavía.',
+    fuente: { titulo: 'COPE', url: 'https://www.cope.es/actualidad/espana/noticias/juicio-caso-kitchen-visto-sentencia-cuatro-meses-20260728_3411628.html' }, enlaces: [P('pp', 'PP')] },
   { fecha: '2026-05-17', titulo: 'Andalucía: Moreno gana pero pierde la mayoría absoluta', categoria: 'elecciones',
     texto: 'El PP obtiene 53 escaños, a dos de la mayoría. El PSOE de María Jesús Montero se queda en 28, su peor resultado histórico en Andalucía, y Vox sube a 15.',
     fuente: { titulo: 'Euronews', url: 'https://es.euronews.com/my-europe/2026/05/18/elecciones-en-andalucia-2026-sanchez-felicita-a-moreno-tras-una-noche-amarga-para-el-psoe-' } },
@@ -451,6 +460,9 @@ export const eventos: Evento[] = [
   { fecha: '2026-07-30', titulo: 'Crisis migratoria en Ceuta', categoria: 'internacional',
     texto: 'Miles de personas entran en Ceuta desde Marruecos en pocas horas, con decenas de fallecidos. El Gobierno despliega al Ejército para reforzar la frontera. Las cifras varían mucho según la fuente.',
     fuente: { titulo: 'Vanguardia', url: 'https://www.vanguardia.com/mundo/2026/07/31/ceuta-enfrenta-una-crisis-sin-precedentes-tras-el-ingreso-masivo-de-migrantes-desde-marruecos/' } },
+  { fecha: '2026-09-21', titulo: 'Begoña Gómez, a juicio con jurado', categoria: 'tribunales',
+    texto: 'El juez Juan Carlos Peinado abre juicio oral contra la esposa del presidente por tráfico de influencias y malversación, tras una instrucción iniciada en 2024. Ella niega los delitos. Aún no hay fecha de juicio.',
+    fuente: { titulo: 'eldiario.es', url: 'https://www.eldiario.es/politica/juez-peinado-da-ultimo-paso-begona-gomez-sea-juzgada-tribunal-jurado_1_13507684.html' } },
   { fecha: '2026-10-02', titulo: 'El Congreso tumba los decretos de vivienda', categoria: 'gobierno', clave: true,
     texto: 'PP, Vox, Junts y UPN derogan los dos decretos-ley de vivienda del Gobierno (172 a 178). El segundo, sobre contratos de alquiler, también recibe el voto en contra de PNV y CC.',
     fuente: BOE('BOE-A-2026-20526', 'Derogación del Real Decreto-ley 26/2026 (BOE)'), enlaces: [P('junts', 'Junts')] },
