@@ -44,10 +44,14 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
           <rect x={x(g.desde)} y="10" width={Math.max(1, x(g.hasta) - x(g.desde) - 1)} height="40" rx="4" style={`fill: ${g.color ?? color.get(g.partido)}`} class:list={['lt-gov', { funciones: g.forma.startsWith('En funciones') }]}><title>{g.presidente}: {g.forma}</title></rect>
         </g>
       ))}
-      {/* Nombre del presidente si cabe; si no, se ve al pasar el ratón por su tramo. */}
-      {mandatos.filter((m) => x(m.hasta) - x(m.desde) > m.presidente.length * 11 + 14).map((m) => (
-        <text x={x(m.desde) + 6} y="37" class="lt-gov-t">{m.presidente}</text>
-      ))}
+      {mandatos.map((m) => {
+        // Todos los tramos llevan nombre: a tamaño normal si cabe, si no en pequeño y, en el más
+        // corto (Arias Navarro, siete meses), solo el primer apellido.
+        const ancho = x(m.hasta) - x(m.desde) - 10;
+        if (m.presidente.length * 11 <= ancho) return <text x={x(m.desde) + 6} y="37" class="lt-gov-t">{m.presidente}</text>;
+        const corto = m.presidente.length * 7 <= ancho ? m.presidente : m.presidente.split(' ')[0];
+        return <text x={x(m.desde) + 4} y="34" class="lt-gov-t chico">{corto}</text>;
+      })}
       {anios.map((a) => (
         <g>
           <line x1={x(`${a}-01-01`)} x2={x(`${a}-01-01`)} y1="56" y2="166" class="lt-tick" />
@@ -245,6 +249,7 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
   .lt-gov { opacity: .92; }
   .lt-gov.funciones { opacity: .45; }
   .lt-gov-t { font-family: var(--display); font-size: 19px; font-weight: 800; fill: #fff; pointer-events: none; }
+  .lt-gov-t.chico { font-size: 12px; }
   .lt-tick { stroke: var(--panel-line); }
   .lt-year { font-family: var(--mono); font-size: 13px; fill: var(--muted); text-anchor: middle; }
   .lt-dot { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; transition: opacity .2s; }
