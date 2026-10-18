@@ -4,7 +4,7 @@
 // teoría («Cómo funciona») queda como referencia plegada.
 //
 // `view` indica qué pestaña está activa. En la portada las tres primeras son botones que
-// cambian de vista sin recargar; en «Cómo funciona» aparecen además sus subvistas.
+// cambian de vista sin recargar.
 import Base from './Base.astro';
 import type { LearnArea } from '../data/learn';
 import diputadosData from '../data/politica/diputados.json';
@@ -37,14 +37,10 @@ const tabs = [
   { id: 'temas', label: 'Temas' },
   { id: 'mapa', label: 'Mapa' },
   { id: 'historia', label: 'Qué ha pasado' },
+  { id: 'gobiernos', label: 'Gobiernos' },
   { id: 'economia', label: 'Economía' },
   { id: 'diputados', label: 'Diputados' },
   { id: 'votaciones', label: 'Votaciones' },
-] as const;
-const subtabs = [
-  { id: 'poderes', label: 'Poderes' },
-  { id: 'mapa', label: 'Mapa' },
-  { id: 'lecciones', label: 'Lecciones' },
 ] as const;
 
 const escanos = new Map<string, number>();
@@ -147,13 +143,6 @@ const leccionAbierta = lessons.some((l) => l.id === current) || mode === 'como-f
           ),
         )}
         <a class="ap-tab ap-tab-soft" href={comoFunciona} aria-current={mode === 'como-funciona' || section === 'como-funciona' ? 'page' : undefined}>Cómo funciona</a>
-        {mode === 'como-funciona' && (
-          <span class="ap-subtabs" role="tablist" aria-label="Vistas de Cómo funciona">
-            {subtabs.map((t, i) => (
-              <button type="button" class="ap-subtab" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-view-tab={t.id}>{t.label}</button>
-            ))}
-          </span>
-        )}
         <span class="ap-countdown" data-ap-countdown>Elecciones generales: <strong>29 de noviembre de 2026</strong></span>
       </nav>
       <slot />

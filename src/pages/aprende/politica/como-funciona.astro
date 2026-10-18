@@ -1,14 +1,13 @@
 ---
 import Aprende from '../../../layouts/Aprende.astro';
 import CalendarioCard from '../../../components/aprende/CalendarioCard.astro';
-import MapaMosaico from '../../../components/aprende/MapaMosaico.astro';
 import PoderesLienzo from '../../../components/aprende/PoderesLienzo.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
 import { getArea } from '../../../data/learn';
 import { competencias, niveles, type Nivel } from '../../../data/politica/competencias';
 import { escanosFuente, escanosPorProvincia } from '../../../data/politica/escanos';
 import { instituciones } from '../../../data/politica/poderes';
-import { areaPath, getLessons, learnPath, lessonPath, lessonSlug, readingMinutes } from '../../../lib/learn';
+import { areaPath, getLessons, learnPath, lessonPath, lessonSlug } from '../../../lib/learn';
 import { breadcrumbs } from '../../../lib/seo';
 
 const area = getArea('politica')!;
@@ -30,9 +29,9 @@ const jsonLd = [
   ]),
 ];
 ---
-<Aprende title={`Cómo funciona · ${area.title}`} description="Cómo funciona el sistema político español: quién elige a quién, el mapa de circunscripciones y 14 lecciones desde cero." jsonLd={jsonLd} area={area} lessons={lessons} mode="como-funciona">
+<Aprende title={`Cómo funciona · ${area.title}`} description="Cómo funciona el sistema político español: quién elige a quién y 14 lecciones desde cero." jsonLd={jsonLd} area={area} lessons={lessons} mode="como-funciona">
   <div class="ap-stage">
-    <section class="ap-view ap-panel" data-view-panel="poderes" aria-label="Quién elige a quién">
+    <section class="ap-view ap-panel" aria-label="Quién elige a quién">
       <header class="ap-view-head">
         <div>
           <h1 class="ap-view-title">Quién elige a quién</h1>
@@ -42,47 +41,6 @@ const jsonLd = [
       <PoderesLienzo />
     </section>
 
-    <section class="ap-view ap-panel" data-view-panel="mapa" aria-label="Mapa de circunscripciones" hidden>
-      <header class="ap-view-head">
-        <div>
-          <h2 class="ap-view-title">Las 52 circunscripciones</h2>
-          <p class="ap-view-sub">Cada provincia reparte sus propios escaños. Pulsa una.</p>
-        </div>
-      </header>
-      <MapaMosaico />
-    </section>
-
-    <section class="ap-view ap-panel lessons-view" data-view-panel="lecciones" aria-label="Todas las lecciones" hidden>
-      <div class="lessons-scroll">
-        {area.sections.filter((s) => s.status === 'ready').map((section) => (
-          <>
-            <h2 class="ap-view-title">{section.title}</h2>
-            <p class="ap-view-sub">{section.description}</p>
-            <ul class="lessons-grid">
-              {lessons.filter((l) => l.data.section === section.id).map((l) => (
-                <li>
-                  <a class="lesson-card" href={lessonPath(l)} data-lesson-chip={l.id}>
-                    <span class="lesson-card-top">
-                      <span class="lesson-card-icon" aria-hidden="true">{l.data.icon}</span>
-                      <span class="lesson-card-num">{String(lessons.indexOf(l) + 1).padStart(2, '0')} · {readingMinutes(l)} min</span>
-                    </span>
-                    <strong>{l.data.title}</strong>
-                    <span class="lesson-card-sum">{l.data.summary}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </>
-        ))}
-        {area.sections.filter((s) => s.status === 'soon').map((section) => (
-          <div class="lessons-soon">
-            <strong>{section.title}</strong> <span>Próximamente</span>
-            <p>{section.description}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-
     <section class="ap-detail ap-panel" aria-live="polite" data-detail-panel>
       <div data-detail="intro">
         <div class="ap-detail-head">
@@ -90,7 +48,7 @@ const jsonLd = [
           <h2 class="ap-detail-title">Empieza aquí</h2>
           <span class="ap-detail-meta">{lessons.length} lecciones · de 3 a 5 minutos cada una</span>
         </div>
-        <p>Todo lo que hace falta para entender cómo funciona España antes de votar, explicado desde cero y con fuentes oficiales. Pulsa las piezas del esquema o las provincias del mapa, o entra directamente en una lección.</p>
+        <p>Todo lo que hace falta para entender cómo funciona España antes de votar, explicado desde cero y con fuentes oficiales. Pulsa las piezas del esquema o entra directamente en una lección.</p>
         <div class="ap-chips">
           {lessons.map((l) => <a class="ap-chip" href={lessonPath(l)} data-lesson-chip={l.id}><span aria-hidden="true">{l.data.icon}</span>{l.data.title}</a>)}
         </div>
@@ -112,22 +70,6 @@ const jsonLd = [
         </div>
       ))}
 
-      <div data-detail="prov" hidden>
-        <div class="ap-detail-head">
-          <span class="ap-detail-icon" aria-hidden="true">📍</span>
-          <h2 class="ap-detail-title" data-prov-field="nombre"></h2>
-          <span class="ap-detail-meta" data-prov-field="ccaa"></span>
-          <button type="button" class="ap-detail-close" data-reset>✕ Cerrar</button>
-        </div>
-        <div class="prov-stats">
-          <div><strong data-prov-field="dip"></strong> diputados <span class="prov-dots" data-prov-field="dots"></span></div>
-          <div><strong data-prov-field="sen"></strong> senadores</div>
-        </div>
-        <p>Para asegurar un diputado aquí hace falta, a grandes rasgos, <span data-prov-field="umbral"></span>. <span data-prov-field="senado"></span></p>
-        <div class="ap-chips">
-          <a class="ap-chip" href={lessonPath(bySlug.get('elecciones')!)} data-lesson-chip="politica/elecciones"><span aria-hidden="true">🗳️</span>Lección: cómo se convierten los votos en escaños</a>
-        </div>
-      </div>
     </section>
   </div>
 
@@ -173,57 +115,8 @@ const jsonLd = [
 </Aprende>
 
 <script>
-  // Pestañas: cambian de vista sin recargar y lo recuerdan en la URL (#mapa, #lecciones).
-  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-view-tab]')];
-  const panels = [...document.querySelectorAll<HTMLElement>('[data-view-panel]')];
-  const detail = document.querySelector<HTMLElement>('[data-detail-panel]')!;
-  const stage = document.querySelector<HTMLElement>('.ap-stage')!;
-
-  const open = (view: string) => {
-    if (!panels.some((p) => p.dataset.viewPanel === view)) view = 'poderes';
-    for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.viewTab === view));
-    for (const p of panels) p.hidden = p.dataset.viewPanel !== view;
-    detail.hidden = view === 'lecciones';
-    stage.dataset.view = view;
-    document.dispatchEvent(new Event('ap:reset'));
-  };
-  for (const t of tabs) {
-    t.addEventListener('click', () => {
-      open(t.dataset.viewTab!);
-      history.replaceState(null, '', t.dataset.viewTab === 'poderes' ? location.pathname : `#${t.dataset.viewTab}`);
-    });
-  }
-  open(location.hash.slice(1));
-  addEventListener('hashchange', () => open(location.hash.slice(1)));
-
   for (const b of document.querySelectorAll('[data-reset]')) {
     b.addEventListener('click', () => document.dispatchEvent(new Event('ap:reset')));
   }
-
 </script>
 
-<style>
-  .lessons-view { overflow-y: auto; }
-  /* En el mapa, la ficha solo aparece al elegir una provincia: así el mosaico tiene sitio. */
-  .ap-stage[data-view='mapa'] .ap-detail:has(> [data-detail='intro']:not([hidden])) { display: none; }
-  .lessons-scroll { padding: 18px 20px 24px; }
-  .lessons-grid { list-style: none; margin: 14px 0 28px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-  .lesson-card { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, border-color .15s; }
-  .lesson-card:hover { color: var(--ink); border-color: var(--accent); transform: translateY(-2px); }
-  .lesson-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .lesson-card-icon { font-size: 24px; }
-  .lesson-card-num { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
-  .lesson-card.is-read .lesson-card-num::after { content: ' · leída ✓'; color: var(--green); font-weight: 600; }
-  .lesson-card strong { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1.2; letter-spacing: -0.2px; }
-  .lesson-card-sum { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); }
-  .lessons-soon { margin-bottom: 12px; padding: 12px 16px; border: 1px dashed var(--line); border-radius: 12px; }
-  .lessons-soon strong { font-family: var(--display); font-size: 16px; }
-  .lessons-soon span { margin-left: 6px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
-  .lessons-soon p { margin: 4px 0 0; font-size: 13.5px; color: var(--text-soft); }
-
-  .prov-stats { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-bottom: 10px; font-size: 14px; color: var(--text-soft); }
-  .prov-stats strong { font-family: var(--display); font-size: 26px; font-weight: 800; color: var(--accent); margin-right: 4px; }
-  .prov-dots { display: inline-flex; flex-wrap: wrap; gap: 2px; max-width: 220px; margin-left: 8px; vertical-align: middle; }
-  .prov-dots :global(i) { width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
-
-</style>
