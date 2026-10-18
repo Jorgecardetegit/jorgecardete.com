@@ -56,6 +56,35 @@ export function posicion(recuento: number[] | undefined): 'S' | 'N' | 'A' | null
   return s === max ? 'S' : n === max ? 'N' : 'A';
 }
 
+type Recuentos = Record<string, number[]> | null;
+
+/**
+ * Afinidad y cohesión con un subconjunto de votaciones (las de un tema, las disputadas): en qué
+ * porcentaje coincidió la posición mayoritaria de cada par de partidos y cuántas veces votó cada
+ * uno sin división interna. Con menos de tres votaciones comparables, null.
+ */
+export function afinidadDe(votos: { partidos: unknown }[], orden: string[]) {
+  const pct = (a: number, b: number) => (b ? Math.round((a / b) * 1000) / 10 : null);
+  const pos = votos.map((v) => Object.fromEntries(orden.map((id) => [id, posicion((v.partidos as Recuentos)?.[id])])));
+  return Object.fromEntries(
+    orden.map((p) => {
+      const afinidad: Record<string, number | null> = {};
+      for (const q of orden) {
+        if (q === p) continue;
+        const comparables = pos.filter((x) => x[p] && x[q]);
+        afinidad[q] = comparables.length >= 3 ? pct(comparables.filter((x) => x[p] === x[q]).length, comparables.length) : null;
+      }
+      const conVoto = votos.map((v) => (v.partidos as Recuentos)?.[p]).filter((r): r is number[] => !!r && r[0] + r[1] + r[2] > 0);
+      const unanimes = conVoto.filter((r) => [r[0], r[1], r[2]].filter((n) => n > 0).length === 1).length;
+      return [p, { afinidad, cohesion: conVoto.length >= 3 ? pct(unanimes, conVoto.length) : null }];
+    }),
+  );
+}
+
+/** Votaciones en que no todos los partidos votaron lo mismo: las que separan a unos de otros. */
+export const disputada = (v: { partidos: unknown }, orden: string[]) =>
+  new Set(orden.map((id) => posicion((v.partidos as Recuentos)?.[id])).filter(Boolean)).size > 1;
+
 /** ¿Votó dividido? Más de una opción entre los presentes. */
 export const dividido = (r: number[] | undefined) => !!r && [r[0], r[1], r[2]].filter((x) => x > 0).length > 1;
 

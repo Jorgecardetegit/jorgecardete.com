@@ -1,7 +1,8 @@
 ---
 // Matriz de afinidad: en qué porcentaje de las votaciones nominales de la legislatura
-// coincidió la posición mayoritaria de cada par de partidos. En la diagonal, la cohesión:
-// votaciones en que todos los diputados presentes del partido votaron lo mismo.
+// coincidió la posición mayoritaria de cada par de partidos. Debajo, aparte, la cohesión:
+// votaciones en que todos los diputados presentes del partido votaron lo mismo. No va en la
+// diagonal porque mide otra cosa y se leería como una coincidencia más.
 import { partidoById, votaciones } from '../../lib/politica';
 
 // `datos` y `pie` permiten usarla con un subconjunto de votaciones (los temas); por defecto,
@@ -12,7 +13,7 @@ const {
   orden,
   destacar,
   datos = votaciones.partidos as Datos,
-  pie = `Porcentaje de las ${votaciones.total.toLocaleString('es-ES')} votaciones nominales de la legislatura en que la mayoría de los diputados de dos partidos votó lo mismo. En la diagonal, cuántas veces votó cada partido sin ninguna división interna.`,
+  pie = `Porcentaje de las ${votaciones.total.toLocaleString('es-ES')} votaciones nominales de la legislatura en que la mayoría de los diputados de dos partidos votó lo mismo. Muchas son de trámite y casi unánimes, lo que sube todas las cifras.`,
 } = Astro.props;
 const ids = orden.filter((id) => datos[id]);
 // Color: de crema (poca coincidencia) al color de acento (mucha), empezando a teñir en el 20 %.
@@ -32,14 +33,15 @@ const tono = (v: number) => Math.round(Math.max(0, Math.min(1, (v - 20) / 75)) *
           <tr class:list={{ on: row === destacar }}>
             <th scope="row"><span class="pt" style={`--pc: ${partidoById.get(row)!.color}`}>{partidoById.get(row)!.siglas}</span></th>
             {ids.map((col) => {
-              const v = row === col ? datos[row].cohesion : datos[row].afinidad[col];
+              if (row === col) return <td class="self" aria-hidden="true" />;
+              const v = datos[row].afinidad[col];
               if (v == null) return <td class="diag" title="Sin votaciones comparables">—</td>;
               const t = tono(v);
               return (
                 <td
-                  class:list={{ diag: row === col, dark: t > 55 }}
-                  style={row === col ? undefined : `--t: ${t}%`}
-                  title={row === col ? `${partidoById.get(row)!.siglas}: votó unido en el ${v} % de las votaciones` : `${partidoById.get(row)!.siglas} y ${partidoById.get(col)!.siglas} coincidieron en el ${v} % de las votaciones`}
+                  class:list={{ dark: t > 55 }}
+                  style={`--t: ${t}%`}
+                  title={`${partidoById.get(row)!.siglas} y ${partidoById.get(col)!.siglas} coincidieron en el ${v} % de las votaciones`}
                 >
                   {Math.round(v)}
                 </td>
@@ -50,7 +52,15 @@ const tono = (v: number) => Math.round(Math.max(0, Math.min(1, (v - 20) / 75)) *
       </tbody>
     </table>
   </div>
-  <figcaption>{pie}</figcaption>
+  <figcaption>
+    {pie}
+    {ids.some((id) => datos[id].cohesion != null) && (
+      <span class="afi-coh">
+        Votó sin ninguna división interna:{' '}
+        {ids.filter((id) => datos[id].cohesion != null).map((id, i) => <>{i > 0 && ' · '}<b>{partidoById.get(id)!.siglas}</b> {Math.round(datos[id].cohesion!)} %</>)}
+      </span>
+    )}
+  </figcaption>
 </figure>
 
 <style>
@@ -64,6 +74,9 @@ const tono = (v: number) => Math.round(Math.max(0, Math.min(1, (v - 20) / 75)) *
   td { min-width: 34px; height: 30px; padding: 0 4px; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--ink); background: color-mix(in srgb, var(--accent) var(--t), var(--panel-2)); border-radius: 6px; cursor: default; }
   td.dark { color: #fff; }
   td.diag { background: transparent; border: 1.5px dashed var(--line); color: var(--muted); font-weight: 600; }
+  td.self { background: transparent; }
+  .afi-coh { display: block; margin-top: 6px; }
+  .afi-coh b { font-weight: 600; color: var(--text-soft); }
   tr.on th, th.on { color: var(--accent); }
   tr.on td:not(.diag) { outline: 2px solid var(--ink); outline-offset: -2px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

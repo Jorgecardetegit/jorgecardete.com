@@ -15,7 +15,7 @@ import { getArea } from '../../../data/learn';
 import { elecciones, revisadoPartidos } from '../../../data/politica/partidos';
 import { getLessons, learnPath } from '../../../lib/learn';
 import {
-  diputadoPath, diputados, escanosActuales, fecha, partidoById, partidoPath, partidos, posicion, proponentes,
+  afinidadDe, diputadoPath, diputados, disputada, escanosActuales, fecha, partidoById, partidoPath, partidos, posicion, proponentes,
   resultadoTexto, tipos, tituloCorto, votaciones,
 } from '../../../lib/politica';
 import { breadcrumbs } from '../../../lib/seo';
@@ -55,6 +55,9 @@ function resumen(v: (typeof lista)[number]) {
   const mayor = [...orden].sort((a, b) => grupos[b].length - grupos[a].length)[0];
   return { grupos, mayor, orden, resto: orden.filter((p) => p !== mayor), textos: posTexto(v.tipo) };
 }
+// Votaciones clave (con desglose por partido) en que no todos los partidos votaron igual.
+const disputadas = [...votaciones.clave, ...votaciones.propuestas].filter((v) => v.partidos && disputada(v, conDiputados));
+const afinidadDisputadas = afinidadDe(disputadas, conDiputados);
 const pctEsc = (n: number) => `${(n / 350) * 100}%`;
 
 const leyes = votaciones.clave.filter((c) => c.tipo === 'ley');
@@ -126,8 +129,23 @@ const jsonLd = [
         <p class="note">Líderes y candidaturas revisados el {fecha(revisadoPartidos, { day: 'numeric', month: 'long' })}. Las candidaturas oficiales se publican en el BOE a principios de noviembre; hasta entonces es lo anunciado por cada partido.</p>
 
         <h2 class="ap-view-title sub">Con quién vota cada partido</h2>
-        <p class="ap-view-sub">Lo que han hecho, más allá de lo que dicen: coincidencias en las votaciones de esta legislatura.</p>
-        <AfinidadMatriz orden={conDiputados} />
+        <div class="vhead-row afi-head">
+          <p class="ap-view-sub">Lo que han hecho, más allá de lo que dicen: coincidencias en las votaciones de esta legislatura.</p>
+          <div class="pv-toggle" role="group" aria-label="Qué votaciones contar">
+            <button type="button" aria-pressed="true" data-afi="disputadas">Solo las disputadas</button>
+            <button type="button" aria-pressed="false" data-afi="todas">Todas</button>
+          </div>
+        </div>
+        <div data-afi-view="disputadas">
+          <AfinidadMatriz
+            orden={conDiputados}
+            datos={afinidadDisputadas}
+            pie={`Porcentaje de las ${disputadas.length} votaciones clave de la legislatura (leyes, decretos, investiduras, enmiendas a la totalidad, vetos y propuestas de los grupos) en que no todos los partidos votaron igual y la mayoría de dos partidos votó lo mismo.`}
+          />
+        </div>
+        <div data-afi-view="todas" hidden>
+          <AfinidadMatriz orden={conDiputados} />
+        </div>
         </div>
       </div>
     </section>
@@ -413,6 +431,15 @@ const jsonLd = [
   open(location.hash.slice(1));
   addEventListener('hashchange', () => open(location.hash.slice(1)));
 
+  // Con quién vota cada partido: solo las votaciones disputadas o todas.
+  const afiBotones = [...document.querySelectorAll<HTMLButtonElement>('[data-afi]')];
+  for (const b of afiBotones) {
+    b.addEventListener('click', () => {
+      for (const o of afiBotones) o.setAttribute('aria-pressed', String(o === b));
+      for (const el of document.querySelectorAll<HTMLElement>('[data-afi-view]')) el.hidden = el.dataset.afiView !== b.dataset.afi;
+    });
+  }
+
   const norm = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
 
   // Diputados: filtros y orden.
@@ -485,6 +512,7 @@ const jsonLd = [
   .pad { padding: 18px 20px 26px; }
   .vhead { margin-bottom: 14px; }
   .vhead-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 16px; }
+  .afi-head { align-items: center; margin-bottom: 10px; }
   [data-pv-view][hidden], [data-pv-sub][hidden] { display: none; }
   .pv-toggle { display: inline-flex; flex: none; gap: 2px; padding: 3px; background: var(--panel-2); border-radius: 999px; }
   .pv-toggle button { padding: 7px 15px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }

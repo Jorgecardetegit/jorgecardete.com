@@ -7,7 +7,7 @@ import AfinidadMatriz from './AfinidadMatriz.astro';
 import { temas, temasDe } from '../../data/politica/temas';
 import { programas2023, propuestas2023, sinPrograma2023 } from '../../data/politica/programas-2023';
 import {
-  escanosActuales, fecha, partidoById, partidos, posicion, proponentes, resultadoTexto, siglasCortas, tipos, tituloCorto, votaciones,
+  afinidadDe, escanosActuales, fecha, partidoById, partidos, posicion, proponentes, resultadoTexto, siglasCortas, tipos, tituloCorto, votaciones,
 } from '../../lib/politica';
 
 const orden = [...partidos].sort((a, b) => escanosActuales(b.id) - escanosActuales(a.id)).map((p) => p.id).filter((id) => escanosActuales(id) > 0);
@@ -19,25 +19,11 @@ const todas = [
 const orden2023 = [...partidos].sort((a, b) => escanosActuales(b.id) - escanosActuales(a.id)).map((p) => p.id);
 const traducidos = Object.values(programas2023).filter((p) => p.idioma).map((p) => p.idioma);
 const tipoLabel = (t: string) => tipos[t as keyof typeof tipos]?.label ?? t;
-const pct = (a: number, b: number) => (b ? Math.round((a / b) * 1000) / 10 : null);
 
 const vistas = temas.map((tema) => {
   const votos = todas.filter((x) => x.temas.includes(tema.id)).map((x) => x.v).sort((a, b) => b.fecha.localeCompare(a.fecha));
   // Afinidad y cohesión solo con las votaciones de este tema.
-  const pos = votos.map((v) => Object.fromEntries(orden.map((id) => [id, posicion((v.partidos as Record<string, number[]> | null)?.[id])])));
-  const datos = Object.fromEntries(
-    orden.map((p) => {
-      const afinidad: Record<string, number | null> = {};
-      for (const q of orden) {
-        if (q === p) continue;
-        const comparables = pos.filter((x) => x[p] && x[q]);
-        afinidad[q] = comparables.length >= 3 ? pct(comparables.filter((x) => x[p] === x[q]).length, comparables.length) : null;
-      }
-      const conVoto = votos.map((v) => (v.partidos as Record<string, number[]> | null)?.[p]).filter((r): r is number[] => !!r && r[0] + r[1] + r[2] > 0);
-      const unanimes = conVoto.filter((r) => [r[0], r[1], r[2]].filter((n) => n > 0).length === 1).length;
-      return [p, { afinidad, cohesion: conVoto.length >= 3 ? pct(unanimes, conVoto.length) : null }];
-    }),
-  );
+  const datos = afinidadDe(votos, orden);
   return { tema, votos, datos };
 });
 ---
