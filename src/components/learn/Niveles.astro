@@ -1,0 +1,35 @@
+---
+// Escalera de niveles, del más alto al más bajo (tribunales, administraciones...).
+// Cada nivel lleva una etiqueta corta a la izquierda, por ejemplo cuántos hay o dónde están.
+interface Nivel { titulo: string; detalle: string; etiqueta?: string; color?: string }
+interface Props { items: Nivel[]; pie?: string }
+const { items, pie } = Astro.props;
+---
+<figure class="niveles">
+  <ol>
+    {items.map((n, i) => (
+      <li style={`--c: var(--${n.color ?? 'green'}); --indent: ${i * 18}px`}>
+        {n.etiqueta && <span class="niveles-tag">{n.etiqueta}</span>}
+        <div>
+          <strong>{n.titulo}</strong>
+          <p>{n.detalle}</p>
+        </div>
+      </li>
+    ))}
+  </ol>
+  {pie && <figcaption>{pie}</figcaption>}
+</figure>
+
+<style>
+  .niveles { margin: 32px 0; padding: 20px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .niveles ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .niveles li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: center; margin: 0 0 0 var(--indent); padding: 10px 14px; background: var(--bg); border: 3px solid var(--ink); border-left: 10px solid var(--c); border-radius: 3px; }
+  .niveles li:not(:has(.niveles-tag)) { grid-template-columns: minmax(0, 1fr); }
+  .niveles-tag { font-family: var(--mono); font-size: 11.5px; line-height: 1.3; color: var(--muted); }
+  .niveles strong { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1.25; }
+  .niveles p { margin: 2px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--text-soft); }
+  .niveles figcaption { margin-top: 14px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  @media (max-width: 640px) {
+    .niveles li { grid-template-columns: minmax(0, 1fr); gap: 2px; margin-left: 0; }
+  }
+</style>
