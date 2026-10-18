@@ -1,8 +1,8 @@
 ---
-// Vista de temas: del tema elegido, qué han votado los partidos y, plegado debajo, qué proponen
-// (el 29-N cuando se publique y, mientras, 2023) y con quién coincide cada uno. El menú de temas y
-// «Quién decide» van en la columna derecha (TemasAside); en pantallas estrechas, donde esa columna
-// cae debajo, el tema se elige con un desplegable.
+// Vista de temas: del tema elegido, una descripción y tres pestañas: qué proponen (el 29-N cuando
+// se publique y, mientras, 2023; es la que se abre), qué han votado y con quién coincide cada uno.
+// El menú de temas y «Quién decide» van en la columna derecha (TemasAside); en pantallas
+// estrechas, donde esa columna cae debajo, el tema se elige con un desplegable.
 import AfinidadMatriz from './AfinidadMatriz.astro';
 import { temas } from '../../data/politica/temas';
 import { votosPorTema } from '../../lib/temas';
@@ -40,13 +40,14 @@ const vistas = temas.map((tema) => {
       <div class="tv-head">
         <h3 class="tv-title"><span aria-hidden="true">{tema.icono}</span> {tema.nombre}</h3>
         <div class="tv-subs" role="tablist" aria-label={`Qué ver de ${tema.nombre}`}>
-          <button type="button" role="tab" aria-selected="true" data-sub="votado">Votaciones <small>{votos.length}</small></button>
-          <button type="button" role="tab" aria-selected="false" data-sub="proponen">Propuestas</button>
+          <button type="button" role="tab" aria-selected="true" data-sub="proponen">Propuestas</button>
+          <button type="button" role="tab" aria-selected="false" data-sub="votado">Votaciones <small>{votos.length}</small></button>
           {votos.length >= 3 && <button type="button" role="tab" aria-selected="false" data-sub="coincide">Coincidencias</button>}
         </div>
       </div>
+      <p class="tv-desc">{tema.descripcion}</p>
 
-      <div data-sub-panel="votado">
+      <div data-sub-panel="votado" hidden>
         {votos.length > 0 ? (
           <>
             <div class="tv-grid-scroll">
@@ -85,7 +86,7 @@ const vistas = temas.map((tema) => {
         )}
       </div>
 
-      <div data-sub-panel="proponen" hidden>
+      <div data-sub-panel="proponen">
         {conPropuesta.length === 0 ? (
           <p class="tv-pending"><b>29-N:</b> aún no hay programas. Se añadirán todos a la vez cuando se publiquen. Mientras, lo que propuso cada uno en 2023:</p>
         ) : (
@@ -187,6 +188,7 @@ const vistas = temas.map((tema) => {
   .tv-subs small { font-family: var(--mono); font-size: 11px; font-weight: 400; opacity: .75; }
   @media (max-width: 520px) { .tv-subs button { padding: 7px 10px; font-size: 12.5px; } }
   [data-sub-panel][hidden] { display: none; }
+  .tv-desc { margin: -4px 0 0; max-width: 760px; font-size: 14.5px; line-height: 1.55; color: var(--text-soft); }
   .tv-title small { font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--muted); }
   .tv-muted { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
   .tv-muted.small { font-size: 12.5px; margin-top: 6px; }
