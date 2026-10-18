@@ -1,0 +1,281 @@
+---
+// Vista de economía: las últimas cifras y, por grupos, un gráfico por indicador desde 2011 con
+// España frente a la media de la UE sobre franjas de quién gobernaba. Al pasar el ratón (o el
+// dedo) se ve el valor de cada año; debajo de cada gráfico, qué mide, qué depende del Gobierno y
+// la tabla con los datos.
+import { ahora, generado, grupos, indicadores, sacudidas, type Grupo, type Indicador } from '../../data/politica/economia';
+import { gobiernos } from '../../data/politica/linea-temporal';
+import { partidos } from '../../data/politica/partidos';
+import { fecha } from '../../lib/politica';
+
+const W = 340;
+const H = 168;
+const M = { l: 38, r: 42, t: 20, b: 20 };
+const X0 = 2011;
+const X1 = 2027;
+const x = (a: number) => M.l + ((a - X0) / (X1 - X0)) * (W - M.l - M.r);
+const xFecha = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return x(y + (m - 1) / 12 + (d - 1) / 365);
+};
+const color = new Map(partidos.map((p) => [p.id, p.color]));
+// Un tramo por presidente: la franja no distingue minoría, coalición o en funciones.
+const tramos = gobiernos.reduce<{ desde: string; hasta: string; presidente: string; partido: string }[]>((acc, g) => {
+  const prev = acc.at(-1);
+  if (prev?.presidente === g.presidente) prev.hasta = g.hasta;
+  else acc.push({ desde: g.desde, hasta: g.hasta, presidente: g.presidente, partido: g.partido });
+  return acc;
+}, []);
+
+const fmt = (v: number, d: number) => v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
+const conUnidad = (v: number, i: Pick<Indicador, 'unidad' | 'decimales'>) =>
+  i.unidad.startsWith('%') ? `${fmt(v, i.decimales)} %` : i.unidad.startsWith('€') ? `${fmt(v, i.decimales)} €` : fmt(v, i.decimales);
+
+// Escala vertical con 3 o 4 marcas redondas que incluyen los datos y la línea de referencia.
+function escala(valores: number[]) {
+  let lo = Math.min(...valores);
+  let hi = Math.max(...valores);
+  if (lo === hi) { lo -= 1; hi += 1; }
+  const bruto = (hi - lo) / 3;
+  const pot = 10 ** Math.floor(Math.log10(bruto));
+  const paso = [1, 2, 2.5, 5, 10].map((k) => k * pot).find((p) => p >= bruto)!;
+  const a = Math.floor(lo / paso) * paso;
+  const b = Math.ceil(hi / paso) * paso;
+  const marcas = [];
+  for (let v = a; v <= b + paso / 2; v += paso) marcas.push(Math.round(v * 1000) / 1000);
+  const y = (v: number) => M.t + (1 - (v - a) / (b - a)) * (H - M.t - M.b);
+  return { y, marcas };
+}
+
+function grafico(i: Indicador) {
+  const anios = [...new Set([...Object.keys(i.es), ...Object.keys(i.comparacion ?? {})])].map(Number).sort((a, b) => a - b);
+  const valores = [...Object.values(i.es), ...Object.values(i.comparacion ?? {}), ...(i.linea ? [i.linea.valor] : [])];
+  const { y, marcas } = escala(valores);
+  const camino = (s: Record<string, number>) =>
+    Object.entries(s).sort(([a], [b]) => a.localeCompare(b)).map(([a, v], k) => `${k ? 'L' : 'M'}${x(Number(a) + 0.5).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  const ultimo = (s: Record<string, number>) => {
+    const a = Object.keys(s).sort().at(-1)!;
+    return { a: Number(a), v: s[a] };
+  };
+  const finEs = ultimo(i.es);
+  const finRef = i.comparacion ? ultimo(i.comparacion) : null;
+  // Etiquetas al final de cada línea, separadas si se pisan.
+  let yEs = y(finEs.v);
+  let yRef = finRef ? y(finRef.v) : 0;
+  if (finRef && Math.abs(yEs - yRef) < 12) {
+    const medio = (yEs + yRef) / 2;
+    const arriba = finEs.v >= finRef.v;
+    yEs = medio + (arriba ? -6 : 6);
+    yRef = medio + (arriba ? 6 : -6);
+  }
+  const tips = anios.map((a) => {
+    const partes = [`<b>${a}</b>`];
+    if (i.es[a] != null) partes.push(`España: ${conUnidad(i.es[a], i)}`);
+    if (i.comparacion?.[a] != null) partes.push(`${i.ref}: ${conUnidad(i.comparacion[a], i)}`);
+    return { a, html: partes.join('<br>') };
+  });
+  return { y, marcas, camino, finEs, finRef, yEs, yRef, tips };
+}
+
+// Resumen en una línea: primer año, 2018 y el último, sin calificarlos.
+function hitos(i: Indicador) {
+  const anios = Object.keys(i.es).sort();
+  return [...new Set([anios[0], '2018', anios.at(-1)!])].filter((a) => i.es[a] != null).map((a) => ({ a, v: i.es[a] }));
+}
+
+const porGrupo = (Object.keys(grupos) as Grupo[]).map((g) => ({ g, items: indicadores.filter((i) => i.grupo === g) }));
+const periodo = (p: string) =>
+  p.includes('Q') ? `${p.slice(-1)}.º trimestre de ${p.slice(0, 4)}` : fecha(`${p}-01`, { month: 'long', year: 'numeric' });
+---
+<div class="ec">
+  <section class="ec-now" aria-label="Las últimas cifras">
+    <h3 class="ec-label">Las últimas cifras</h3>
+    <ul class="ec-tiles">
+      {ahora.map((t) => (
+        <li class="ec-tile">
+          <span class="ec-tile-t">{t.titulo}</span>
+          <strong class="ec-tile-v">{fmt(t.es, 1)} %</strong>
+          <span class="ec-tile-ue">Media de la UE: {t.ref != null ? `${fmt(t.ref, 1)} %` : '—'}</span>
+          <span class="ec-tile-p">{periodo(t.periodo)} · {t.nota}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <aside class="ec-how">
+    <strong>Cómo leer los gráficos.</strong> La línea continua es España y la discontinua, casi siempre la media de la Unión Europea, para distinguir lo que pasó aquí de lo que pasó en toda Europa. El fondo muestra quién gobernaba ({tramos.map((t, k, a) => <><span class="ec-sw" style={`--pc: ${color.get(t.partido)}`} />{t.presidente}{k < a.length - 1 ? ', ' : ''}</>)}) y las rayas verticales, tres sacudidas que vinieron de fuera: {sacudidas.map((s) => `${s.texto[0].toLowerCase()}${s.texto.slice(1)} (${s.anio})`).join(', ')}. Un Gobierno influye en la economía, pero no la controla: muchas cifras dependen más de Europa, de los precios de la energía o del Banco Central Europeo que de quién gobierna en Madrid.
+  </aside>
+
+  {porGrupo.map(({ g, items }) => (
+    <section class="ec-group">
+      <h3 class="ec-group-t">{grupos[g]}</h3>
+      <div class="ec-grid">
+        {items.map((i) => {
+          const c = grafico(i);
+          return (
+            <article class="ec-card" data-ec>
+              <header class="ec-card-h">
+                <h4>{i.titulo} <small>{i.unidad}</small></h4>
+                <span class="ec-legend">
+                  <span><i class="ec-k es" />España</span>
+                  {i.comparacion && <span><i class="ec-k ref" />{i.ref}</span>}
+                  {i.linea && <span><i class="ec-k lin" />{i.linea.texto}</span>}
+                </span>
+              </header>
+              <div class="ec-plot">
+                <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${i.titulo}, España${i.comparacion ? ` y ${i.ref}` : ''}, de ${Object.keys(i.es).sort()[0]} a ${c.finEs.a}. Los datos, en la tabla de debajo.`}>
+                  {tramos.map((t) => {
+                    const a = Math.max(xFecha(t.desde), x(X0));
+                    const b = Math.min(xFecha(t.hasta), x(X1));
+                    return (
+                      <g>
+                        <rect x={a} y={M.t - 14} width={Math.max(0, b - a - 1)} height={H - M.b - M.t + 14} style={`fill: ${color.get(t.partido)}`} class="ec-gov" />
+                        {b - a > 50 && <text x={a + 4} y={M.t - 4} class="ec-gov-t">{t.presidente}</text>}
+                      </g>
+                    );
+                  })}
+                  {c.marcas.map((v) => (
+                    <g>
+                      <line x1={M.l} x2={W - M.r} y1={c.y(v)} y2={c.y(v)} class="ec-grid-l" />
+                      <text x={M.l - 5} y={c.y(v) + 3.5} class="ec-axis">{fmt(v, Number.isInteger(v) ? 0 : 1)}</text>
+                    </g>
+                  ))}
+                  {sacudidas.map((s) => <line x1={x(s.anio + 0.15)} x2={x(s.anio + 0.15)} y1={M.t} y2={H - M.b} class="ec-shock"><title>{s.texto} ({s.anio})</title></line>)}
+                  {i.linea && (
+                    <line x1={M.l} x2={W - M.r} y1={c.y(i.linea.valor)} y2={c.y(i.linea.valor)} class="ec-ref-l" />
+                  )}
+                  {[2011, 2015, 2019, 2023].map((a) => <text x={x(a + 0.5)} y={H - 5} class="ec-axis mid">{a}</text>)}
+                  {i.comparacion && <path d={c.camino(i.comparacion)} class="ec-line ref" />}
+                  <path d={c.camino(i.es)} class="ec-line es" />
+                  <circle cx={x(c.finEs.a + 0.5)} cy={c.y(c.finEs.v)} r="3.5" class="ec-dot" />
+                  <text x={x(c.finEs.a + 0.5) + 6} y={c.yEs + 3.5} class="ec-end es">{fmt(c.finEs.v, i.decimales)}</text>
+                  {c.finRef && <text x={x(c.finRef.a + 0.5) + 6} y={c.yRef + 3.5} class="ec-end ref">{fmt(c.finRef.v, i.decimales)}</text>}
+                  <line class="ec-cross" x1="0" x2="0" y1={M.t} y2={H - M.b} data-ec-cross />
+                  {c.tips.map((t) => (
+                    <rect class="ec-hit" x={x(t.a)} y={M.t} width={x(1) - x(0)} height={H - M.t - M.b} data-x={x(t.a + 0.5)} data-tip={t.html} />
+                  ))}
+                </svg>
+                <div class="ec-tip" role="status" hidden data-ec-tip />
+              </div>
+              <p class="ec-hitos">
+                {hitos(i).map((h, k) => <>{k > 0 && <span class="ec-arrow">→</span>}<span><small>{h.a}</small> {conUnidad(h.v, i)}</span></>)}
+                {c.finRef && i.ref === 'UE' && <span class="ec-hitos-ue">UE en {c.finRef.a}: {conUnidad(c.finRef.v, i)}</span>}
+              </p>
+              <details class="ec-more">
+                <summary>Qué mide y qué depende del Gobierno</summary>
+                <p>{i.que}</p>
+                <p><b>El Gobierno:</b> {i.gobierno}</p>
+                {i.ojo && <p class="ec-ojo"><b>Ojo:</b> {i.ojo}</p>}
+                <div class="ec-table-wrap">
+                  <table class="ec-table">
+                    <thead><tr><th scope="col">Año</th><th scope="col">España</th>{i.comparacion && <th scope="col">{i.ref}</th>}</tr></thead>
+                    <tbody>
+                      {c.tips.map((t) => (
+                        <tr><th scope="row">{t.a}</th><td>{i.es[t.a] != null ? fmt(i.es[t.a], i.decimales) : '—'}</td>{i.comparacion && <td>{i.comparacion[t.a] != null ? fmt(i.comparacion[t.a], i.decimales) : '—'}</td>}</tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p class="ec-src">Fuente: <a href={i.fuente.url}>{i.fuente.titulo}</a></p>
+              </details>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  ))}
+
+  <p class="ec-note">Datos anuales de Eurostat, que usa la misma metodología para todos los países de la UE (por eso algunas cifras difieren unas décimas de las del INE). Descargados el {fecha(generado, { day: 'numeric', month: 'long', year: 'numeric' })}; el último año puede revisarse. El salario mínimo sale del BOE.</p>
+</div>
+
+<script>
+  // Al pasar por un año: raya vertical y los valores de ese año.
+  for (const card of document.querySelectorAll<HTMLElement>('[data-ec]')) {
+    const svg = card.querySelector('svg')!;
+    const cross = card.querySelector<SVGLineElement>('[data-ec-cross]')!;
+    const tip = card.querySelector<HTMLElement>('[data-ec-tip]')!;
+    const show = (r: SVGRectElement) => {
+      const xv = r.dataset.x!;
+      cross.setAttribute('x1', xv);
+      cross.setAttribute('x2', xv);
+      cross.classList.add('on');
+      tip.innerHTML = r.dataset.tip!;
+      tip.hidden = false;
+      const pct = Number(xv) / svg.viewBox.baseVal.width;
+      tip.style.left = `${pct * 100}%`;
+      tip.classList.toggle('left', pct > 0.6);
+    };
+    const hide = () => {
+      cross.classList.remove('on');
+      tip.hidden = true;
+    };
+    for (const r of card.querySelectorAll<SVGRectElement>('.ec-hit')) {
+      r.addEventListener('pointerenter', () => show(r));
+    }
+    svg.addEventListener('pointerleave', hide);
+  }
+</script>
+
+<style>
+  .ec { display: flex; flex-direction: column; gap: 18px; }
+  .ec-label, .ec-group-t { margin: 0 0 8px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .7px; text-transform: uppercase; color: var(--accent); }
+  .ec-tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .ec-tile { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
+  .ec-tile-t { font-size: 13px; color: var(--text-soft); }
+  .ec-tile-v { font-family: var(--display); font-size: 30px; font-weight: 800; letter-spacing: -0.8px; color: var(--ink); }
+  .ec-tile-ue { font-family: var(--mono); font-size: 12px; color: var(--text-soft); }
+  .ec-tile-p { font-size: 11.5px; color: var(--muted); }
+  .ec-how { padding: 12px 14px; font-size: 13.5px; line-height: 1.55; color: var(--text-soft); background: var(--bg); border: 1px solid var(--panel-line); border-left: 4px solid var(--accent); border-radius: 10px; }
+  .ec-how strong { color: var(--ink); }
+  .ec-sw { display: inline-block; width: 10px; height: 10px; margin: 0 4px 0 2px; border-radius: 2px; background: var(--pc); opacity: .5; vertical-align: -1px; }
+
+  .ec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 12px; }
+  .ec-card { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px 10px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; min-width: 0; }
+  .ec-card-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px; }
+  .ec-card-h h4 { margin: 0; font-family: var(--display); font-size: 16px; font-weight: 800; letter-spacing: -0.2px; color: var(--ink); }
+  .ec-card-h small { font-family: var(--mono); font-size: 11px; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+  .ec-legend { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 11.5px; color: var(--text-soft); }
+  .ec-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .ec-k { display: inline-block; width: 16px; height: 0; border-top: 2px solid var(--ink); }
+  .ec-k.ref { border-top: 2px dashed var(--muted); }
+  .ec-k.lin { border-top: 1px dashed var(--muted); opacity: .8; }
+
+  .ec-plot { position: relative; }
+  .ec-plot svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; }
+  .ec-gov { fill-opacity: .055; }
+  .ec-gov-t { font-family: var(--mono); font-size: 9.5px; fill: var(--muted); }
+  .ec-grid-l { stroke: var(--panel-line); stroke-width: 1; }
+  .ec-axis { font-family: var(--mono); font-size: 9.5px; fill: var(--muted); text-anchor: end; }
+  .ec-axis.mid { text-anchor: middle; }
+  .ec-shock { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 1 3; opacity: .7; }
+  .ec-ref-l { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; opacity: .8; }
+  .ec-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .ec-line.es { stroke: var(--ink); }
+  .ec-line.ref { stroke: var(--muted); stroke-dasharray: 5 4; }
+  .ec-dot { fill: var(--ink); stroke: var(--bg); stroke-width: 2; }
+  .ec-end { font-family: var(--mono); font-size: 10.5px; font-weight: 700; fill: var(--ink); }
+  .ec-end.ref { font-weight: 400; fill: var(--muted); }
+  .ec-cross { stroke: var(--ink); stroke-width: 1; opacity: 0; pointer-events: none; }
+  .ec-cross.on { opacity: .45; }
+  .ec-hit { fill: transparent; }
+  .ec-tip { position: absolute; top: 4px; z-index: 2; transform: translateX(10px); padding: 6px 9px; font-size: 12px; line-height: 1.45; white-space: nowrap; color: var(--ink); background: var(--panel); border: 1px solid var(--panel-line); border-radius: 8px; box-shadow: 0 4px 14px rgb(0 0 0 / .12); pointer-events: none; }
+  .ec-tip.left { transform: translateX(calc(-100% - 10px)); }
+  .ec-tip[hidden] { display: none; }
+
+  .ec-hitos { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0; font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .ec-hitos small { color: var(--muted); }
+  .ec-arrow { color: var(--muted); }
+  .ec-hitos-ue { margin-left: auto; color: var(--muted); }
+  .ec-more { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); }
+  .ec-more summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--accent); }
+  .ec-more p { margin: 8px 0 0; }
+  .ec-more b { color: var(--ink); }
+  .ec-ojo { padding: 6px 10px; background: var(--panel-2); border-radius: 8px; }
+  .ec-table-wrap { margin-top: 8px; max-height: 220px; overflow-y: auto; }
+  .ec-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+  .ec-table th, .ec-table td { padding: 3px 8px; text-align: right; border-bottom: 1px solid var(--panel-line); }
+  .ec-table th[scope='row'], .ec-table thead th:first-child { text-align: left; font-weight: 400; color: var(--muted); }
+  .ec-table thead th { position: sticky; top: 0; background: var(--bg); font-weight: 600; color: var(--muted); }
+  .ec-src { font-size: 12px; color: var(--muted); }
+  .ec-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+</style>
