@@ -5,7 +5,10 @@ import { categorias, eventos, gobiernos, type Categoria } from '../../data/polit
 import { partidos } from '../../data/politica/partidos';
 import { fecha } from '../../lib/politica';
 
-const W = 1000;
+// Escala: la de cuando la franja empezaba en 2011 (16 años en el ancho del panel). De 1975 a 2026
+// mide 52/16 del panel, así que se desliza y arranca mostrando los años más recientes.
+const ANIOS_VISIBLES = 16;
+const W = 1000 * (52 / ANIOS_VISIBLES);
 const inicio = Date.UTC(1975, 0, 1);
 const fin = Date.UTC(2027, 0, 1);
 const x = (iso: string) => {
@@ -28,20 +31,27 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
 ---
 <div class="lt" data-lt>
   <figure class="lt-strip">
-    <svg viewBox={`0 0 ${W} 186`} role="img" aria-label="Línea temporal de 1975 a 2026: quién gobernaba y hechos principales">
+    <div class="lt-jump" role="group" aria-label="Ir a un presidente">
+      <span class="lt-jump-l">Ir a:</span>
+      {mandatos.map((m) => <button type="button" class="lt-jump-b" data-lt-ir={(x(m.desde) / W).toFixed(4)}>{m.presidente}</button>)}
+      <button type="button" class="lt-jump-b" data-lt-ir="1">Hoy</button>
+      <span class="lt-jump-hint" aria-hidden="true">← desliza →</span>
+    </div>
+    <div class="lt-scroll" data-lt-scroll tabindex="0" aria-label="Franja de 1975 a 2026, desplazable en horizontal">
+    <svg style={`--escala: ${(52 / ANIOS_VISIBLES) * 100}%`} viewBox={`0 0 ${W} 186`} role="img" aria-label="Línea temporal de 1975 a 2026: quién gobernaba y hechos principales">
       {gobiernos.map((g) => (
         <g>
           <rect x={x(g.desde)} y="10" width={Math.max(1, x(g.hasta) - x(g.desde) - 1)} height="40" rx="4" style={`fill: ${g.color ?? color.get(g.partido)}`} class:list={['lt-gov', { funciones: g.forma.startsWith('En funciones') }]}><title>{g.presidente}: {g.forma}</title></rect>
         </g>
       ))}
       {/* Nombre del presidente si cabe; si no, se ve al pasar el ratón por su tramo. */}
-      {mandatos.filter((m) => x(m.hasta) - x(m.desde) > 70).map((m) => (
+      {mandatos.filter((m) => x(m.hasta) - x(m.desde) > m.presidente.length * 11 + 14).map((m) => (
         <text x={x(m.desde) + 6} y="37" class="lt-gov-t">{m.presidente}</text>
       ))}
       {anios.map((a) => (
         <g>
-          <line x1={x(`${a}-01-01`)} x2={x(`${a}-01-01`)} y1="56" y2="166" class:list={['lt-tick', { mayor: a % 5 === 0 }]} />
-          {a % 5 === 0 && <text x={x(`${a}-01-01`)} y="182" class="lt-year">{a}</text>}
+          <line x1={x(`${a}-01-01`)} x2={x(`${a}-01-01`)} y1="56" y2="166" class="lt-tick" />
+          <text x={x(`${a}-07-01`)} y="182" class="lt-year">{a}</text>
         </g>
       ))}
       {/* Los hechos clave, al final: se dibujan encima de los que caen en la misma fecha. */}
@@ -60,6 +70,7 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
         ><title>{fechaEvento(e.fecha)} · {e.titulo}</title></circle>
       ))}
     </svg>
+    </div>
     <figcaption>Arriba, quién gobernaba (más claro, en funciones; pasa el ratón para ver si en minoría o en coalición). Debajo, un punto por hecho, en una fila por categoría; los grandes son los que marcan la legislatura.</figcaption>
   </figure>
 
@@ -109,6 +120,46 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
   for (const root of document.querySelectorAll<HTMLElement>('[data-lt]')) {
     const items = [...root.querySelectorAll<HTMLElement>('.lt-item')];
     const dots = [...root.querySelectorAll<SVGCircleElement>('.lt-dot')];
+    const scroller = root.querySelector<HTMLElement>('[data-lt-scroll]')!;
+
+    // Deslizar: rueda o trackpad de serie; con el ratón, arrastrando. Arranca en lo más reciente
+    // en cuanto la pestaña se hace visible (antes no tiene ancho).
+    const ir = (frac: number, suave = true) =>
+      scroller.scrollTo({ left: frac * scroller.scrollWidth - (frac >= 1 ? 0 : 12), behavior: suave ? 'smooth' : 'auto' });
+    let colocado = false;
+    new ResizeObserver(() => {
+      if (!colocado && scroller.clientWidth > 0) {
+        ir(1, false);
+        colocado = true;
+      }
+    }).observe(scroller);
+    for (const b of root.querySelectorAll<HTMLButtonElement>('[data-lt-ir]')) b.addEventListener('click', () => ir(+b.dataset.ltIr!));
+    let arrastre: { x: number; left: number; movido: boolean } | null = null;
+    scroller.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button === 0) arrastre = { x: e.clientX, left: scroller.scrollLeft, movido: false };
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!arrastre) return;
+      const dx = e.clientX - arrastre.x;
+      if (Math.abs(dx) > 4) arrastre.movido = true;
+      if (arrastre.movido) {
+        scroller.scrollLeft = arrastre.left - dx;
+        scroller.classList.add('arrastrando');
+      }
+    });
+    window.addEventListener('pointerup', () => {
+      // Si se ha arrastrado, el clic que viene después no abre ningún hecho.
+      if (arrastre?.movido) scroller.addEventListener('click', (e) => e.stopPropagation(), { capture: true, once: true });
+      arrastre = null;
+      scroller.classList.remove('arrastrando');
+    });
+    // Al abrir un hecho desde la lista, su punto se centra en la franja.
+    const centra = (ev: string) => {
+      const d = dots.find((x) => x.dataset.ev === ev);
+      if (!d) return;
+      const r = d.getBoundingClientRect(), c = scroller.getBoundingClientRect();
+      if (r.left < c.left || r.right > c.right) scroller.scrollBy({ left: r.left - c.left - c.width / 2, behavior: 'smooth' });
+    };
     const cats = [...root.querySelectorAll<HTMLButtonElement>('[data-lt-cat]')];
     const q = root.querySelector<HTMLInputElement>('[data-lt-q]')!;
     const soloClave = root.querySelector<HTMLButtonElement>('[data-lt-clave]')!;
@@ -145,6 +196,7 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
       columna?.classList.toggle('con-ficha', !!ev);
       if (!ev) return;
       if (desdePunto) items.find((i) => i.dataset.ev === ev)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      else centra(ev);
       if (matchMedia('(max-width: 1180px)').matches) ficha.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
@@ -180,13 +232,21 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
 <style>
   .lt { display: flex; flex-direction: column; gap: 12px; }
   .lt-strip { margin: 0; padding: 12px 14px 10px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
-  .lt-strip svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .lt-scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; cursor: grab; padding-bottom: 4px; }
+  .lt-scroll.arrastrando { cursor: grabbing; user-select: none; }
+  .lt-scroll.arrastrando .lt-dot { pointer-events: none; }
+  .lt-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .lt-strip svg { display: block; width: var(--escala); height: auto; overflow: visible; }
+  .lt-jump { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-bottom: 10px; font-size: 12px; }
+  .lt-jump-l { font-family: var(--mono); color: var(--muted); }
+  .lt-jump-b { padding: 3px 9px; font: inherit; font-size: 12px; font-weight: 600; color: var(--ink); background: var(--panel); border: 1px solid var(--panel-line); border-radius: 999px; cursor: pointer; }
+  .lt-jump-b:hover { border-color: var(--accent); color: var(--accent); }
+  .lt-jump-hint { margin-left: auto; font-family: var(--mono); color: var(--muted); }
   .lt-gov { opacity: .92; }
   .lt-gov.funciones { opacity: .45; }
   .lt-gov-t { font-family: var(--display); font-size: 19px; font-weight: 800; fill: #fff; pointer-events: none; }
   .lt-tick { stroke: var(--panel-line); }
-  .lt-year { font-family: var(--mono); font-size: 16px; fill: var(--muted); text-anchor: middle; }
-  .lt-tick:not(.mayor) { opacity: .35; }
+  .lt-year { font-family: var(--mono); font-size: 13px; fill: var(--muted); text-anchor: middle; }
   .lt-dot { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; transition: opacity .2s; }
   .lt-dot.clave { stroke: var(--ink); stroke-width: 1.8; }
   .lt-dot:hover, .lt-dot:focus-visible { stroke: var(--ink); stroke-width: 2.2; outline: none; }
@@ -225,7 +285,9 @@ const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { mo
   @media (max-width: 640px) {
     .lt-item { grid-template-columns: minmax(0, 1fr); gap: 2px; }
     /* La franja no se lee encogida: se desliza en horizontal. */
-    .lt-strip { overflow-x: auto; }
-    .lt-strip svg { min-width: 1100px; }
+    .lt-strip svg { min-width: 2470px; }
+    .lt-jump-hint { display: none; }
+    .lt-jump { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .lt-jump-b, .lt-jump-l { flex: none; }
   }
 </style>
