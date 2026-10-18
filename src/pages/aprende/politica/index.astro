@@ -13,6 +13,7 @@ import TemasVista from '../../../components/aprende/TemasVista.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
 import { getArea } from '../../../data/learn';
 import { elecciones, revisadoPartidos } from '../../../data/politica/partidos';
+import { declaraciones, revisadoPactos, sinDeclaracion } from '../../../data/politica/pactos';
 import { getLessons, learnPath } from '../../../lib/learn';
 import {
   afinidadDe, diputadoPath, diputados, disputada, escanosActuales, fecha, partidoById, partidoPath, partidos, posicion, proponentes,
@@ -127,6 +128,23 @@ const jsonLd = [
           })}
         </ul>
         <p class="note">Líderes y candidaturas revisados el {fecha(revisadoPartidos, { day: 'numeric', month: 'long' })}. Las candidaturas oficiales se publican en el BOE a principios de noviembre; hasta entonces es lo anunciado por cada partido.</p>
+
+        <h2 class="ap-view-title sub">Qué han dicho sobre los pactos</h2>
+        <p class="ap-view-sub">Para ser investido hacen falta 176 votos en la primera votación, o más síes que noes en la segunda. Esto es lo que ha dicho cada partido sobre a quién apoyaría, con sus palabras y su fecha.</p>
+        <ul class="pacto-list">
+          {declaraciones.map((d) => {
+            const p = partidoById.get(d.partido)!;
+            return (
+              <li class="pacto">
+                <span class="pacto-head"><a class="pt" style={`--pc: ${p.color}`} href={partidoPath(p.id)}>{p.siglas}</a> <span class="pacto-who">{d.quien} · {fecha(d.fecha, { day: 'numeric', month: 'short' })}</span></span>
+                <p>{d.texto}</p>
+                {d.cita && <blockquote>«{d.cita}»</blockquote>}
+                <a class="pacto-src" href={d.fuente.url}>{d.fuente.titulo}</a>
+              </li>
+            );
+          })}
+        </ul>
+        <p class="note">Sin una declaración clara sobre a quién apoyarían: {sinDeclaracion.map((id) => partidoById.get(id)!.siglas).join(', ')}. Revisado el {fecha(revisadoPactos, { day: 'numeric', month: 'long' })}; en campaña las posturas cambian, y lo que digan antes de votar no obliga después.</p>
 
         <h2 class="ap-view-title sub">Con quién vota cada partido</h2>
         <div class="vhead-row afi-head">
@@ -530,6 +548,14 @@ const jsonLd = [
   .pv-toggle button[aria-pressed='true'] { color: var(--bg); background: var(--ink); }
   .ap-view-title.sub { margin-top: 30px; }
   .note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+  .pacto-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+  .pacto { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: var(--panel-2); border-radius: 12px; }
+  .pacto p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-soft); }
+  .pacto-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+  .pacto-head .pt { font-weight: 700; text-decoration: none; color: var(--ink); }
+  .pacto-who { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .pacto blockquote { margin: 0; padding-left: 10px; border-left: 3px solid var(--accent); font-size: 13.5px; font-style: italic; color: var(--ink); }
+  .pacto-src { margin-top: auto; font-size: 12px; color: var(--muted); }
 
   .pgrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
   .pcard { position: relative; display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 14px 16px 12px 18px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; color: var(--ink); font-weight: 400; text-decoration: none; overflow: hidden; transition: transform .15s, border-color .15s; }
