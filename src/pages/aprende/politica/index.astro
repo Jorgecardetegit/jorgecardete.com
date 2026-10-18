@@ -13,7 +13,7 @@ import { elecciones, revisadoPartidos } from '../../../data/politica/partidos';
 import { getLessons, learnPath } from '../../../lib/learn';
 import {
   diputadoPath, diputados, escanosActuales, fecha, partidoById, partidoPath, partidos, posicion, proponentes,
-  resultadoTexto, siglasCortas, tipos, tituloCorto, votaciones,
+  resultadoTexto, tipos, tituloCorto, votaciones,
 } from '../../../lib/politica';
 import { breadcrumbs } from '../../../lib/seo';
 
@@ -32,6 +32,27 @@ const lista = [...votaciones.clave, ...votaciones.propuestas.map((p) => ({ ...p,
 const tiposFiltro = ['investidura', 'ley', 'decreto', 'totalidad', 'veto', 'propuesta'] as const;
 const tipoLabel = (t: string) => (t === 'investidura' ? 'Investidura' : tipos[t as keyof typeof tipos]?.label ?? t);
 const tipoPlural = (t: string) => (t === 'investidura' ? 'Investiduras' : tipos[t as keyof typeof tipos]?.plural ?? t);
+
+// Resumen de una votación en una frase: solo los partidos que se salieron de la posición más
+// repetida; el resto se agrupa como «el resto». En enmiendas y vetos, «sí» es apoyar la enmienda.
+type Pos = 'S' | 'N' | 'A';
+const posTexto = (tipo: string): Record<Pos, string> =>
+  tipo === 'totalidad' ? { S: 'Apoyan la enmienda', N: 'En contra de la enmienda', A: 'Abstención' }
+  : tipo === 'veto' ? { S: 'Apoyan el veto', N: 'En contra del veto', A: 'Abstención' }
+  : { S: 'A favor', N: 'En contra', A: 'Abstención' };
+function resumen(v: (typeof lista)[number]) {
+  const grupos: Record<Pos, { id: string; div: boolean }[]> = { S: [], N: [], A: [] };
+  for (const id of conDiputados) {
+    const r = v.partidos?.[id as keyof typeof v.partidos] as number[] | undefined;
+    const pos = posicion(r) as Pos | null;
+    if (!pos || !r) continue;
+    grupos[pos].push({ id, div: [r[0], r[1], r[2]].filter((x) => x > 0).length > 1 });
+  }
+  const orden = (['S', 'N', 'A'] as Pos[]).filter((p) => grupos[p].length);
+  const mayor = [...orden].sort((a, b) => grupos[b].length - grupos[a].length)[0];
+  return { grupos, mayor, resto: orden.filter((p) => p !== mayor), textos: posTexto(v.tipo) };
+}
+const pctEsc = (n: number) => `${(n / 350) * 100}%`;
 
 const leyes = votaciones.clave.filter((c) => c.tipo === 'ley');
 const decretos = votaciones.clave.filter((c) => c.tipo === 'decreto');
@@ -194,8 +215,9 @@ const jsonLd = [
           <span class="fcount"><strong data-v-count>{lista.length}</strong> votaciones</span>
         </div>
         <div class="vlegend" aria-hidden="true">
-          <span><i class="vt vt-S">S</i> sí</span><span><i class="vt vt-N">N</i> no</span><span><i class="vt vt-A">A</i> abstención</span><span><i class="vt vt-x">½</i> partido dividido</span>
-          <span class="vlegend-parties">{conDiputados.map((id) => <b style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</b>)}</span>
+          <span class="vlegend-bar">Barra: los 350 escaños</span>
+          <span><i class="vsw vs-S"></i> sí</span><span><i class="vsw vs-N"></i> no</span><span><i class="vsw vs-A"></i> abstención</span><span><i class="vsw vs-nv"></i> no votan</span>
+          <span class="vlegend-tip">Despliega una votación para ver el voto de cada partido</span>
         </div>
         <ol class="vlist">
           {lista.map((v) => (
@@ -209,19 +231,50 @@ const jsonLd = [
                       <span class:list={['vres', v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</span>
                       {v.tipo === 'propuesta' && <span class="vprop">Propone: {proponentes(v).texto}</span>}
                     </span>
-                    <span class="vtitle">{tituloCorto(v.titulo)}</span>
+                    <span class="vtitle">{tituloCorto(v)}</span>
+                    {(() => {
+                      if (!v.partidos) return <span class="vwho muted">Sin desglose por partido</span>;
+                      const { grupos, mayor, resto, textos } = resumen(v);
+                      const nombres = (p: Pos) => grupos[p].map((x, k) => <>{k > 0 && ', '}<span class="pt" style={`--pc: ${partidoById.get(x.id)!.color}`}>{partidoById.get(x.id)!.siglas}{x.div && <em> (dividido)</em>}</span></>);
+                      return (
+                        <span class="vwho">
+                          {resto.length === 0 ? <span class={`c-${mayor}`}>Todos: {textos[mayor].toLowerCase()}</span> : (
+                            <>
+                              {resto.map((p) => <span class="vwho-g"><b class={`c-${p}`}>{textos[p]}:</b> {nombres(p)}</span>)}
+                              <span class="vwho-g vwho-rest">El resto: <b class={`c-${mayor}`}>{textos[mayor].toLowerCase()}</b>{grupos[mayor].some((x) => x.div) && <> ({grupos[mayor].filter((x) => x.div).map((x) => partidoById.get(x.id)!.siglas).join(', ')} dividido)</>}</span>
+                            </>
+                          )}
+                        </span>
+                      );
+                    })()}
                   </span>
-                  <span class="vparties">
-                    {conDiputados.map((id) => {
-                      const r = v.partidos?.[id as keyof typeof v.partidos] as number[] | undefined;
-                      const pos = posicion(r);
-                      const div = r && [r[0], r[1], r[2]].filter((x) => x > 0).length > 1;
-                      return <i class:list={['vt', pos ? `vt-${pos}` : 'vt-x']} data-s={siglasCortas[id]} title={`${partidoById.get(id)!.siglas}: ${r ? `${r[0]} sí, ${r[1]} no, ${r[2]} abst.` : 'sin desglose'}`}>{pos ? (div ? '½' : pos) : '·'}</i>;
-                    })}
+                  <span class="vbar-wrap">
+                    <span class="vbar" role="img" aria-label={`${v.totales.si} sí, ${v.totales.no} no, ${v.totales.abs} abstenciones, ${v.totales.nv} no votan`}>
+                      <i class="vs-S" style={`width: ${pctEsc(v.totales.si)}`} />
+                      <i class="vs-N" style={`width: ${pctEsc(v.totales.no)}`} />
+                      <i class="vs-A" style={`width: ${pctEsc(v.totales.abs)}`} />
+                    </span>
+                    <span class="vbar-num"><b class="c-S">{v.totales.si}</b> sí · <b class="c-N">{v.totales.no}</b> no{v.totales.abs > 0 && <> · <b class="c-A">{v.totales.abs}</b> abst.</>}</span>
                   </span>
                 </summary>
                 <div class="vdetail">
-                  <p class="vfull">{v.titulo}{v.detalle && <span> · {v.detalle}</span>}</p>
+                  {v.partidos && (
+                    <ul class="vgrid">
+                      {conDiputados.map((id) => {
+                        const r = v.partidos?.[id as keyof typeof v.partidos] as number[] | undefined;
+                        const pos = posicion(r);
+                        const div = r && [r[0], r[1], r[2]].filter((x) => x > 0).length > 1;
+                        return (
+                          <li title={r ? `${r[0]} sí, ${r[1]} no, ${r[2]} abst.` : 'sin desglose'}>
+                            <i class:list={['vt', pos ? `vt-${pos}` : 'vt-x']}>{pos ? (div ? '½' : pos) : '·'}</i>
+                            <span class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</span>
+                            {r && div && <small>{r[0]}/{r[1]}/{r[2]}</small>}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                  <p class="vfull"><span class="vfull-l">Título oficial:</span> {v.titulo}{v.detalle && <span> · {v.detalle}</span>}</p>
                   <p class="vtot"><strong>{v.totales.si}</strong> sí · <strong>{v.totales.no}</strong> no · <strong>{v.totales.abs}</strong> abstenciones · {v.totales.nv} no votan</p>
                   {'nota' in v && v.nota && <p class="vnote">{v.nota}</p>}
                   {!v.partidos && <p class="vnote">El Congreso no publica el desglose por diputado de esta votación en sus datos abiertos.</p>}
@@ -412,12 +465,20 @@ const jsonLd = [
 
   .vlegend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
   .vlegend span { display: inline-flex; align-items: center; gap: 5px; }
-  .vlegend-parties { margin-left: auto; display: inline-grid !important; grid-auto-flow: column; grid-auto-columns: 22px; gap: 3px !important; }
-  .vlegend-parties b { font-size: 8.5px; font-weight: 600; text-align: center; color: var(--muted); border-bottom: 2px solid var(--pc); line-height: 1.4; overflow: hidden; white-space: nowrap; }
+  .vlegend-bar { font-family: var(--mono); }
+  .vlegend-tip { margin-left: auto; }
+  .vsw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+  .vs-S { background: var(--green); }
+  .vs-N { background: var(--red); }
+  .vs-A { background: var(--gold); }
+  .vs-nv { background: var(--panel-2); border: 1px solid var(--panel-line); }
+  .c-S { color: var(--green); }
+  .c-N { color: var(--red); }
+  .c-A { color: color-mix(in srgb, var(--gold) 70%, var(--ink)); }
   .vlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
   .vlist li[hidden] { display: none; }
   .vitem { border-bottom: 1px solid var(--panel-line); }
-  .vitem summary { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 9px 6px; cursor: pointer; list-style: none; }
+  .vitem summary { display: grid; grid-template-columns: 78px minmax(0, 1fr) 190px; align-items: center; gap: 16px; padding: 11px 6px; cursor: pointer; list-style: none; }
   .vitem summary::-webkit-details-marker { display: none; }
   .vitem summary:hover { background: var(--panel-2); }
   .vdate { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
@@ -429,8 +490,22 @@ const jsonLd = [
   .vres.ko { color: var(--red); }
   .vprop { color: var(--muted); }
   .vtitle { font-size: 14px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .vparties { display: grid; grid-auto-flow: column; grid-auto-columns: 22px; gap: 3px; }
-  .vdetail { padding: 2px 6px 14px 96px; font-size: 13.5px; line-height: 1.5; color: var(--text-soft); }
+  .vtitle { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .vwho { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 12.5px; color: var(--text-soft); }
+  .vwho .pt { font-weight: 500; }
+  .vwho .pt em { font-style: normal; color: var(--muted); }
+  .vwho-g b { font-weight: 600; }
+  .vwho-rest { color: var(--muted); }
+  .vbar-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .vbar { display: flex; height: 10px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+  .vbar i { display: block; height: 100%; }
+  .vbar-num { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .vbar-num b { font-weight: 700; }
+  .vgrid { display: flex; flex-wrap: wrap; gap: 6px 14px; list-style: none; margin: 4px 0 12px; padding: 0; }
+  .vgrid li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+  .vgrid small { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .vfull-l { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .vdetail { padding: 2px 6px 14px 110px; font-size: 13.5px; line-height: 1.5; color: var(--text-soft); }
   .vdetail p { margin: 0 0 6px; }
   .vtot strong { color: var(--ink); }
   .vnote { color: var(--muted); }
@@ -446,11 +521,9 @@ const jsonLd = [
     .drow { grid-template-columns: minmax(0, 1fr) 70px; }
     .drow > :nth-child(2), .drow > :nth-child(3), .drow > :nth-child(5) { display: none; }
     .vitem summary { grid-template-columns: minmax(0, 1fr); }
-    .vparties { grid-auto-columns: 24px; overflow-x: auto; padding-bottom: 12px; }
-    /* Sin la leyenda de arriba: cada casilla lleva debajo las siglas de su partido. */
-    .vparties i { position: relative; }
-    .vparties i::after { content: attr(data-s); position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 1px; font-size: 8px; font-weight: 600; color: var(--muted); }
+    .vitem summary { gap: 8px; }
+    .vdate { order: -1; }
     .vdetail { padding-left: 6px; }
-    .vlegend-parties { display: none !important; }
+    .vlegend-tip { margin-left: 0; }
   }
 </style>

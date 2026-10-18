@@ -110,7 +110,7 @@ const vistas = temas.map((tema) => {
                     <tr hidden={j >= 12}>
                       <th scope="row">
                         <span class="tv-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)}{v.tipo === 'propuesta' ? ` de ${proponentes(v).texto}` : ''} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
-                        <span class="tv-vt">{tituloCorto(v.titulo)}</span>
+                        <span class="tv-vt">{tituloCorto(v)}</span>
                       </th>
                       {orden.map((id) => {
                         const r = (v.partidos as Record<string, number[]> | null)?.[id];

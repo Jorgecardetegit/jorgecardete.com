@@ -2,6 +2,7 @@
 import diputadosData from '../data/politica/diputados.json';
 import votacionesData from '../data/politica/votaciones.json';
 import { partidos, type Partido } from '../data/politica/partidos';
+import { titulosLlanos } from '../data/politica/titulos-llanos';
 
 const base = '/aprende/politica/';
 export const partidoPath = (id: string) => `${base}partidos/${id}/`;
@@ -67,15 +68,44 @@ export const fechaCongreso = (s: string) => {
   return fecha(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`);
 };
 
-/** Título corto de una iniciativa: sin «Votación del dictamen del», «Proyecto de Ley» se queda. */
-export const tituloCorto = (t: string) =>
-  t
+const meses = 'enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre';
+
+/** Limpia un título oficial: sin trámite, proponente, número y fecha de la norma ni referencias legales. */
+function limpiarTitulo(t: string): string {
+  let s = t
+    .replace(/^Votaci[oó]n (conjunta )?de (la|las) enmiendas? a la totalidad de (devolución|texto alternativo) (al|a la) /i, '')
     .replace(/^Votaci[oó]n (del|de la|de) (nuevo )?(dictamen|conjunto)( del texto)?( del| de la)? /i, '')
-    .replace(/^Votaci[oó]n de la enmienda a la totalidad de (devolución|texto alternativo) (al|a la) /i, '')
-    .replace(/^Del Grupo Parlamentario [^,]+, /, '')
-    .replace(/^Proposición de Ley del Grupo Parlamentario [^,]+, /, 'Proposición de Ley ')
+    .replace(/,? presentadas? por (el|los) Grupos? Parlamentarios? .*$/i, '')
+    .replace(/^Proposición de Ley (del|de los) (Grupos? Parlamentarios?|Parlamento|Asamblea|Sr\.|Sra\.) [^,]+, /i, 'Proposición de Ley ')
+    .replace(/^(Del|De los) (Grupos? Parlamentarios?|Parlamento|Asamblea|Sr\.|Sra\.) [^,]+, /i, '')
+    .replace(/,? (por tramitarse|teniendo en cuenta|por tener la misma).*$/i, '')
+    .replace(/ \((antes denominad[ao]|corresponde a)[^)]*\)/gi, '')
+    .replace(/ \(Orgánica\)/gi, '')
     .replace(/\.$/, '')
-    .replace(/^./, (c) => c.toUpperCase());
+    .replace(/^Real Decreto-ley \d+\/\d{4}, de \d+ de \w+, /i, '')
+    .replace(/^(Proyecto|Proposición) de Ley( Orgánica)?( básica)?\s*/i, '')
+    .replace(/^Proposición de reforma (del|de la|de los) /i, 'Reforma $1 ');
+  // «por la que se modifica la Ley X, para Y» → «Y».
+  const para = s.match(/^(?:por (?:la|el) que se (?:modifica|modifican|reforma)|de (?:modificación|reforma) de)\b.*?,? para (?:su |la |el )?(.+)$/i);
+  if (para && para[1].length > 25) s = para[1];
+  s = s
+    .replace(/^por (el|la) que se (aprueban?|adoptan?|establecen?|regulan?|crean?|declaran?|prorrogan?|garantiza|amplía|autoriza)\s+/i, (_m, _a, v: string) =>
+      /prorrog/i.test(v) ? 'Prórroga de ' : /amplía/i.test(v) ? 'Ampliar ' : /autoriza/i.test(v) ? 'Autorizar ' : /crean?/i.test(v) ? 'Crear ' : '')
+    .replace(/^por (el|la) que se modifica(n)? (el|la|los|las) /i, 'Reforma de $3 ')
+    .replace(/^Orgánica /, '')
+    .replace(/^(relativa a|sobre|de|para|del) (la |el |los |las )?/i, '')
+    .replace(/^Reforma de el /, 'Reforma del ')
+    .replace(new RegExp(`, de \\d+ de (${meses})( de \\d{4})?,?`, 'gi'), '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return s.replace(/^./, (c) => c.toUpperCase());
+}
+
+/**
+ * Titular llano de una votación: el escrito a mano en titulos-llanos.ts si lo hay; si no, el título
+ * oficial limpio. El título oficial completo se sigue mostrando al desplegar.
+ */
+export const tituloCorto = (v: { id?: string; titulo: string }) => (v.id && titulosLlanos[v.id]) || limpiarTitulo(v.titulo);
 
 export { partidos };
 

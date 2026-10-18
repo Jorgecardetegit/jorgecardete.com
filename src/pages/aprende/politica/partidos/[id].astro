@@ -117,7 +117,7 @@ const jsonLd = [
                   <span class:list={['vt', `vt-${pos}`]} title={r ? `${r[0]} sí, ${r[1]} no, ${r[2]} abst.` : undefined}>{div ? '½' : pos}</span>
                   <span class="plist-body">
                     <span class="plist-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
-                    <span class="plist-title">{tituloCorto(v.titulo)}</span>
+                    <span class="plist-title">{tituloCorto(v)}</span>
                   </span>
                   <span class="plist-vote">{votoTexto[pos!]}{div && r ? ` (${r[0]}/${r[1]}/${r[2]})` : ''}</span>
                 </li>
@@ -142,7 +142,7 @@ const jsonLd = [
                 <span class:list={['vres-dot', x.resultado === 'aprobada' ? 'ok' : 'ko']} aria-hidden="true" />
                 <span class="plist-body">
                   <span class="plist-meta">{fecha(x.fecha)} · <b class:list={[x.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto('propuesta', x.resultado)}</b>{proponentes(x).partidos.length > 1 && ` · junto a ${proponentes(x).texto}`}</span>
-                  <span class="plist-title">{tituloCorto(x.titulo)}</span>
+                  <span class="plist-title">{tituloCorto(x)}</span>
                 </span>
                 <span class="mini">
                   {orden.map((id) => {

@@ -97,7 +97,7 @@ const jsonLd = [
               <span class:list={['vt', `vt-${voto}`]}>{voto}</span>
               <span class="plist-body">
                 <span class="plist-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)} · su partido votó «{votoTexto[delPartido!]}»</span>
-                <span class="plist-title">{tituloCorto(v.titulo)}</span>
+                <span class="plist-title">{tituloCorto(v)}</span>
               </span>
             </li>
           ))}
@@ -115,7 +115,7 @@ const jsonLd = [
                 <span class:list={['vt', ['S', 'N', 'A'].includes(voto) ? `vt-${voto}` : 'vt-x']}>{['S', 'N', 'A'].includes(voto) ? voto : '·'}</span>
                 <span class="plist-body">
                   <span class="plist-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
-                  <span class="plist-title">{tituloCorto(v.titulo)}</span>
+                  <span class="plist-title">{tituloCorto(v)}</span>
                 </span>
                 <span class="plist-vote">{votoTexto[voto]}</span>
               </li>
