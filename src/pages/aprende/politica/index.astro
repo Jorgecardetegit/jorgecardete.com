@@ -72,10 +72,21 @@ const jsonLd = [
   <div class="ap-stage">
     <section class="ap-view ap-panel scroll" data-view-panel="partidos" aria-label="Partidos">
       <div class="pad">
-        <header class="vhead">
-          <h1 class="ap-view-title">Los partidos</h1>
-          <p class="ap-view-sub">Los que tenían escaño en el Congreso al disolverse las Cortes o eurodiputados. Misma ficha para todos.</p>
+        <header class="vhead vhead-row">
+          <div>
+            <h1 class="ap-view-title">Los partidos</h1>
+            <p class="ap-view-sub" data-pv-sub="lista">Los que tenían escaño en el Congreso al disolverse las Cortes o eurodiputados. Misma ficha para todos.</p>
+            <p class="ap-view-sub" data-pv-sub="mapa" hidden>Cada provincia es una circunscripción y reparte sus propios diputados. Cambia de capa y pulsa una provincia: su resultado de 2023 y quién la representaba aparecen a la derecha.</p>
+          </div>
+          <div class="pv-toggle" role="group" aria-label="Cómo ver los partidos">
+            <button type="button" aria-pressed="true" data-pv="lista">Todos</button>
+            <button type="button" aria-pressed="false" data-pv="mapa">Por comunidad</button>
+          </div>
         </header>
+        <div class="mapa-layout" data-pv-view="mapa" hidden>
+          <MapaEspana />
+        </div>
+        <div data-pv-view="lista">
         <ul class="pgrid">
           {porEscanos.map((p) => {
             const max = Math.max(1, ...p.resultados.map((r) => r.escanos));
@@ -116,6 +127,7 @@ const jsonLd = [
         <h2 class="ap-view-title sub">Con quién vota cada partido</h2>
         <p class="ap-view-sub">Lo que han hecho, más allá de lo que dicen: coincidencias en las votaciones de esta legislatura.</p>
         <AfinidadMatriz orden={conDiputados} />
+        </div>
       </div>
     </section>
 
@@ -126,18 +138,6 @@ const jsonLd = [
           <p class="ap-view-sub">Elige un tema: quién decide sobre él, qué han votado los partidos en esta legislatura y con quién coincide cada uno.</p>
         </header>
         <TemasVista />
-      </div>
-    </section>
-
-    <section class="ap-view ap-panel scroll" data-view-panel="mapa" aria-label="Mapa por provincias" hidden>
-      <div class="pad">
-        <header class="vhead">
-          <h2 class="ap-view-title">España, provincia a provincia</h2>
-          <p class="ap-view-sub">Cada provincia es una circunscripción y reparte sus propios diputados. Cambia de capa y pulsa una provincia: su resultado de 2023 y quién la representaba aparecen a la derecha.</p>
-        </header>
-        <div class="mapa-layout">
-          <MapaEspana />
-        </div>
       </div>
     </section>
 
@@ -372,12 +372,27 @@ const jsonLd = [
   // Pestañas: cambian de vista sin recargar y lo recuerdan en la URL.
   const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-view-tab]')];
   const panels = [...document.querySelectorAll<HTMLElement>('[data-view-panel]')];
+  // En Partidos, «Todos» (las fichas) o «Por comunidad» (el mapa). #mapa abre el mapa.
+  const pvBotones = [...document.querySelectorAll<HTMLButtonElement>('[data-pv]')];
+  const verPartidos = (como: string) => {
+    for (const b of pvBotones) b.setAttribute('aria-pressed', String(b.dataset.pv === como));
+    for (const el of document.querySelectorAll<HTMLElement>('[data-pv-view]')) el.hidden = el.dataset.pvView !== como;
+    for (const el of document.querySelectorAll<HTMLElement>('[data-pv-sub]')) el.hidden = el.dataset.pvSub !== como;
+  };
   const open = (view: string) => {
-    if (!panels.some((p) => p.dataset.viewPanel === view)) view = 'partidos';
+    verPartidos(view === 'mapa' ? 'mapa' : 'lista');
+    if (view === 'mapa' || !panels.some((p) => p.dataset.viewPanel === view)) view = 'partidos';
     for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.viewTab === view));
     for (const p of panels) p.hidden = p.dataset.viewPanel !== view;
     document.dispatchEvent(new Event('ap:reset'));
   };
+  for (const b of pvBotones) {
+    b.addEventListener('click', () => {
+      verPartidos(b.dataset.pv!);
+      document.dispatchEvent(new Event('ap:reset'));
+      history.replaceState(null, '', b.dataset.pv === 'mapa' ? '#mapa' : location.pathname);
+    });
+  }
   for (const t of tabs) {
     t.addEventListener('click', () => {
       open(t.dataset.viewTab!);
@@ -458,6 +473,12 @@ const jsonLd = [
   .mapa-layout :global(.mapa svg) { max-height: 68vh; }
   .pad { padding: 18px 20px 26px; }
   .vhead { margin-bottom: 14px; }
+  .vhead-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 16px; }
+  [data-pv-view][hidden], [data-pv-sub][hidden] { display: none; }
+  .pv-toggle { display: inline-flex; flex: none; gap: 2px; padding: 3px; background: var(--panel-2); border-radius: 999px; }
+  .pv-toggle button { padding: 7px 15px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
+  .pv-toggle button:hover { color: var(--ink); }
+  .pv-toggle button[aria-pressed='true'] { color: var(--bg); background: var(--ink); }
   .ap-view-title.sub { margin-top: 30px; }
   .note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
 
