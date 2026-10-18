@@ -42,6 +42,22 @@ const partMin = Math.min(...Object.values(res).map((r) => r.participacion));
 const partMax = Math.max(...Object.values(res).map((r) => r.participacion));
 const pctDe = (ine: string, id: string) => res[ine].candidaturas.filter((c) => c.partido === id).reduce((s, c) => s + c.pct, 0);
 
+// Lo ajustado que fue el último escaño de 2023, con la ley D'Hondt: a quién fue y cuántos votos le
+// faltaron al siguiente partido para quitárselo. Solo si el reparto recalculado cuadra con el oficial.
+type Cand = { siglas: string; partido: string | null; votos: number; escanos: number };
+function ultimoEscano(cands: Cand[], validos: number) {
+  const listas = cands.filter((c) => c.partido && c.votos >= validos * 0.03);
+  const total = cands.reduce((n, c) => n + c.escanos, 0);
+  const cocientes = listas.flatMap((c) => Array.from({ length: total + 1 }, (_, k) => ({ c, q: c.votos / (k + 1) }))).sort((a, b) => b.q - a.q);
+  const ganan = cocientes.slice(0, total);
+  if (listas.some((c) => ganan.filter((g) => g.c === c).length !== c.escanos)) return null;
+  const ultimo = ganan.at(-1)!;
+  const rival = cocientes.slice(total).find((x) => x.c !== ultimo.c);
+  if (!rival) return null;
+  const faltan = Math.floor(ultimo.q * (rival.c.escanos + 1)) + 1 - rival.c.votos;
+  return [ultimo.c.partido, rival.c.partido, faltan] as const;
+}
+
 const formas = todas.map((f) => {
   const prov = porIne.get(f.id)!;
   const r = res[f.id];
@@ -63,6 +79,7 @@ const formas = todas.map((f) => {
       part: r.participacion,
       cands: r.candidaturas.map((c) => [c.partido ? siglas.get(c.partido) : c.siglas, c.partido, c.pct, c.escanos, c.siglas]),
       dips: (diputadosPorProvincia.get(prov.congreso) ?? []).map((d) => [d.nombre, diputadoPath(d.id), d.partido]),
+      ult: ultimoEscano(r.candidaturas as Cand[], r.validos),
     },
     // Rellenos de cada capa, calculados aquí para que el cambio de capa sea instantáneo.
     capas: {
@@ -90,6 +107,10 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
         <button type="button" aria-pressed="false" data-capa="diputados">Diputados que elige</button>
         <button type="button" aria-pressed="false" data-capa="participacion">Participación</button>
       </div>
+      <select class="mapa-select" aria-label="Tu provincia" data-prov>
+        <option value="">Busca tu provincia…</option>
+        {[...formas].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')).map((f) => <option value={f.ine}>{f.nombre}</option>)}
+      </select>
       <select class="mapa-select" aria-label="Partido" data-partido hidden>
         {conVoto.map((p) => <option value={p.id}>{p.siglas}</option>)}
       </select>
@@ -145,6 +166,7 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
   <script type="application/json" data-mapa-datos set:html={JSON.stringify({
     provs: Object.fromEntries(formas.map((f) => [f.ine, f.datos])),
     colores: Object.fromEntries(color),
+    siglas: Object.fromEntries(siglas),
     maxPct,
     minPct,
     fuente: resultados.fuente,
@@ -153,14 +175,15 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
 
 
 <script>
-  type Prov = { nombre: string; ccaa: string; d26: number; d23: number; sen: number; part: number; cands: [string, string | null, number, number, string][]; dips: [string, string, string | null][] };
+  type Prov = { nombre: string; ccaa: string; d26: number; d23: number; sen: number; part: number; cands: [string, string | null, number, number, string][]; dips: [string, string, string | null][]; ult: [string, string, number] | null };
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-mapa]')) {
-    const datos = JSON.parse(root.querySelector('[data-mapa-datos]')!.textContent!) as { provs: Record<string, Prov>; colores: Record<string, string>; maxPct: Record<string, number>; minPct: Record<string, number>; fuente: string };
+    const datos = JSON.parse(root.querySelector('[data-mapa-datos]')!.textContent!) as { provs: Record<string, Prov>; colores: Record<string, string>; siglas: Record<string, string>; maxPct: Record<string, number>; minPct: Record<string, number>; fuente: string };
     const paths = [...root.querySelectorAll<SVGElement>('.prov')];
     const fichaEl = document.querySelector<HTMLElement>('[data-mapa-ficha]');
     const columna = fichaEl?.closest<HTMLElement>('.ap-right');
     const select = root.querySelector<HTMLSelectElement>('[data-partido]');
+    const provSelect = root.querySelector<HTMLSelectElement>('[data-prov]');
     const botones = [...root.querySelectorAll<HTMLButtonElement>('[data-capa]')];
     let capa = 'ganador';
 
@@ -195,11 +218,13 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
       });
     }
     select?.addEventListener('change', pinta);
+    provSelect?.addEventListener('change', () => abre(provSelect.value || null));
 
     const fmt = (n: number) => n.toLocaleString('es-ES');
     const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
     const abre = (ine: string | null) => {
       for (const p of paths) p.classList.toggle('on', p.dataset.ine === ine);
+      if (provSelect) provSelect.value = ine ?? '';
       if (!fichaEl || root.dataset.fijo) return;
       fichaEl.hidden = !ine;
       columna?.classList.toggle('con-ficha', !!ine);
@@ -224,6 +249,7 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
           <div><strong>${p.sen}</strong><span>senadores</span></div>
           <div><strong>${fmt(p.part)} %</strong><span>participación en 2023</span></div>
         </div>
+        ${p.ult ? `<p class="mf-ult">En 2023, el último escaño fue para <b>${esc(datos.siglas[p.ult[0]])}</b>; a <b>${esc(datos.siglas[p.ult[1]])}</b> le faltaron <b>${fmt(p.ult[2])} votos</b> para quitárselo.</p>` : ''}
         <div class="mf-bar" aria-hidden="true">${barras}</div>
         <div class="mf-cols">
           <div><h4>Resultado de 2023</h4><ol class="mf-res">${filas}</ol></div>
