@@ -1,0 +1,304 @@
+---
+import Aprende from '../../../../layouts/Aprende.astro';
+import AfinidadMatriz from '../../../../components/aprende/AfinidadMatriz.astro';
+import { getArea } from '../../../../data/learn';
+import { elecciones, revisadoPartidos, type Partido } from '../../../../data/politica/partidos';
+import { getLessons, learnPath } from '../../../../lib/learn';
+import {
+  diputadoPath, diputados, escanosActuales, fecha, partidoById, partidoPath, partidos, posicion, proponentes,
+  resultadoTexto, tipos, tituloCorto, votaciones, votoTexto,
+} from '../../../../lib/politica';
+import { breadcrumbs } from '../../../../lib/seo';
+
+export function getStaticPaths() {
+  return partidos.map((p) => ({ params: { id: p.id }, props: { partido: p } }));
+}
+
+interface Props { partido: Partido }
+const { partido: p } = Astro.props;
+const area = getArea('politica')!;
+const lessons = await getLessons(area.id, area.sections.map((s) => s.id));
+
+const suyos = diputados.filter((d) => d.partido === p.id);
+const porProvincia = [...Map.groupBy(suyos, (d) => d.provincia)].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'es'));
+const datos = (votaciones.partidos as Record<string, { afinidad: Record<string, number>; cohesion: number; votaciones: number }>)[p.id];
+const afines = datos
+  ? Object.entries(datos.afinidad).sort((a, b) => b[1] - a[1]).map(([id, v]) => ({ id, v }))
+  : [];
+const orden = [...partidos].sort((a, b) => escanosActuales(b.id) - escanosActuales(a.id)).map((x) => x.id).filter((id) => escanosActuales(id) > 0);
+
+// Sus votaciones: las clave, de la más reciente a la más antigua, con su posición.
+const tipoLabel = (t: string) => (t === 'investidura' ? 'Investidura' : tipos[t as keyof typeof tipos]?.label ?? t);
+const suyasClave = [...votaciones.clave]
+  .reverse()
+  .map((v) => ({ v, r: (v.partidos as Record<string, number[]> | null)?.[p.id] }))
+  .filter(({ r }) => r && r[0] + r[1] + r[2] > 0);
+const propias = [...votaciones.propuestas].reverse().filter((x) => proponentes(x).partidos.includes(p.id));
+const enMixto = ['podemos', 'bng', 'cc', 'upn'].includes(p.id);
+const max = Math.max(1, ...p.resultados.map((r) => r.escanos));
+
+const site = Astro.site!;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'PoliticalParty',
+    name: p.nombre,
+    alternateName: p.siglas,
+    foundingDate: String(p.fundacion),
+    ...(p.web && { url: p.web }),
+  },
+  breadcrumbs([
+    { name: 'Aprende', url: new URL(learnPath, site) },
+    { name: area.title, url: new URL('/aprende/politica/', site) },
+    { name: p.nombre, url: new URL(Astro.url.pathname, site) },
+  ]),
+];
+---
+<Aprende title={`${p.siglas}: ${p.nombre}`} description={`${p.nombre}: resultados, líder, candidatura al 29-N, cómo ha votado en la XV legislatura, qué leyes ha propuesto y sus diputados.`} jsonLd={jsonLd} area={area} lessons={lessons} section="partidos" current={p.id}>
+  <article class="ap-panel page" style={`--pc: ${p.color}`}>
+    <header class="phead">
+      <div class="phead-band" aria-hidden="true"></div>
+      <p class="kicker"><a href="/aprende/politica/">Partidos</a> · {p.ambito} · desde {p.fundacion}</p>
+      <h1>{p.siglas}{p.siglas !== p.nombre && <span>{p.nombre}</span>}</h1>
+      <p class="lead">{p.resumen}</p>
+      <div class="facts">
+        <div><span>Líder</span><strong>{p.lider.nombre}</strong><small>{p.lider.cargo}</small></div>
+        <div><span>Candidatura al 29-N</span><strong>{p.candidatura.texto.split(',')[0]}</strong><small>{p.candidatura.estado === 'por confirmar' ? 'Pendiente de anunciar' : p.candidatura.texto.includes(',') ? p.candidatura.texto.split(',').slice(1).join(',').trim() : 'Anunciada por el partido'}</small></div>
+        <div><span>Diputados al disolverse</span><strong>{suyos.length || 'Ninguno'}</strong><small>{datos ? `votó unido el ${Math.round(datos.cohesion)} % de las veces` : 'sin escaño en el Congreso'}</small></div>
+      </div>
+    </header>
+
+    <section class="block">
+      <h2>Resultados</h2>
+      {p.resultados.length > 0 ? (
+        <div class="bars" role="img" aria-label={`Escaños en el Congreso: ${p.resultados.map((r) => `${r.eleccion}, ${r.escanos}`).join('; ')}`}>
+          {elecciones.map((e) => {
+            const r = p.resultados.find((x) => x.eleccion === e.id);
+            return (
+              <div class="bar">
+                <span class="bar-v">{r ? r.escanos : '—'}</span>
+                <span class="bar-track"><i style={`height: ${r ? Math.max(3, (r.escanos / max) * 100) : 0}%`} /></span>
+                <span class="bar-l">{e.label}</span>
+                {r?.como && <span class="bar-como">{r.como}</span>}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="muted">No se ha presentado al Congreso con estas siglas.</p>
+      )}
+      <p class="muted small">
+        Escaños en el Congreso.{p.voto2023 && ` En 2023 obtuvo el ${p.voto2023.toLocaleString('es-ES')} % de los votos válidos.`}
+        {p.europa2024 && ` En las europeas de 2024: ${p.europa2024.escanos} ${p.europa2024.escanos === 1 ? 'escaño' : 'escaños'} y el ${p.europa2024.pct.toLocaleString('es-ES')} %${p.europa2024.como ? ` (${p.europa2024.como})` : ''}.`}
+        {' '}Fuente: Ministerio del Interior.
+      </p>
+    </section>
+
+    <section class="block">
+      <h2>Qué ha votado</h2>
+      {suyasClave.length > 0 ? (
+        <>
+          <p class="muted">Su posición mayoritaria en las votaciones clave de la legislatura (de la más reciente a la más antigua). «½» indica que sus diputados se dividieron. En una enmienda a la totalidad, votar «sí» es querer tumbar el texto; en un veto del Senado, votar «sí» es levantar el veto.</p>
+          <ol class="plist" data-more-list>
+            {suyasClave.map(({ v, r }, i) => {
+              const pos = posicion(r);
+              const div = r && [r[0], r[1], r[2]].filter((x) => x > 0).length > 1;
+              return (
+                <li hidden={i >= 12}>
+                  <span class:list={['vt', `vt-${pos}`]} title={r ? `${r[0]} sí, ${r[1]} no, ${r[2]} abst.` : undefined}>{div ? '½' : pos}</span>
+                  <span class="plist-body">
+                    <span class="plist-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
+                    <span class="plist-title">{tituloCorto(v.titulo)}</span>
+                  </span>
+                  <span class="plist-vote">{votoTexto[pos!]}{div && r ? ` (${r[0]}/${r[1]}/${r[2]})` : ''}</span>
+                </li>
+              );
+            })}
+          </ol>
+          {suyasClave.length > 12 && <button type="button" class="more" data-more>Ver las {suyasClave.length}</button>}
+        </>
+      ) : (
+        <p class="muted">Sin diputados en el Congreso en esta legislatura.</p>
+      )}
+    </section>
+
+    <section class="block">
+      <h2>Qué ha propuesto</h2>
+      {propias.length > 0 ? (
+        <>
+          <p class="muted">Proposiciones de ley que llevó al Pleno y si el Congreso aceptó tramitarlas. Al lado, cómo votó el resto.</p>
+          <ol class="plist props" data-more-list>
+            {propias.map((x, i) => (
+              <li hidden={i >= 10}>
+                <span class:list={['vres-dot', x.resultado === 'aprobada' ? 'ok' : 'ko']} aria-hidden="true" />
+                <span class="plist-body">
+                  <span class="plist-meta">{fecha(x.fecha)} · <b class:list={[x.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto('propuesta', x.resultado)}</b>{proponentes(x).partidos.length > 1 && ` · junto a ${proponentes(x).texto}`}</span>
+                  <span class="plist-title">{tituloCorto(x.titulo)}</span>
+                </span>
+                <span class="mini">
+                  {orden.map((id) => {
+                    const r = (x.partidos as Record<string, number[]> | null)?.[id];
+                    const pos = posicion(r);
+                    return <i class:list={['vt', pos ? `vt-${pos}` : 'vt-x']} title={`${partidoById.get(id)!.siglas}: ${pos ? votoTexto[pos] : 'sin datos'}`}>{pos ?? '·'}</i>;
+                  })}
+                </span>
+              </li>
+            ))}
+          </ol>
+          {propias.length > 10 && <button type="button" class="more" data-more>Ver las {propias.length}</button>}
+        </>
+      ) : enMixto ? (
+        <p class="muted">Sus diputados están en el Grupo Mixto, y los datos oficiales atribuyen sus proposiciones de ley al grupo sin decir qué diputado las firma. Por eso no se pueden asignar a este partido con seguridad.</p>
+      ) : (
+        <p class="muted">No llevó proposiciones de ley propias al Pleno en esta legislatura.</p>
+      )}
+      <p class="muted small">El programa electoral para el 29-N se añadirá cuando el partido lo publique.</p>
+    </section>
+
+    {datos && (
+      <section class="block">
+        <h2>Con quién vota</h2>
+        <AfinidadMatriz orden={orden} destacar={p.id} />
+      </section>
+    )}
+
+    {suyos.length > 0 && (
+      <section class="block">
+        <h2>Sus diputados <span class="count">{suyos.length}</span></h2>
+        <div class="provs">
+          {porProvincia.map(([prov, ds]) => (
+            <div class="prov">
+              <h3>{prov} <span>{ds.length}</span></h3>
+              <ul>{ds.map((d) => <li><a href={diputadoPath(d.id)}>{d.nombre}</a></li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+
+  <Fragment slot="aside">
+    <section class="ap-card ap-panel" style={`--pc: ${p.color}`}>
+      <div class="side-label">Ficha</div>
+      <dl class="ficha">
+        <dt>Nombre</dt><dd>{p.nombre}</dd>
+        <dt>Ámbito</dt><dd>{p.ambito}</dd>
+        <dt>Fundación</dt><dd>{p.fundacion}</dd>
+        <dt>Líder</dt><dd>{p.lider.nombre}<br /><small>{p.lider.cargo}</small></dd>
+        {p.web && <><dt>Web</dt><dd><a href={p.web} rel="noopener">{p.web.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}</a></dd></>}
+      </dl>
+      <p class="tiny">Líder y candidatura revisados el {fecha(revisadoPartidos, { day: 'numeric', month: 'long', year: 'numeric' })}.</p>
+    </section>
+
+    {afines.length > 0 && (
+      <section class="ap-card ap-panel">
+        <div class="side-label">Con quién coincide más</div>
+        <ol class="afines">
+          {afines.map(({ id, v }) => (
+            <li>
+              <a href={partidoPath(id)} class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</a>
+              <span class="afi-bar"><i style={`width: ${v}%; background: ${partidoById.get(id)!.color}`} /></span>
+              <span class="afi-v">{Math.round(v)} %</span>
+            </li>
+          ))}
+        </ol>
+        <p class="tiny">Porcentaje de las {votaciones.total.toLocaleString('es-ES')} votaciones nominales en que votaron lo mismo.</p>
+      </section>
+    )}
+
+    <section class="ap-card ap-panel">
+      <div class="side-label">Otros partidos</div>
+      <ul class="others">
+        {partidos.filter((x) => x.id !== p.id).map((x) => <li><a class="pt" style={`--pc: ${x.color}`} href={partidoPath(x.id)}>{x.siglas}</a></li>)}
+      </ul>
+    </section>
+  </Fragment>
+</Aprende>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-more]')) {
+    const list = button.previousElementSibling as HTMLElement;
+    button.addEventListener('click', () => {
+      for (const li of list.querySelectorAll<HTMLElement>('li[hidden]')) li.hidden = false;
+      button.remove();
+    });
+  }
+</script>
+
+<style>
+  .page { flex: 1; min-height: 0; overflow-y: auto; padding: 0 0 30px; }
+  .phead { position: relative; padding: 30px 32px 22px; border-bottom: 1px solid var(--panel-line); }
+  .phead-band { position: absolute; inset: 0 0 auto; height: 6px; background: var(--pc); border-radius: 16px 16px 0 0; }
+  .kicker { margin: 0 0 8px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .kicker a { font-weight: 500; text-decoration: none; }
+  h1 { margin: 0 0 10px; font-family: var(--display); font-size: clamp(34px, 4vw, 48px); font-weight: 800; line-height: 1; letter-spacing: -1.2px; }
+  h1 span { display: block; margin-top: 6px; font-size: 18px; font-weight: 600; letter-spacing: -0.2px; color: var(--text-soft); }
+  .lead { max-width: 760px; margin: 0 0 18px; font-size: 16px; line-height: 1.6; color: var(--text-soft); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+  .facts > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--panel-line); border-left: 4px solid var(--pc); border-radius: 10px; }
+  .facts span { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+  .facts strong { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1.2; }
+  .facts small { font-size: 12px; line-height: 1.35; color: var(--muted); }
+
+  .block { padding: 22px 32px 6px; }
+  .block h2 { margin: 0 0 8px; font-family: var(--display); font-size: 21px; font-weight: 800; letter-spacing: -0.4px; }
+  .count { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .muted { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--muted); max-width: 760px; }
+  .small { font-size: 12.5px; margin-top: 10px; }
+
+  .bars { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; max-width: 560px; height: 190px; }
+  .bar { display: grid; grid-template-rows: auto 1fr auto auto; justify-items: center; gap: 4px; min-width: 0; }
+  .bar-v { font-family: var(--display); font-size: 18px; font-weight: 800; }
+  .bar-track { display: flex; align-items: flex-end; width: 100%; max-width: 64px; background: var(--panel-2); border-radius: 8px 8px 0 0; }
+  .bar-track i { display: block; width: 100%; background: var(--pc); border-radius: 8px 8px 0 0; }
+  .bar-l { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .bar-como { font-size: 10.5px; line-height: 1.2; text-align: center; color: var(--muted); }
+
+  .plist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .plist li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--panel-line); }
+  .plist li[hidden] { display: none; }
+  .plist-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .plist-meta { font-size: 11.5px; color: var(--muted); }
+  .plist-meta b.ok, .ok { color: var(--green); }
+  .plist-meta b.ko, .ko { color: var(--red); }
+  .plist-title { font-size: 14px; line-height: 1.35; }
+  .plist-vote { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .vres-dot { width: 12px; height: 12px; border-radius: 50%; justify-self: center; }
+  .vres-dot.ok { background: var(--green); }
+  .vres-dot.ko { background: var(--red); }
+  .mini { display: grid; grid-auto-flow: column; grid-auto-columns: 18px; gap: 2px; }
+  .mini .vt { min-width: 18px; height: 18px; padding: 0; font-size: 9.5px; border-radius: 4px; }
+  .more { margin-top: 10px; padding: 6px 14px; font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--panel-2); border: 0; border-radius: 999px; cursor: pointer; }
+
+  .provs { columns: 3 220px; column-gap: 24px; }
+  .prov { break-inside: avoid; margin-bottom: 12px; }
+  .prov h3 { margin: 0 0 4px; font-size: 13px; font-weight: 700; }
+  .prov h3 span { font-family: var(--mono); font-weight: 400; color: var(--muted); }
+  .prov ul { list-style: none; margin: 0; padding: 0; font-size: 13.5px; line-height: 1.6; }
+  .prov a { font-weight: 500; color: var(--ink); text-decoration: none; }
+  .prov a:hover { color: var(--accent); text-decoration: underline; }
+
+  .side-label { margin-bottom: 8px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--accent); }
+  .ficha { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 13.5px; }
+  .ficha dt { color: var(--muted); }
+  .ficha dd { margin: 0; font-weight: 500; }
+  .ficha small { font-weight: 400; color: var(--muted); }
+  .ficha a { font-weight: 500; overflow-wrap: anywhere; }
+  .tiny { margin: 10px 0 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+  .afines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .afines li { display: grid; grid-template-columns: 76px minmax(0, 1fr) 42px; align-items: center; gap: 8px; font-size: 13px; }
+  .afines .pt { color: var(--ink); text-decoration: none; }
+  .afi-bar { height: 6px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+  .afi-bar i { display: block; height: 100%; border-radius: inherit; }
+  .afi-v { font-family: var(--mono); font-size: 12px; text-align: right; }
+  .others { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13px; }
+  .others a { color: var(--ink); text-decoration: none; }
+  .others a:hover { color: var(--accent); }
+
+  @media (max-width: 820px) {
+    .page { overflow: visible; }
+    .phead, .block { padding-left: 18px; padding-right: 18px; }
+    .plist li { grid-template-columns: 26px minmax(0, 1fr); }
+    .plist-vote, .mini { grid-column: 2; }
+  }
+</style>
