@@ -1,5 +1,5 @@
 // Genera src/data/politica/economia.json con los indicadores económicos de España desde 2011,
-// junto a la media de la UE (o Alemania en el bono a 10 años), a partir de la API de Eurostat.
+// junto a la media de la UE, a partir de la API de Eurostat.
 // Eurostat usa la misma metodología para todos los países, así que España y la UE se comparan
 // sin ajustes. Uso:
 //   node scripts/aprende/economia.mjs
@@ -13,20 +13,14 @@ setDefaultAutoSelectFamilyAttemptTimeout(5000);
 const API = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data';
 const DESDE = 2011;
 
-// Series anuales. `con` es la referencia con la que se compara España.
+// Series anuales. `con` es la referencia con la que se compara España (null: ninguna).
 const anuales = [
   { id: 'pib', dataset: 'nama_10_gdp', filtros: { unit: 'CLV_PCH_PRE', na_item: 'B1GQ' } },
-  { id: 'pibpc', dataset: 'prc_ppp_ind', filtros: { na_item: 'VI_PPS_EU27_2020_HAB', ppp_cat: 'GDP' }, con: null },
   { id: 'renta', dataset: 'tepsr_wc310', filtros: {} },
   { id: 'paro', dataset: 'une_rt_a', filtros: { age: 'Y15-74', sex: 'T', unit: 'PC_ACT' } },
-  { id: 'paroJoven', dataset: 'une_rt_a', filtros: { age: 'Y15-24', sex: 'T', unit: 'PC_ACT' } },
-  { id: 'empleo', dataset: 'lfsi_emp_a', filtros: { indic_em: 'EMP_LFS', age: 'Y20-64', sex: 'T', unit: 'PC_POP' } },
-  { id: 'temporal', dataset: 'lfsi_pt_a', filtros: { wstatus: 'EMP_TEMP', unit: 'PC_SAL', age: 'Y15-64', sex: 'T' } },
   { id: 'inflacion', dataset: 'prc_hicp_aind', filtros: { unit: 'RCH_A_AVG', coicop: 'CP00' } },
   { id: 'vivienda', dataset: 'prc_hpi_a', filtros: { purchase: 'TOTAL', unit: 'I15_A_AVG' } },
   { id: 'deuda', dataset: 'gov_10dd_edpt1', filtros: { na_item: 'GD', unit: 'PC_GDP', sector: 'S13' } },
-  { id: 'deficit', dataset: 'gov_10dd_edpt1', filtros: { na_item: 'B9', unit: 'PC_GDP', sector: 'S13' } },
-  { id: 'bono', dataset: 'irt_lt_mcby_a', filtros: { int_rt: 'MCBY' }, con: 'DE' },
   { id: 'pobreza', dataset: 'ilc_peps01n', filtros: { unit: 'PC', age: 'TOTAL', sex: 'T' } },
 ];
 
