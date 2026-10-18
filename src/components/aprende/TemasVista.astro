@@ -1,9 +1,11 @@
 ---
 // Vista de temas: para cada uno, quién decide, con quién coincide cada partido al votar sobre
-// ese tema, todas sus votaciones con la posición de cada partido y, cuando se publiquen, lo que
-// propone cada uno para el 29-N.
+// ese tema, todas sus votaciones con la posición de cada partido, lo que propuso cada uno en su
+// programa de 2023 (para contrastarlo con lo que votó) y, cuando se publiquen, lo que propone para
+// el 29-N.
 import AfinidadMatriz from './AfinidadMatriz.astro';
 import { temas, temasDe } from '../../data/politica/temas';
+import { programas2023, propuestas2023, sinPrograma2023 } from '../../data/politica/programas-2023';
 import {
   escanosActuales, fecha, partidoById, partidos, posicion, proponentes, resultadoTexto, siglasCortas, tipos, tituloCorto, votaciones,
 } from '../../lib/politica';
@@ -13,6 +15,9 @@ const todas = [
   ...votaciones.clave.filter((v) => v.tipo !== 'investidura'),
   ...votaciones.propuestas,
 ].map((v) => ({ v, temas: temasDe(`${v.titulo} ${v.detalle ?? ''}`) }));
+// Para 2023 cuentan todos los partidos de la lista, tengan o no escaño hoy.
+const orden2023 = [...partidos].sort((a, b) => escanosActuales(b.id) - escanosActuales(a.id)).map((p) => p.id);
+const traducidos = Object.values(programas2023).filter((p) => p.idioma).map((p) => p.idioma);
 const tipoLabel = (t: string) => tipos[t as keyof typeof tipos]?.label ?? t;
 const pct = (a: number, b: number) => (b ? Math.round((a / b) * 1000) / 10 : null);
 
@@ -66,6 +71,26 @@ const vistas = temas.map((tema) => {
             ))}
           </ul>
         )}
+      </div>
+
+      <div class="tv-block">
+        <div class="tv-label">Qué propusieron en 2023 <span class="tv-count">programas de las generales del 23-J</span></div>
+        <div class="tv-h23">
+          {orden2023.filter((id) => propuestas2023[tema.id]?.[id]).map((id) => (
+            <div class="tv-h23-p">
+              <span class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</span>
+              <ul>
+                {propuestas2023[tema.id][id].map((x) => (
+                  <li>{x.t} <a href={`${programas2023[id].url}#page=${x.p}`} target="_blank" rel="noopener" title={`${programas2023[id].titulo}, página ${x.p} del PDF`}>pág. {x.p}</a></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p class="tv-muted small">
+          Medidas concretas de cada programa, con su página. Si un partido no aparece, no hemos encontrado una propuesta concreta sobre este tema en su programa.
+          {' '}{programas2023.podemos.nota} {Object.values(sinPrograma2023).join(' ')} Los programas en {[...new Set(traducidos)].join(' y ')} están traducidos. El de Junts enlaza a una copia de Betevé porque el partido ya no lo tiene en su web.
+        </p>
       </div>
 
       <div class="tv-block">
@@ -160,6 +185,12 @@ const vistas = temas.map((tema) => {
   .tv-lessons a { font-weight: 600; text-decoration: none; }
   .tv-muted { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
   .tv-muted.small { font-size: 12.5px; margin-top: 6px; }
+  .tv-h23 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+  .tv-h23-p { padding: 10px 12px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
+  .tv-h23-p ul { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; line-height: 1.45; color: var(--text-soft); }
+  .tv-h23-p li + li { margin-top: 4px; }
+  .tv-h23-p a { font-family: var(--mono); font-size: 11px; white-space: nowrap; color: var(--muted); text-decoration: none; }
+  .tv-h23-p a:hover { color: var(--accent); }
   .tv-props { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
   .tv-grid-scroll { overflow-x: auto; }
   .tv-grid { width: 100%; border-collapse: collapse; }

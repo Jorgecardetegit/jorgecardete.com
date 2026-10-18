@@ -57,6 +57,7 @@ El panel (`/aprende/politica/`) gira en torno a las elecciones: partidos, diputa
 | `src/data/politica/votaciones.json` | Votaciones clave, propuestas, afinidad entre partidos y estadísticas por diputado | `node scripts/aprende/votaciones.mjs <carpeta con los JSON de votaciones>` |
 | `src/data/politica/resultados-2023.json` | Votos y escaños de 2023 por provincia (mapa) | `node scripts/aprende/resultados.mjs <carpeta con 03022307.DAT, 07022307.DAT y 08022307.DAT>` del `02202307_TOTA.zip` de [infoelectoral.interior.gob.es](https://infoelectoral.interior.gob.es/) |
 | `src/data/politica/votaciones-manuales.json` | Votaciones clave que el Congreso publica solo como imagen | A mano, con fuente en cada una |
+| `src/data/politica/programas-2023.ts` | Qué propuso cada partido en su programa del 23-J, tema a tema, con la página del PDF | A mano, leyendo los programas (enlaces en el propio archivo) |
 
 Los JSON de origen son los de [datos abiertos del Congreso](https://www.congreso.es/es/opendata) (diputados y votaciones por sesión). Criterio de partidos: escaño en el Congreso al disolverse las Cortes o eurodiputados.
 
@@ -65,5 +66,5 @@ Los JSON de origen son los de [datos abiertos del Congreso](https://www.congreso
 1. **Cómo funciona.** 14 lecciones de teoría. Hecho.
 2. **Partidos, diputados y votaciones.** Hecho con los datos de la XV legislatura. Pendiente: programas del 29-N cuando se publiquen y candidaturas oficiales del BOE (hacia el 3 de noviembre).
 3. **Qué ha pasado.** Línea temporal desde 2011 en `src/data/politica/linea-temporal.ts`. Hecho. Cada hecho lleva fuente (BOE, Interior, medios o Wikipedia) y enlaces a lecciones y partidos; al añadir uno nuevo, verificarlo en al menos dos fuentes.
-4. **Temas.** Hecho con las votaciones (`src/data/politica/temas.ts`: cada votación se asigna por palabras clave del título). Pendiente: `propuestas` de cada partido con los programas del 29-N, todas a la vez cuando estén publicados.
+4. **Temas.** Hecho con las votaciones (`src/data/politica/temas.ts`: cada votación se asigna por palabras clave del título) y con lo que propuso cada partido en 2023 para contrastarlo. Pendiente: `propuestas` de cada partido con los programas del 29-N, todas a la vez cuando estén publicados.
 5. **Cuando se publiquen:** candidaturas oficiales en el BOE (hacia el 3 de noviembre) y programas electorales.
