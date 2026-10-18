@@ -235,7 +235,14 @@ const jsonLd = [
                     {(() => {
                       if (!v.partidos) return <span class="vwho muted">Sin desglose por partido</span>;
                       const { grupos, mayor, resto, orden, textos } = resumen(v);
-                      const nombres = (p: Pos) => grupos[p].map((x, k) => <>{k > 0 && ', '}<span class="pt" style={`--pc: ${partidoById.get(x.id)!.color}`}>{partidoById.get(x.id)!.siglas}{x.div && <em> (dividido)</em>}</span></>);
+                      // Los dos partidos con más escaños de cada grupo; el resto, tras el botón «+N» (si son
+                      // tres, se ven los tres: un «+1» no ahorra nada).
+                      const nombres = (p: Pos) => {
+                        const visibles = grupos[p].length <= 3 ? 3 : 2;
+                        const items = grupos[p].map((x, k) => <span class:list={{ 'vwho-extra': k >= visibles }}>{k > 0 && ', '}<span class="pt" style={`--pc: ${partidoById.get(x.id)!.color}`}>{partidoById.get(x.id)!.siglas}{x.div && <em> (dividido)</em>}</span></span>);
+                        const extra = grupos[p].length - visibles;
+                        return <>{items}{extra > 0 && <button type="button" class="vwho-more" data-who-more aria-expanded="false" aria-label={`Ver ${extra} partidos más`}>+{extra}</button>}</>;
+                      };
                       return (
                         <span class="vwho">
                           {resto.length === 0 ? <span class={`c-${mayor}`}>Todos: {textos[mayor].toLowerCase()}</span>
@@ -329,6 +336,17 @@ const jsonLd = [
 </Aprende>
 
 <script>
+  // «+N» en el resumen de una votación: muestra el resto de partidos sin abrir el desplegable.
+  document.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-who-more]');
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const g = b.closest('.vwho-g')!;
+    const open = g.classList.toggle('open');
+    b.setAttribute('aria-expanded', String(open));
+    b.textContent = open ? '−' : `+${g.querySelectorAll('.vwho-extra').length}`;
+  });
   // Pestañas: cambian de vista sin recargar y lo recuerdan en la URL.
   const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-view-tab]')];
   const panels = [...document.querySelectorAll<HTMLElement>('[data-view-panel]')];
@@ -491,6 +509,9 @@ const jsonLd = [
   .vwho .pt { font-weight: 500; }
   .vwho .pt em { font-style: normal; color: var(--muted); }
   .vwho-g b { font-weight: 600; }
+  .vwho-g:not(.open) .vwho-extra { display: none; }
+  .vwho-more { margin-left: 6px; padding: 0 7px; font: inherit; font-family: var(--mono); font-size: 11px; font-weight: 600; line-height: 18px; color: var(--accent); background: var(--panel-2); border: 1px solid var(--panel-line); border-radius: 999px; cursor: pointer; }
+  .vwho-more:hover { border-color: var(--accent); }
   .vbar-wrap { display: flex; flex-direction: column; gap: 4px; }
   .vbar { display: flex; height: 10px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
   .vbar i { display: block; height: 100%; }
