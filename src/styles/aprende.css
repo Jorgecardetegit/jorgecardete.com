@@ -133,7 +133,6 @@
 .ap-theory summary::-webkit-details-marker { display: none; }
 .ap-theory summary::after { content: '+'; margin-left: auto; font-size: 15px; color: var(--muted); }
 .ap-theory[open] summary::after { content: '−'; }
-.ap-tab-soft { margin-left: 6px; color: var(--muted); background: transparent; box-shadow: none; border-style: dashed; }
 
 /* Chip de partido: punto de color y siglas. */
 .pt { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }

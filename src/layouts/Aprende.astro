@@ -101,6 +101,13 @@ const leccionAbierta = lessons.some((l) => l.id === current) || mode === 'como-f
           <details class="ap-sec ap-theory" data-sec open={leccionAbierta}>
             <summary class="ap-sec-title">Cómo funciona <span class="ap-count">{lessons.length} lecciones</span></summary>
             <ol class="ap-list">
+              <li data-search="quien elige a quien esquema poderes instituciones como funciona">
+                <a href={comoFunciona} aria-current={mode === 'como-funciona' ? 'page' : undefined}>
+                  <span class="ap-dot" aria-hidden="true" />
+                  <span class="ap-num" aria-hidden="true">🧭</span>
+                  <span class="ap-lt">Quién elige a quién (esquema)</span>
+                </a>
+              </li>
               {lessons.map((lesson, i) => (
                 <li data-search={searchLesson(lesson)}>
                   <a href={lessonPath(lesson)} aria-current={lesson.id === current ? 'page' : undefined} data-lesson-link={lesson.id}>
@@ -141,7 +148,6 @@ const leccionAbierta = lessons.some((l) => l.id === current) || mode === 'como-f
             <a class="ap-tab" href={`${base}#${t.id}`} aria-current={section === t.id ? 'page' : undefined}>{t.label}</a>
           ),
         )}
-        <a class="ap-tab ap-tab-soft" href={comoFunciona} aria-current={mode === 'como-funciona' || section === 'como-funciona' ? 'page' : undefined}>Cómo funciona</a>
         <span class="ap-countdown" data-ap-countdown>Elecciones generales: <strong>29 de noviembre de 2026</strong></span>
       </nav>
       <slot />
