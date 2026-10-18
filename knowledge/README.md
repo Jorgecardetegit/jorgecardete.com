@@ -46,9 +46,22 @@ Colores: `green`, `terracotta`, `gold`, `purple`, `red`.
 - Hechos judiciales con el estado procesal exacto.
 - Frases cortas, sin jerga; si un término técnico hace falta, se explica la primera vez.
 
-## Plan de Política en España
+## Datos de Política en España
+
+El panel (`/aprende/politica/`) gira en torno a las elecciones: partidos, diputados y votaciones. Las lecciones de esta carpeta son la referencia teórica, en `/aprende/politica/como-funciona/`.
+
+| Archivo | Qué es | De dónde sale |
+| --- | --- | --- |
+| `src/data/politica/partidos.ts` | Ficha de cada partido, líder y candidatura (con fecha de revisión) | A mano, con fuentes |
+| `src/data/politica/diputados.json` | Los 350 diputados de la legislatura, con biografía oficial | `node scripts/aprende/diputados.mjs <activos.json> <bajas.json> <histórico.json> <fecha disolución>` |
+| `src/data/politica/votaciones.json` | Votaciones clave, propuestas, afinidad entre partidos y estadísticas por diputado | `node scripts/aprende/votaciones.mjs <carpeta con los JSON de votaciones>` |
+| `src/data/politica/votaciones-manuales.json` | Votaciones clave que el Congreso publica solo como imagen | A mano, con fuente en cada una |
+
+Los JSON de origen son los de [datos abiertos del Congreso](https://www.congreso.es/es/opendata) (diputados y votaciones por sesión). Criterio de partidos: escaño en el Congreso al disolverse las Cortes o eurodiputados.
+
+## Plan
 
 1. **Cómo funciona.** 14 lecciones de teoría. Hecho.
-2. **Los partidos.** Una ficha por partido con la misma plantilla: propuestas por tema, votaciones reales (datos abiertos del Congreso), pactos y candidatos por provincia (BOE). Criterio de inclusión: partidos con escaño en el Congreso o en el Parlamento Europeo.
-3. **Qué ha pasado.** Línea temporal desde 1978, con detalle desde 2011.
-4. **Después:** matriz tema × partido, datos de contexto (INE, Eurostat) y una página de metodología.
+2. **Partidos, diputados y votaciones.** Hecho con los datos de la XV legislatura. Pendiente: programas del 29-N cuando se publiquen y candidaturas oficiales del BOE (hacia el 3 de noviembre).
+3. **Qué ha pasado.** Línea temporal desde 2011.
+4. **Temas.** Tabla tema × partido con lo que propone y lo que ha votado cada uno.
