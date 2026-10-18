@@ -1,0 +1,162 @@
+---
+// Panel de un área de /aprende/: navegación a la izquierda, contenido en el centro y
+// datos a la derecha (slot «aside»). En la portada, las pestañas cambian de vista sin
+// recargar; en las lecciones, llevan de vuelta a la portada con esa vista abierta.
+import Base from './Base.astro';
+import type { LearnArea } from '../data/learn';
+import { areaPath, lessonPath, readingMinutes, type Lesson } from '../lib/learn';
+import '../styles/aprende.css';
+
+const views = [
+  { id: 'poderes', label: 'Poderes' },
+  { id: 'mapa', label: 'Mapa' },
+  { id: 'lecciones', label: 'Lecciones' },
+] as const;
+
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: Record<string, unknown>[];
+  area: LearnArea;
+  lessons: Lesson[];
+  /** Lección abierta (en su página). */
+  current?: string;
+  /** En la portada: vista inicial y pestañas como botones. */
+  home?: boolean;
+}
+
+const { title, description, jsonLd, area, lessons, current, home = false } = Astro.props;
+const searchText = (l: Lesson) =>
+  [l.data.title, l.data.description, l.data.summary, ...l.data.keyPoints].join(' ').toLowerCase();
+---
+<Base title={title} description={description} jsonLd={jsonLd} translated={false} bare>
+  <div class="ap" style={`--accent: ${area.color}`}>
+    <aside class="ap-left ap-panel" data-ap-left>
+      <header class="ap-brand">
+        <a class="ap-logo" href={areaPath(area.id)} aria-hidden="true" tabindex="-1">{area.icon}</a>
+        <div class="ap-brand-text">
+          <a class="ap-title" href={areaPath(area.id)}>{area.title}</a>
+          <a class="ap-home" href="/">jorge.dev · aprende</a>
+        </div>
+        <button type="button" class="ap-menu" aria-expanded="false" data-ap-menu>Lecciones</button>
+      </header>
+      <p class="ap-desc">{area.description}</p>
+      <label class="ap-search">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <input type="search" placeholder="Busca: investidura, IVA, 155..." aria-label="Buscar en las lecciones" data-ap-search />
+      </label>
+
+      <div class="ap-left-scroll">
+        <nav aria-label="Lecciones">
+          {area.sections.map((section) => {
+            const items = lessons.filter((l) => l.data.section === section.id);
+            return (
+              <div class="ap-sec">
+                <div class="ap-sec-title">
+                  {section.title}
+                  {items.length > 0 && <span class="ap-count">{items.length}</span>}
+                  {section.status === 'soon' && <span class="ap-soon">pronto</span>}
+                </div>
+                {items.length > 0 ? (
+                  <ol class="ap-list">
+                    {items.map((lesson) => (
+                      <li data-search={searchText(lesson)}>
+                        <a href={lessonPath(lesson)} aria-current={lesson.id === current ? 'page' : undefined} data-lesson-link={lesson.id}>
+                          <span class="ap-dot" aria-hidden="true" />
+                          <span class="ap-num">{String(lessons.indexOf(lesson) + 1).padStart(2, '0')}</span>
+                          <span class="ap-lt">{lesson.data.title}</span>
+                          <span class="ap-min">{readingMinutes(lesson)}′</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p class="ap-sec-desc">{section.description}</p>
+                )}
+              </div>
+            );
+          })}
+          <p class="ap-noresults" hidden data-ap-noresults>Ninguna lección habla de eso todavía.</p>
+        </nav>
+      </div>
+
+      <footer class="ap-foot">
+        <div class="ap-progress">
+          <span><strong data-ap-read>0</strong> de {lessons.length} leídas</span>
+          <span class="ap-bar"><i data-ap-bar /></span>
+        </div>
+        <div class="ap-foot-row">
+          <a href="/">← jorge.dev</a>
+          <button type="button" class="theme-toggle" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar entre modo claro y oscuro">
+            <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          </button>
+        </div>
+      </footer>
+    </aside>
+
+    <main class="ap-main">
+      <nav class="ap-top" aria-label="Vistas" role={home ? 'tablist' : undefined}>
+        {views.map((v, i) =>
+          home ? (
+            <button type="button" class="ap-tab" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-view-tab={v.id}>{v.label}</button>
+          ) : (
+            <a class="ap-tab" href={`${areaPath(area.id)}#${v.id}`}>{v.label}</a>
+          ),
+        )}
+        <span class="ap-countdown" data-ap-countdown>Elecciones generales: <strong>29 de noviembre de 2026</strong></span>
+      </nav>
+      <slot />
+    </main>
+
+    <aside class="ap-right" aria-label="Datos">
+      <slot name="aside" />
+    </aside>
+  </div>
+</Base>
+
+<script>
+  import { readLessons } from '../lib/learn-progress';
+
+  // Leídas: punto verde en la lista, contador y barra.
+  const read = readLessons();
+  const links = [...document.querySelectorAll<HTMLElement>('[data-lesson-link]')];
+  for (const a of links) a.classList.toggle('is-read', read.has(a.dataset.lessonLink!));
+  for (const chip of document.querySelectorAll<HTMLElement>('[data-lesson-chip]')) {
+    chip.classList.toggle('is-read', read.has(chip.dataset.lessonChip!));
+  }
+  const done = links.filter((a) => a.classList.contains('is-read')).length;
+  document.querySelector('[data-ap-read]')!.textContent = String(done);
+  document.querySelector<HTMLElement>('[data-ap-bar]')!.style.width = `${links.length ? (done / links.length) * 100 : 0}%`;
+
+  // Buscador: filtra la lista por título, resumen y puntos clave.
+  const search = document.querySelector<HTMLInputElement>('[data-ap-search]')!;
+  const items = [...document.querySelectorAll<HTMLElement>('[data-search]')];
+  const empty = document.querySelector<HTMLElement>('[data-ap-noresults]')!;
+  const normalize = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+  search.addEventListener('input', () => {
+    const q = normalize(search.value);
+    let shown = 0;
+    for (const li of items) {
+      li.hidden = q !== '' && !normalize(li.dataset.search!).includes(q);
+      if (!li.hidden) shown++;
+    }
+    empty.hidden = shown > 0;
+  });
+
+  // Cuenta atrás hasta el 29 de noviembre de 2026 (hora peninsular).
+  const countdown = document.querySelector('[data-ap-countdown]')!;
+  const days = Math.ceil((new Date('2026-11-29T09:00:00+01:00').getTime() - Date.now()) / 86_400_000);
+  if (days > 1) countdown.innerHTML = `Elecciones generales del 29-N: faltan <strong>${days} días</strong>`;
+  else if (days === 1) countdown.innerHTML = 'Elecciones generales: <strong>mañana</strong>';
+  else if (days === 0) countdown.innerHTML = 'Elecciones generales: <strong>hoy</strong>';
+
+  // Móvil: la lista de lecciones se abre y cierra con un botón.
+  const left = document.querySelector<HTMLElement>('[data-ap-left]')!;
+  const menu = document.querySelector<HTMLButtonElement>('[data-ap-menu]')!;
+  menu.addEventListener('click', () => {
+    const open = !left.classList.contains('is-open');
+    left.classList.toggle('is-open', open);
+    menu.setAttribute('aria-expanded', String(open));
+  });
+</script>
