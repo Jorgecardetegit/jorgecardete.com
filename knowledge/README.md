@@ -58,6 +58,7 @@ El panel (`/aprende/politica/`) gira en torno a las elecciones: partidos, diputa
 | `src/data/politica/resultados-2023.json` | Votos y escaños de 2023 por provincia (mapa) | `node scripts/aprende/resultados.mjs <carpeta con 03022307.DAT, 07022307.DAT y 08022307.DAT>` del `02202307_TOTA.zip` de [infoelectoral.interior.gob.es](https://infoelectoral.interior.gob.es/) |
 | `src/data/politica/votaciones-manuales.json` | Votaciones clave que el Congreso publica solo como imagen | A mano, con fuente en cada una |
 | `src/data/politica/programas-2023.ts` | Qué propuso cada partido en su programa del 23-J, tema a tema, con la página del PDF | A mano, leyendo los programas (enlaces en el propio archivo) |
+| `src/data/politica/economia.json` | Indicadores económicos de España y la UE desde 2011 y las últimas cifras mensuales (pestaña «Economía»); los textos y el salario mínimo, en `economia.ts` | `node scripts/aprende/economia.mjs` (API de Eurostat) |
 
 Los JSON de origen son los de [datos abiertos del Congreso](https://www.congreso.es/es/opendata) (diputados y votaciones por sesión). Criterio de partidos: escaño en el Congreso al disolverse las Cortes o eurodiputados.
 
