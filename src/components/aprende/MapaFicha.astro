@@ -1,0 +1,31 @@
+---
+// Ficha de una provincia del mapa. Va en la columna derecha del panel: mientras está abierta,
+// esa columna solo la muestra a ella (clase `con-ficha` en `.ap-right`). La rellena MapaEspana.
+---
+<section class="ap-card ap-panel mapa-ficha" data-mapa-ficha aria-live="polite" hidden></section>
+
+<style>
+  .mapa-ficha { font-size: 14px; }
+  .mapa-ficha[hidden] { display: none; }
+  .mapa-ficha :global(.mf-head) { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 12px; }
+  .mapa-ficha :global(.mf-head h3) { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .mapa-ficha :global(.mf-head span) { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .mapa-ficha :global(.mf-close) { margin-left: auto; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); background: none; border: 0; cursor: pointer; }
+  .mapa-ficha :global(.mf-stats) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
+  .mapa-ficha :global(.mf-stats div) { display: flex; flex-direction: column; padding: 7px 8px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
+  .mapa-ficha :global(.mf-stats strong) { font-family: var(--display); font-size: 20px; font-weight: 800; line-height: 1.1; color: var(--accent); }
+  .mapa-ficha :global(.mf-stats span) { font-size: 11px; line-height: 1.3; color: var(--muted); }
+  .mapa-ficha :global(.mf-bar) { display: flex; height: 12px; gap: 1px; border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+  .mapa-ficha :global(.mf-cols) { display: flex; flex-direction: column; gap: 16px; }
+  .mapa-ficha :global(h4) { margin: 0 0 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); }
+  .mapa-ficha :global(.mf-res) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .mapa-ficha :global(.mf-res li) { display: grid; grid-template-columns: minmax(0, 1fr) auto 60px; align-items: baseline; gap: 2px 8px; font-size: 13px; }
+  .mapa-ficha :global(.mf-res small) { grid-column: 1; grid-row: 2; font-size: 11px; color: var(--muted); margin-top: -2px; }
+  .mapa-ficha :global(.mf-res span) { font-family: var(--mono); font-size: 12px; text-align: right; }
+  .mapa-ficha :global(.mf-res strong) { font-family: var(--mono); font-size: 12px; text-align: right; white-space: nowrap; }
+  .mapa-ficha :global(.mf-dips) { list-style: none; margin: 0; padding: 0; font-size: 13px; line-height: 1.65; }
+  .mapa-ficha :global(.mf-dips a) { display: flex; align-items: center; gap: 7px; color: var(--ink); font-weight: 400; text-decoration: none; }
+  .mapa-ficha :global(.mf-dips a:hover) { color: var(--accent); }
+  .mapa-ficha :global(.mf-dips i) { flex: none; width: 8px; height: 8px; border-radius: 2px; }
+  .mapa-ficha :global(.mf-src) { margin: 12px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+</style>

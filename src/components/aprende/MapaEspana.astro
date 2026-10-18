@@ -1,7 +1,8 @@
 ---
 // Mapa de España por provincias, dibujado al compilar (SVG, sin librerías en el navegador).
 // Capas: partido más votado en 2023, voto a un partido, diputados que elige cada provincia
-// y participación. Al pulsar una provincia se rellena la ficha `[data-mapa-ficha]`.
+// y participación. Al pulsar una provincia se rellena la ficha (MapaFicha.astro), que ocupa
+// el lugar de la columna derecha mientras está abierta.
 //
 // `partido` fija la capa de voto a ese partido y oculta los controles (ficha de partido).
 import { feature } from 'topojson-client';
@@ -13,8 +14,8 @@ import { provincias } from '../../data/politica/provincias';
 import resultados from '../../data/politica/resultados-2023.json';
 import { diputadoPath } from '../../lib/politica';
 
-interface Props { partido?: string; ficha?: boolean }
-const { partido: fijo, ficha = true } = Astro.props;
+interface Props { partido?: string }
+const { partido: fijo } = Astro.props;
 
 const W = 800;
 const H = 620;
@@ -150,11 +151,6 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
   })} />
 </div>
 
-{ficha && !fijo && (
-  <div class="mapa-ficha" data-mapa-ficha>
-    <p class="mapa-hint">Pulsa una provincia para ver cómo votó en 2023, cuántos diputados elige el 29-N y quiénes la representaban.</p>
-  </div>
-)}
 
 <script>
   type Prov = { nombre: string; ccaa: string; d26: number; d23: number; sen: number; part: number; cands: [string, string | null, number, number, string][]; dips: [string, string, string | null][] };
@@ -162,7 +158,8 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
   for (const root of document.querySelectorAll<HTMLElement>('[data-mapa]')) {
     const datos = JSON.parse(root.querySelector('[data-mapa-datos]')!.textContent!) as { provs: Record<string, Prov>; colores: Record<string, string>; maxPct: Record<string, number>; minPct: Record<string, number>; fuente: string };
     const paths = [...root.querySelectorAll<SVGElement>('.prov')];
-    const fichaEl = root.parentElement?.querySelector<HTMLElement>('[data-mapa-ficha]');
+    const fichaEl = document.querySelector<HTMLElement>('[data-mapa-ficha]');
+    const columna = fichaEl?.closest<HTMLElement>('.ap-right');
     const select = root.querySelector<HTMLSelectElement>('[data-partido]');
     const botones = [...root.querySelectorAll<HTMLButtonElement>('[data-capa]')];
     let capa = 'ganador';
@@ -203,11 +200,10 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
     const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
     const abre = (ine: string | null) => {
       for (const p of paths) p.classList.toggle('on', p.dataset.ine === ine);
-      if (!fichaEl) return;
-      if (!ine) {
-        fichaEl.innerHTML = '<p class="mapa-hint">Pulsa una provincia para ver cómo votó en 2023, cuántos diputados elige el 29-N y quiénes la representaban.</p>';
-        return;
-      }
+      if (!fichaEl || root.dataset.fijo) return;
+      fichaEl.hidden = !ine;
+      columna?.classList.toggle('con-ficha', !!ine);
+      if (!ine) return;
       const p = datos.provs[ine];
       const cambio = p.d26 - p.d23;
       const barras = p.cands
@@ -235,6 +231,8 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
         </div>
         <p class="mf-src">Fuente: ${esc(datos.fuente)}.</p>`;
       fichaEl.querySelector('[data-mf-close]')?.addEventListener('click', () => abre(null));
+      // Con la columna derecha debajo del mapa (pantallas estrechas), se lleva la vista a la ficha.
+      if (matchMedia('(max-width: 1180px)').matches) fichaEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     for (const p of paths) {
@@ -248,6 +246,7 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
       });
     }
     if (!root.dataset.fijo) pinta();
+    document.addEventListener('ap:reset', () => abre(null));
   }
 </script>
 
@@ -274,30 +273,4 @@ const tonoPartido = (id: string, v: number) => Math.round(8 + 92 * ((v - minPct[
   .mapa-legend .pt { font-size: 12px; color: var(--ink); }
   .lg-grad i { display: inline-block; width: 90px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 8%, var(--panel-2)), var(--c)); }
 
-  .mapa-ficha { font-size: 14px; }
-  .mapa-ficha :global(.mapa-hint) { margin: 0; color: var(--muted); }
-  .mapa-ficha :global(.mf-head) { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; }
-  .mapa-ficha :global(.mf-head h3) { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
-  .mapa-ficha :global(.mf-head span) { font-family: var(--mono); font-size: 12px; color: var(--muted); }
-  .mapa-ficha :global(.mf-close) { margin-left: auto; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); background: none; border: 0; cursor: pointer; }
-  .mapa-ficha :global(.mf-stats) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
-  .mapa-ficha :global(.mf-stats div) { display: flex; flex-direction: column; padding: 8px 10px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
-  .mapa-ficha :global(.mf-stats strong) { font-family: var(--display); font-size: 22px; font-weight: 800; color: var(--accent); }
-  .mapa-ficha :global(.mf-stats span) { font-size: 12px; line-height: 1.35; color: var(--muted); }
-  .mapa-ficha :global(.mf-bar) { display: flex; height: 14px; gap: 1px; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
-  .mapa-ficha :global(.mf-cols) { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; }
-  .mapa-ficha :global(h4) { margin: 0 0 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); }
-  .mapa-ficha :global(.mf-res) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
-  .mapa-ficha :global(.mf-res li) { display: grid; grid-template-columns: minmax(0, 1fr) auto 52px; align-items: baseline; gap: 4px 10px; font-size: 13px; }
-  .mapa-ficha :global(.mf-res small) { grid-column: 1; grid-row: 2; font-size: 11px; color: var(--muted); margin-top: -2px; }
-  .mapa-ficha :global(.mf-res span) { font-family: var(--mono); font-size: 12px; text-align: right; }
-  .mapa-ficha :global(.mf-res strong) { font-family: var(--mono); font-size: 12px; text-align: right; }
-  .mapa-ficha :global(.mf-dips) { list-style: none; margin: 0; padding: 0; columns: 2 150px; column-gap: 12px; font-size: 13px; line-height: 1.6; }
-  .mapa-ficha :global(.mf-dips a) { display: flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 400; text-decoration: none; }
-  .mapa-ficha :global(.mf-dips a:hover) { color: var(--accent); }
-  .mapa-ficha :global(.mf-dips i) { flex: none; width: 8px; height: 8px; border-radius: 2px; }
-  .mapa-ficha :global(.mf-src) { margin: 10px 0 0; font-size: 11.5px; color: var(--muted); }
-  @media (max-width: 640px) {
-    .mapa-ficha :global(.mf-cols) { grid-template-columns: minmax(0, 1fr); }
-  }
 </style>

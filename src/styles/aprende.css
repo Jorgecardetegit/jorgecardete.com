@@ -147,3 +147,6 @@
 .vt-N { color: #fff; background: var(--red); }
 .vt-A { color: #1f1d1a; background: var(--gold); }
 .vt-x { color: var(--muted); background: var(--panel-2); }
+
+/* Con una provincia del mapa abierta, la columna derecha muestra solo su ficha. */
+.ap-right.con-ficha > :not([data-mapa-ficha]) { display: none; }
