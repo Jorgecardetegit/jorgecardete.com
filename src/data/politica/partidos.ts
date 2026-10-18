@@ -68,7 +68,7 @@ export const partidos: Partido[] = [
     id: 'sumar', nombre: 'Sumar', siglas: 'Sumar', color: '#d6215f', ambito: 'Toda España', fundacion: 2023,
     lider: { nombre: 'Verónica Martínez Barbero y Rosa Martínez', cargo: 'Co-coordinadoras de Movimiento Sumar (desde julio de 2026)' },
     candidatura: { texto: 'Ada Colau, cabeza de lista por Barcelona del Frente Amplio (Movimiento Sumar, IU, Más Madrid, Comuns y otras organizaciones; en Aragón, con Chunta, y en Baleares, con Més). En la Comunitat Valenciana (Compromís-Front Valencià) y en Canarias (con Nueva Canarias) va en listas conjuntas con Podemos', estado: 'anunciada' },
-    resumen: 'Plataforma creada en 2023 en torno a Yolanda Díaz que agrupó a una quincena de partidos de izquierda: IU, Más Madrid, Comuns, Compromís y otros, y al principio también Podemos. Fue cuarta fuerza en 2023 y ha formado parte del Gobierno de coalición con el PSOE. Al 29-N se presenta como Frente Amplio, sin Podemos y con Compromís y Chunta en listas propias o regionales.',
+    resumen: 'Plataforma creada en 2023 en torno a Yolanda Díaz que agrupó a una quincena de partidos de izquierda: IU, Más Madrid, Comuns, Compromís y otros, y al principio también Podemos. Fue cuarta fuerza en 2023 y ha formado parte del Gobierno de coalición con el PSOE. Al 29-N se presenta como Frente Amplio, sin Podemos salvo en la Comunitat Valenciana y Canarias.',
     web: 'https://movimientosumar.es/', voto2023: 12.33,
     resultados: [{ eleccion: '2023', escanos: 31 }],
     europa2024: { escanos: 3, pct: 4.67 },
