@@ -1,0 +1,123 @@
+---
+// Las 52 circunscripciones como mosaico, coloreadas por diputados o senadores.
+// Al pulsar una provincia se rellena la ficha `[data-detail="prov"]` de la página.
+import { provincias } from '../../data/politica/provincias';
+
+const maxDip = Math.max(...provincias.map((p) => p.diputados));
+const maxSen = Math.max(...provincias.map((p) => p.senadores));
+// Intensidad del color: raíz cuadrada para que las provincias pequeñas no queden todas iguales.
+const shade = (n: number, max: number) => Math.round(14 + 86 * Math.sqrt(n / max));
+---
+<div class="mm-tools">
+  <div class="mm-toggle" role="group" aria-label="Qué mostrar">
+    <button type="button" aria-pressed="true" data-metric="diputados">Diputados</button>
+    <button type="button" aria-pressed="false" data-metric="senadores">Senadores</button>
+  </div>
+  <div class="mm-legend" aria-hidden="true"><span>menos</span><i /><span>más</span></div>
+</div>
+<div class="mm-wrap">
+  <div class="mm-grid" data-mosaico data-max-dip={maxDip} data-max-sen={maxSen}>
+    <div class="mm-zone" style="grid-column: 7 / span 2; grid-row: 9"><span>Canarias</span></div>
+    {provincias.map((p) => {
+      const s = shade(p.diputados, maxDip);
+      return (
+        <button
+          type="button"
+          class:list={['mm-tile', { dark: s > 58 }]}
+          style={`grid-column: ${p.col + 1}; grid-row: ${p.fila + 1}; --s: ${s}%`}
+          data-prov={p.nombre}
+          data-ccaa={p.ccaa}
+          data-dip={p.diputados}
+          data-sen={p.senadores}
+          aria-label={`${p.nombre}: ${p.diputados} diputados, ${p.senadores} senadores`}
+          aria-pressed="false"
+        >
+          <span class="mm-abbr">{p.abbr}</span>
+          <span class="mm-n" data-n>{p.diputados}</span>
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  import { showDetail } from '../../lib/aprende-detail';
+
+  for (const grid of document.querySelectorAll<HTMLElement>('[data-mosaico]')) {
+    const tiles = [...grid.querySelectorAll<HTMLButtonElement>('[data-prov]')];
+    const toggles = [...document.querySelectorAll<HTMLButtonElement>('[data-metric]')];
+    const max = { diputados: Number(grid.dataset.maxDip), senadores: Number(grid.dataset.maxSen) };
+    let metric: keyof typeof max = 'diputados';
+
+    const value = (t: HTMLElement) => Number(metric === 'diputados' ? t.dataset.dip : t.dataset.sen);
+    const paint = () => {
+      for (const t of tiles) {
+        const s = Math.round(14 + 86 * Math.sqrt(value(t) / max[metric]));
+        t.style.setProperty('--s', `${s}%`);
+        t.classList.toggle('dark', s > 58);
+        t.querySelector('[data-n]')!.textContent = String(value(t));
+      }
+    };
+
+    const field = (name: string) => document.querySelector<HTMLElement>(`[data-prov-field="${name}"]`);
+    const select = (tile: HTMLButtonElement | null) => {
+      for (const t of tiles) {
+        t.setAttribute('aria-pressed', String(t === tile));
+        t.classList.toggle('same-ccaa', tile !== null && t !== tile && t.dataset.ccaa === tile.dataset.ccaa);
+      }
+      if (!tile) return showDetail('intro');
+      const dip = Number(tile.dataset.dip);
+      const sen = Number(tile.dataset.sen);
+      field('nombre')!.textContent = tile.dataset.prov!;
+      field('ccaa')!.textContent = tile.dataset.ccaa!;
+      field('dip')!.textContent = String(dip);
+      field('sen')!.textContent = String(sen);
+      field('dots')!.innerHTML = '<i></i>'.repeat(dip);
+      // Con N escaños, asegurar uno exige en torno a 1/(N+1) de los votos.
+      field('umbral')!.textContent = dip >= 32 ? 'el umbral legal del 3 %' : `cerca del ${Math.round(100 / (dip + 1))} % de los votos`;
+      field('senado')!.textContent =
+        sen === 4 ? 'Se eligen 4 senadores y cada votante marca hasta 3.' :
+        sen === 2 ? 'Se eligen 2 senadores y cada votante marca 1.' :
+        'Cada isla elige sus senadores: 3 en las islas mayores (marcas 2) y 1 en las demás.';
+      showDetail('prov');
+    };
+
+    for (const t of tiles) t.addEventListener('click', () => select(t.getAttribute('aria-pressed') === 'true' ? null : t));
+    for (const b of toggles) {
+      b.addEventListener('click', () => {
+        metric = b.dataset.metric as keyof typeof max;
+        for (const x of toggles) x.setAttribute('aria-pressed', String(x === b));
+        paint();
+      });
+    }
+    document.addEventListener('ap:reset', () => select(null));
+  }
+</script>
+
+<style>
+  .mm-tools { position: absolute; top: 16px; right: 18px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
+  .mm-toggle { display: flex; padding: 3px; background: var(--panel-2); border-radius: 999px; }
+  .mm-toggle button { padding: 5px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
+  .mm-toggle button[aria-pressed='true'] { color: var(--ink); background: var(--panel); box-shadow: var(--panel-shadow); }
+  .mm-legend { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .mm-legend i { width: 70px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, var(--panel)), var(--accent)); }
+
+  .mm-wrap { position: absolute; inset: 70px 16px 16px; display: grid; place-items: center; container-type: size; }
+  .mm-grid { display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(9, 1fr); gap: 0.6cqmin; width: min(100cqw, calc(100cqh * 10 / 9)); aspect-ratio: 10 / 9; container-type: inline-size; }
+  .mm-zone { position: relative; border: 1.5px dashed var(--line); border-radius: 1.4cqw; margin: -0.4cqw; }
+  .mm-zone span { position: absolute; top: -1.9cqw; left: 0.6cqw; font-family: var(--mono); font-size: max(9px, 1.2cqw); color: var(--muted); }
+  .mm-tile { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; padding: 0.7cqw 0.8cqw; text-align: left; color: var(--ink); background: color-mix(in srgb, var(--accent) var(--s), var(--panel)); border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--panel-line)); border-radius: 1.2cqw; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+  .mm-tile.dark { color: #fff; }
+  .mm-tile:hover { transform: translateY(-2px); box-shadow: var(--panel-shadow); z-index: 1; }
+  .mm-tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .mm-tile[aria-pressed='true'] { outline: 3px solid var(--ink); outline-offset: 1px; z-index: 2; }
+  .mm-tile.same-ccaa { box-shadow: 0 0 0 2px var(--ink) inset; }
+  .mm-abbr { font-family: var(--mono); font-size: max(8px, 1.15cqw); font-weight: 600; letter-spacing: .3px; opacity: .85; }
+  .mm-n { font-family: var(--display); font-size: max(12px, 2.6cqw); font-weight: 800; line-height: 1; }
+
+  @media (max-width: 820px) {
+    .mm-tools { position: static; justify-content: flex-start; padding: 12px 16px 0; }
+    .mm-wrap { position: relative; inset: auto; display: block; padding: 22px 12px 14px; container-type: normal; }
+    .mm-grid { width: 100%; gap: 3px; }
+  }
+</style>

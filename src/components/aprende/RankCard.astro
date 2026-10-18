@@ -1,0 +1,58 @@
+---
+// Tarjeta de la columna derecha: filas con su valor y una barra proporcional. Si hay más
+// filas que `limite`, un botón despliega el resto.
+interface Fila { label: string; valor: number; texto?: string; href?: string }
+interface Props { titulo: string; cuenta?: string; filas: Fila[]; max?: number; limite?: number; nota?: string }
+const { titulo, cuenta, filas, max = Math.max(...filas.map((f) => f.valor)), limite = 5, nota } = Astro.props;
+const fmt = new Intl.NumberFormat('es-ES');
+---
+<section class="ap-card ap-panel rank" data-rank>
+  <header class="ap-card-head">
+    <h2 class="ap-card-title">{titulo}</h2>
+    {cuenta && <span class="ap-card-count">· {cuenta}</span>}
+    {filas.length > limite && <button type="button" class="ap-card-link" aria-expanded="false" data-rank-more>Ver todas</button>}
+  </header>
+  <ol class="rank-list">
+    {filas.map((f, i) => {
+      const Tag = f.href ? 'a' : 'div';
+      return (
+        <li hidden={i >= limite} data-extra={i >= limite ? '' : undefined}>
+          <Tag class="rank-row" href={f.href}>
+            <span class="rank-i">{i + 1}</span>
+            <span class="rank-label">{f.label}</span>
+            <span class="rank-v">{f.texto ?? fmt.format(f.valor)}</span>
+            <span class="rank-bar" aria-hidden="true"><i style={`width: ${Math.max(2, (f.valor / max) * 100)}%`} /></span>
+          </Tag>
+        </li>
+      );
+    })}
+  </ol>
+  {nota && <p class="rank-note">{nota}</p>}
+</section>
+
+<script>
+  for (const card of document.querySelectorAll<HTMLElement>('[data-rank]')) {
+    const more = card.querySelector<HTMLButtonElement>('[data-rank-more]');
+    if (!more) continue;
+    const label = more.textContent;
+    more.addEventListener('click', () => {
+      const open = more.getAttribute('aria-expanded') !== 'true';
+      for (const li of card.querySelectorAll<HTMLElement>('[data-extra]')) li.hidden = !open;
+      more.setAttribute('aria-expanded', String(open));
+      more.textContent = open ? 'Ver menos' : label;
+    });
+  }
+</script>
+
+<style>
+  .rank-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .rank-list li[hidden] { display: none; }
+  .rank-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: baseline; gap: 2px 8px; padding: 5px 6px; margin: 0 -6px; border-radius: 8px; font-size: 14px; font-weight: 400; color: var(--ink); text-decoration: none; }
+  a.rank-row:hover { background: var(--panel-2); color: var(--ink); }
+  .rank-i { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .rank-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-v { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent); }
+  .rank-bar { grid-column: 2 / -1; height: 4px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+  .rank-bar i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+  .rank-note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+</style>

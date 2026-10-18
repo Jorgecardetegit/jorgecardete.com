@@ -1,0 +1,263 @@
+---
+import Aprende from '../../../layouts/Aprende.astro';
+import MapaMosaico from '../../../components/aprende/MapaMosaico.astro';
+import PoderesLienzo from '../../../components/aprende/PoderesLienzo.astro';
+import RankCard from '../../../components/aprende/RankCard.astro';
+import { getArea } from '../../../data/learn';
+import { competencias, niveles, type Nivel } from '../../../data/politica/competencias';
+import { escanosFuente, escanosPorProvincia } from '../../../data/politica/escanos';
+import { instituciones } from '../../../data/politica/poderes';
+import { getLessons, learnPath, lessonPath, lessonSlug, readingMinutes } from '../../../lib/learn';
+import { breadcrumbs } from '../../../lib/seo';
+
+const area = getArea('politica')!;
+const lessons = await getLessons(area.id, area.sections.map((s) => s.id));
+const bySlug = new Map(lessons.map((l) => [lessonSlug(l), l]));
+const lessonsFor = (slugs: string[]) => slugs.map((s) => bySlug.get(s)!).filter(Boolean);
+
+const calendario = [
+  { fecha: '2026-10-06', label: 'Convocatoria en el BOE' },
+  { fecha: '2026-11-13', label: 'Empieza la campaña' },
+  { fecha: '2026-11-19', label: 'Último día para pedir el voto por correo' },
+  { fecha: '2026-11-24', label: 'Prohibido publicar encuestas' },
+  { fecha: '2026-11-29', label: 'Votación, de 9 a 20 h' },
+  { fecha: '2026-12-23', label: 'Se constituyen las nuevas Cortes' },
+];
+const dia = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+
+const porNivel = (Object.keys(niveles) as Nivel[])
+  .map((n) => ({ label: niveles[n].label, valor: competencias.filter((c) => c.quien.includes(n)).length, href: `${learnPath}politica/territorio/#quién-se-encarga-de-qué` }))
+  .sort((a, b) => b.valor - a.valor);
+
+const site = Astro.site!;
+const jsonLd = [
+  breadcrumbs([
+    { name: 'Aprende', url: new URL(learnPath, site) },
+    { name: area.title, url: new URL(Astro.url.pathname, site) },
+  ]),
+];
+---
+<Aprende title={area.title} description={area.description} jsonLd={jsonLd} area={area} lessons={lessons} home>
+  <div class="ap-stage">
+    <section class="ap-view ap-panel" data-view-panel="poderes" aria-label="Quién elige a quién">
+      <header class="ap-view-head">
+        <div>
+          <h1 class="ap-view-title">Quién elige a quién</h1>
+          <p class="ap-view-sub">Pulsa una institución para ver qué hace y con quién se conecta.</p>
+        </div>
+      </header>
+      <PoderesLienzo />
+    </section>
+
+    <section class="ap-view ap-panel" data-view-panel="mapa" aria-label="Mapa de circunscripciones" hidden>
+      <header class="ap-view-head">
+        <div>
+          <h2 class="ap-view-title">Las 52 circunscripciones</h2>
+          <p class="ap-view-sub">Cada provincia reparte sus propios escaños. Pulsa una.</p>
+        </div>
+      </header>
+      <MapaMosaico />
+    </section>
+
+    <section class="ap-view ap-panel lessons-view" data-view-panel="lecciones" aria-label="Todas las lecciones" hidden>
+      <div class="lessons-scroll">
+        {area.sections.filter((s) => s.status === 'ready').map((section) => (
+          <>
+            <h2 class="ap-view-title">{section.title}</h2>
+            <p class="ap-view-sub">{section.description}</p>
+            <ul class="lessons-grid">
+              {lessons.filter((l) => l.data.section === section.id).map((l) => (
+                <li>
+                  <a class="lesson-card" href={lessonPath(l)} data-lesson-chip={l.id}>
+                    <span class="lesson-card-top">
+                      <span class="lesson-card-icon" aria-hidden="true">{l.data.icon}</span>
+                      <span class="lesson-card-num">{String(lessons.indexOf(l) + 1).padStart(2, '0')} · {readingMinutes(l)} min</span>
+                    </span>
+                    <strong>{l.data.title}</strong>
+                    <span class="lesson-card-sum">{l.data.summary}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))}
+        {area.sections.filter((s) => s.status === 'soon').map((section) => (
+          <div class="lessons-soon">
+            <strong>{section.title}</strong> <span>Próximamente</span>
+            <p>{section.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="ap-detail ap-panel" aria-live="polite" data-detail-panel>
+      <div data-detail="intro">
+        <div class="ap-detail-head">
+          <span class="ap-detail-icon" aria-hidden="true">🧭</span>
+          <h2 class="ap-detail-title">Empieza aquí</h2>
+          <span class="ap-detail-meta">{lessons.length} lecciones · de 3 a 5 minutos cada una</span>
+        </div>
+        <p>Todo lo que hace falta para entender cómo funciona España antes de votar, explicado desde cero y con fuentes oficiales. Pulsa las piezas del esquema o las provincias del mapa, o entra directamente en una lección.</p>
+        <div class="ap-chips">
+          {lessons.map((l) => <a class="ap-chip" href={lessonPath(l)} data-lesson-chip={l.id}><span aria-hidden="true">{l.data.icon}</span>{l.data.title}</a>)}
+        </div>
+      </div>
+
+      {instituciones.map((inst) => (
+        <div data-detail={`inst:${inst.id}`} hidden>
+          <div class="ap-detail-head">
+            <span class="ap-detail-icon" aria-hidden="true">{inst.icono}</span>
+            <h2 class="ap-detail-title">{inst.nombre}</h2>
+            <span class="ap-detail-meta">{inst.etiqueta}</span>
+            <button type="button" class="ap-detail-close" data-reset>✕ Cerrar</button>
+          </div>
+          <p>{inst.resumen}</p>
+          <ul class="ap-facts">{inst.hechos.map((h) => <li>{h}</li>)}</ul>
+          <div class="ap-chips">
+            {lessonsFor(inst.lecciones).map((l) => <a class="ap-chip" href={lessonPath(l)} data-lesson-chip={l.id}><span aria-hidden="true">{l.data.icon}</span>Lección: {l.data.title}</a>)}
+          </div>
+        </div>
+      ))}
+
+      <div data-detail="prov" hidden>
+        <div class="ap-detail-head">
+          <span class="ap-detail-icon" aria-hidden="true">📍</span>
+          <h2 class="ap-detail-title" data-prov-field="nombre"></h2>
+          <span class="ap-detail-meta" data-prov-field="ccaa"></span>
+          <button type="button" class="ap-detail-close" data-reset>✕ Cerrar</button>
+        </div>
+        <div class="prov-stats">
+          <div><strong data-prov-field="dip"></strong> diputados <span class="prov-dots" data-prov-field="dots"></span></div>
+          <div><strong data-prov-field="sen"></strong> senadores</div>
+        </div>
+        <p>Para asegurar un diputado aquí hace falta, a grandes rasgos, <span data-prov-field="umbral"></span>. <span data-prov-field="senado"></span></p>
+        <div class="ap-chips">
+          <a class="ap-chip" href={lessonPath(bySlug.get('elecciones')!)} data-lesson-chip="politica/elecciones"><span aria-hidden="true">🗳️</span>Lección: cómo se convierten los votos en escaños</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <Fragment slot="aside">
+    <section class="ap-card ap-panel">
+      <header class="ap-card-head">
+        <h2 class="ap-card-title">Calendario del 29-N</h2>
+      </header>
+      <ol class="cal">
+        {calendario.map((c) => (
+          <li data-date={c.fecha}>
+            <span class="cal-date">{dia.format(new Date(c.fecha))}</span>
+            <span>{c.label}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <RankCard
+      titulo="Diputados por provincia"
+      cuenta="52"
+      filas={escanosPorProvincia.map(([label, valor]) => ({ label, valor }))}
+      nota={`Reparto oficial de 2026. Fuente: ${escanosFuente.title}.`}
+    />
+
+    <RankCard
+      titulo="Mayorías del Congreso"
+      cuenta="350"
+      max={350}
+      filas={[
+        { label: 'Absoluta: investidura, leyes orgánicas', valor: 176, href: lessonPath(bySlug.get('cortes')!) },
+        { label: '3/5: CGPJ, Tribunal Constitucional', valor: 210, href: lessonPath(bySlug.get('cortes')!) },
+        { label: '2/3: reforma agravada', valor: 234, href: lessonPath(bySlug.get('constitucion')!) },
+      ]}
+    />
+
+    <RankCard
+      titulo="Senado"
+      cuenta="266"
+      max={266}
+      filas={[
+        { label: 'Elegidos en las urnas', valor: 208, href: lessonPath(bySlug.get('elecciones')!) },
+        { label: 'Designados por las comunidades', valor: 58, href: lessonPath(bySlug.get('territorio')!) },
+      ]}
+    />
+
+    <RankCard
+      titulo="Quién se encarga"
+      cuenta={`${competencias.length} temas`}
+      max={competencias.length}
+      filas={porNivel}
+      nota="En cuántos de los grandes temas (sanidad, vivienda, policía...) interviene cada administración."
+    />
+  </Fragment>
+</Aprende>
+
+<script>
+  // Pestañas: cambian de vista sin recargar y lo recuerdan en la URL (#mapa, #lecciones).
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-view-tab]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-view-panel]')];
+  const detail = document.querySelector<HTMLElement>('[data-detail-panel]')!;
+  const stage = document.querySelector<HTMLElement>('.ap-stage')!;
+
+  const open = (view: string) => {
+    if (!panels.some((p) => p.dataset.viewPanel === view)) view = 'poderes';
+    for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.viewTab === view));
+    for (const p of panels) p.hidden = p.dataset.viewPanel !== view;
+    detail.hidden = view === 'lecciones';
+    stage.dataset.view = view;
+    document.dispatchEvent(new Event('ap:reset'));
+  };
+  for (const t of tabs) {
+    t.addEventListener('click', () => {
+      open(t.dataset.viewTab!);
+      history.replaceState(null, '', t.dataset.viewTab === 'poderes' ? location.pathname : `#${t.dataset.viewTab}`);
+    });
+  }
+  open(location.hash.slice(1));
+  addEventListener('hashchange', () => open(location.hash.slice(1)));
+
+  for (const b of document.querySelectorAll('[data-reset]')) {
+    b.addEventListener('click', () => document.dispatchEvent(new Event('ap:reset')));
+  }
+
+  // Calendario: lo ya pasado se atenúa y lo siguiente se resalta.
+  const today = new Date().toISOString().slice(0, 10);
+  const dates = [...document.querySelectorAll<HTMLElement>('[data-date]')];
+  const next = dates.find((d) => d.dataset.date! >= today);
+  for (const d of dates) {
+    d.classList.toggle('is-past', d.dataset.date! < today);
+    d.classList.toggle('is-next', d === next);
+  }
+</script>
+
+<style>
+  .lessons-view { overflow-y: auto; }
+  /* En el mapa, la ficha solo aparece al elegir una provincia: así el mosaico tiene sitio. */
+  .ap-stage[data-view='mapa'] .ap-detail:has(> [data-detail='intro']:not([hidden])) { display: none; }
+  .lessons-scroll { padding: 18px 20px 24px; }
+  .lessons-grid { list-style: none; margin: 14px 0 28px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .lesson-card { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; color: var(--ink); font-weight: 400; text-decoration: none; transition: transform .15s, border-color .15s; }
+  .lesson-card:hover { color: var(--ink); border-color: var(--accent); transform: translateY(-2px); }
+  .lesson-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .lesson-card-icon { font-size: 24px; }
+  .lesson-card-num { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .lesson-card.is-read .lesson-card-num::after { content: ' · leída ✓'; color: var(--green); font-weight: 600; }
+  .lesson-card strong { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1.2; letter-spacing: -0.2px; }
+  .lesson-card-sum { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); }
+  .lessons-soon { margin-bottom: 12px; padding: 12px 16px; border: 1px dashed var(--line); border-radius: 12px; }
+  .lessons-soon strong { font-family: var(--display); font-size: 16px; }
+  .lessons-soon span { margin-left: 6px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .lessons-soon p { margin: 4px 0 0; font-size: 13.5px; color: var(--text-soft); }
+
+  .prov-stats { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-bottom: 10px; font-size: 14px; color: var(--text-soft); }
+  .prov-stats strong { font-family: var(--display); font-size: 26px; font-weight: 800; color: var(--accent); margin-right: 4px; }
+  .prov-dots { display: inline-flex; flex-wrap: wrap; gap: 2px; max-width: 220px; margin-left: 8px; vertical-align: middle; }
+  .prov-dots :global(i) { width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
+
+  .cal { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .cal li { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; padding: 5px 6px; margin: 0 -6px; border-radius: 8px; font-size: 13.5px; line-height: 1.35; }
+  .cal-date { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .cal li.is-past { opacity: .45; }
+  .cal li.is-past span:last-child { text-decoration: line-through; }
+  .cal li.is-next { background: color-mix(in srgb, var(--accent) 12%, transparent); font-weight: 600; }
+  .cal li.is-next .cal-date { color: var(--accent); }
+</style>
