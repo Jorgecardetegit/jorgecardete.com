@@ -25,6 +25,10 @@ export interface Pregunta {
   linea?: { valor: number; texto: string };
   que: string;
   gobierno: string;
+  /** Cuánto depende del Gobierno de España: 1 poco, 2 en parte, 3 mucho. */
+  control: 1 | 2 | 3;
+  /** Qué lo mueve: lo que hace el Gobierno de España, lo que hacen comunidades y ayuntamientos, y lo que viene de fuera. */
+  palancas: { gobierno: string[]; otros?: string[]; fuera: string[] };
   ojo?: string;
   fuente: { titulo: string; url: string };
 }
@@ -101,6 +105,12 @@ export const preguntas: Pregunta[] = [
     ...paro, ref: 'UE', hoy: { valor: datos.ahora.paro.es, periodo: datos.ahora.paro.periodo, ue: datos.ahora.paro.ref }, fmt: pct(1),
     que: 'La tasa de paro: el porcentaje de personas que quieren trabajar y buscan empleo pero no lo tienen. Sale de la Encuesta de Población Activa, armonizada con el resto de Europa.',
     gobierno: 'Lo mueven sobre todo el crecimiento de la economía y las leyes laborales (reformas de 2012 y 2021). España tiene desde hace décadas un paro más alto que la media europea, con cualquier Gobierno.',
+    control: 2,
+    palancas: {
+      gobierno: ['Leyes laborales (reformas de 2012 y 2021)', 'Tipos de contrato y despido', 'Prestación por desempleo'],
+      otros: ['Oficinas de empleo', 'Formación para el empleo'],
+      fuera: ['Cuánto crece la economía', 'Demanda de Europa y turismo', 'Crisis como la pandemia'],
+    },
     fuente: eurostat(ind.paro.dataset),
   },
   {
@@ -110,6 +120,11 @@ export const preguntas: Pregunta[] = [
     es: smi, ue: smiReal, ref: `Descontada la subida de precios (€ de ${ultimoIpc})`, hoy: anual(smi, null), fmt: (v) => `${n(v)} €`,
     que: 'El salario mínimo interprofesional: lo menos que se puede pagar por una jornada completa, en euros brutos al mes y 14 pagas. La línea discontinua lo traduce a euros de hoy para ver cuánto ha subido de verdad.',
     gobierno: 'Lo fija directamente el Gobierno cada año por real decreto, tras consultar a sindicatos y patronal. No necesita al Congreso.',
+    control: 3,
+    palancas: {
+      gobierno: ['Lo fija cada año por real decreto', 'Consulta a sindicatos y patronal, pero decide él'],
+      fuera: ['Lo que sube la vida, que se come parte de la subida'],
+    },
     ojo: 'Es el suelo, no el sueldo de la mayoría. Hay debate entre economistas sobre si las subidas grandes frenan la contratación en algunas zonas y sectores.',
     fuente: { titulo: 'Reales decretos del salario mínimo (BOE)', url: 'https://www.boe.es/buscar/boe.php?campo%5B0%5D=TIT&dato%5B0%5D=salario+m%C3%ADnimo+interprofesional' },
   },
@@ -121,6 +136,12 @@ export const preguntas: Pregunta[] = [
     linea: { valor: 0, texto: 'Igual que en 2008' },
     que: 'La renta disponible de los hogares por persona: sueldos, pensiones y otras rentas, menos impuestos, descontada la inflación. Mide mejor que el PIB lo que nota la gente en el bolsillo.',
     gobierno: 'Le afectan directamente los impuestos, las pensiones, las ayudas y el salario mínimo; e indirectamente, el empleo y los precios.',
+    control: 2,
+    palancas: {
+      gobierno: ['Impuesto sobre la renta (IRPF) e IVA', 'Pensiones', 'Ayudas y salario mínimo'],
+      otros: ['Tramo autonómico del IRPF', 'Ayudas autonómicas'],
+      fuera: ['Subida de los precios', 'Cuántos empleos se crean', 'Sueldos que pactan empresas y sindicatos'],
+    },
     fuente: eurostat(ind.renta.dataset),
   },
   {
@@ -131,6 +152,11 @@ export const preguntas: Pregunta[] = [
     linea: { valor: 2, texto: 'Lo sano: 2 %' },
     que: 'La inflación: cuánto suben de media los precios de lo que se compra en un año (el IPC armonizado europeo, casi igual al IPC del INE).',
     gobierno: 'Poco: la deciden sobre todo el precio de la energía y los tipos de interés del Banco Central Europeo. El Gobierno puede suavizarla con rebajas de impuestos, topes y ayudas.',
+    control: 1,
+    palancas: {
+      gobierno: ['Rebajas del IVA y de impuestos a la energía', 'Topes y ayudas (como al combustible)'],
+      fuera: ['Precio del petróleo, el gas y la luz', 'Tipos de interés del Banco Central Europeo', 'Guerras y crisis internacionales'],
+    },
     ojo: 'Que los precios bajen tampoco es buena señal: suele ir con crisis.',
     fuente: eurostat(ind.inflacion.dataset),
   },
@@ -142,6 +168,12 @@ export const preguntas: Pregunta[] = [
     linea: { valor: 100000, texto: 'Precio de 2015' },
     que: 'El precio de compra de las viviendas, nuevas y usadas, respecto a 2015. Sin descontar la inflación.',
     gobierno: 'Lo mueven los tipos de interés, la población y lo que se construye. El suelo y el urbanismo son de comunidades y ayuntamientos; el Estado regula alquileres, hipotecas e impuestos.',
+    control: 1,
+    palancas: {
+      gobierno: ['Ley de vivienda y alquileres', 'Impuestos y ayudas a la compra', 'Reglas de las hipotecas'],
+      otros: ['Suelo y urbanismo', 'Vivienda pública', 'Licencias de pisos turísticos'],
+      fuera: ['Tipos de interés del Banco Central Europeo', 'Población que llega', 'Compradores e inversores extranjeros'],
+    },
     ojo: 'Que suba es bueno para quien ya tiene casa y malo para quien quiere comprarla. El alquiler no aparece aquí.',
     fuente: eurostat(ind.vivienda.dataset),
   },
@@ -153,6 +185,12 @@ export const preguntas: Pregunta[] = [
     linea: { valor: 0, texto: 'Ni crece ni cae' },
     que: 'El crecimiento del PIB: cuánto aumenta todo lo que se produce en España, descontada la subida de precios.',
     gobierno: 'Influye con el gasto, los impuestos y las reformas, pero pesan más el ciclo europeo, los tipos de interés, el turismo y crisis como la pandemia.',
+    control: 1,
+    palancas: {
+      gobierno: ['Gasto público e impuestos', 'Reparto de los fondos europeos', 'Reformas'],
+      otros: ['Gasto de comunidades y ayuntamientos'],
+      fuera: ['Cómo le va a Europa', 'Tipos de interés del Banco Central Europeo', 'Turismo', 'Crisis como la pandemia'],
+    },
     ojo: 'Crecer mucho después de una caída grande es en parte rebote: 2021 y 2022 recuperan lo perdido en 2020. Y con más población, el PIB crece aunque cada persona no tenga más.',
     fuente: eurostat(ind.pib.dataset),
   },
@@ -164,6 +202,12 @@ export const preguntas: Pregunta[] = [
     linea: { valor: 60, texto: 'Referencia europea: 60' },
     que: 'La deuda pública: todo lo que deben el Estado, las comunidades, los ayuntamientos y la Seguridad Social, comparado con lo que produce el país en un año.',
     gobierno: 'Sube cada año que se gasta más de lo que se ingresa, y baja como porcentaje cuando la economía crece más deprisa que la deuda. En 2012 sumó además el rescate de la banca, y en 2020, la pandemia.',
+    control: 2,
+    palancas: {
+      gobierno: ['Presupuestos: cuánto se gasta y se recauda', 'Pensiones (el mayor gasto)'],
+      otros: ['Gasto de comunidades y ayuntamientos'],
+      fuera: ['Crisis que hunden los ingresos', 'Cuánto crece la economía', 'Tipos de interés de la deuda'],
+    },
     fuente: eurostat(ind.deuda.dataset),
   },
   {
@@ -173,6 +217,12 @@ export const preguntas: Pregunta[] = [
     ...pobreza, ref: 'UE', hoy: anual(pobreza.es, pobreza.ue), fmt: pct(1),
     que: 'La tasa AROPE: personas con ingresos muy por debajo de lo normal en el país, que no pueden pagar gastos básicos o que viven en hogares donde casi no se trabaja.',
     gobierno: 'Le afectan las ayudas (como el ingreso mínimo vital desde 2020), las pensiones, el salario mínimo y el empleo.',
+    control: 2,
+    palancas: {
+      gobierno: ['Ingreso mínimo vital (desde 2020)', 'Pensiones mínimas', 'Salario mínimo'],
+      otros: ['Rentas mínimas autonómicas', 'Servicios sociales'],
+      fuera: ['Cuánto empleo hay', 'Precio de la vivienda y de la energía'],
+    },
     ojo: 'Eurostat cambió la definición en 2015 y no da la serie nueva antes; por eso empieza ahí. Cada año se refiere a los ingresos del año anterior.',
     fuente: eurostat(ind.pobreza.dataset),
   },

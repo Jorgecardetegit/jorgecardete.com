@@ -1,19 +1,40 @@
 ---
 // Vista de economía: un botón por tema y, del elegido, la pregunta, la respuesta en una frase,
-// tres cifras (el primer año, 2018 y hoy) con la UE al lado y una sola gráfica, España frente a
-// la UE. Sin colores de partido: 2011 y 2018 se explican como los años del cambio de presidente.
-// Qué mide, qué depende del Gobierno, la tabla y la fuente quedan plegados en «Saber más».
+// tres cifras (el primer año, 2018 y hoy) con la UE al lado, una sola gráfica (España frente a
+// la UE) con una franja debajo de quién gobernaba, y cuánto depende el tema del Gobierno: un
+// medidor y qué lo mueve, separando Gobierno, comunidades y lo que viene de fuera. Los matices,
+// la tabla y la fuente quedan plegados en «Saber más».
 import { generado, preguntas, sacudidas, type Pregunta } from '../../data/politica/economia';
-import { fecha } from '../../lib/politica';
+import { gobiernos } from '../../data/politica/linea-temporal';
+import { fecha, partidoById } from '../../lib/politica';
 
 // Dos lienzos: el ancho y uno estrecho para móvil, con textos que se lean al encogerse.
-interface Lienzo { id: string; W: number; H: number; M: { l: number; r: number; t: number; b: number }; anios: number[]; etiquetas: boolean }
+// G es el alto de la franja de quién gobernaba, debajo de los años.
+interface Lienzo { id: string; W: number; H: number; G: number; M: { l: number; r: number; t: number; b: number }; anios: number[]; etiquetas: boolean }
 const lienzos: Lienzo[] = [
-  { id: 'ancho', W: 720, H: 300, M: { l: 58, r: 74, t: 30, b: 28 }, anios: [2011, 2014, 2018, 2022, 2026], etiquetas: true },
-  { id: 'movil', W: 360, H: 260, M: { l: 50, r: 62, t: 14, b: 24 }, anios: [2011, 2018, 2026], etiquetas: false },
+  { id: 'ancho', W: 720, H: 300, G: 30, M: { l: 58, r: 74, t: 30, b: 28 }, anios: [2011, 2014, 2018, 2022, 2026], etiquetas: true },
+  { id: 'movil', W: 360, H: 260, G: 26, M: { l: 50, r: 62, t: 14, b: 24 }, anios: [2011, 2018, 2026], etiquetas: false },
 ];
 const X0 = 2011;
 const X1 = 2026.9;
+
+// Un tramo por presidente (la franja no distingue minoría, coalición o en funciones).
+const anioDe = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return y + (m - 1) / 12 + (d - 1) / 365;
+};
+const tramos = gobiernos.reduce<{ desde: number; hasta: number; presidente: string; partido: string }[]>((acc, g) => {
+  const prev = acc.at(-1);
+  if (prev?.presidente === g.presidente) prev.hasta = anioDe(g.hasta);
+  else acc.push({ desde: anioDe(g.desde), hasta: anioDe(g.hasta), presidente: g.presidente, partido: g.partido });
+  return acc;
+}, []);
+const siglas = (id: string) => partidoById.get(id)?.siglas ?? id.toUpperCase();
+const colorDe = (id: string) => partidoById.get(id)?.color ?? 'var(--muted)';
+const gobiernoEn = (a: number) => tramos.find((t) => a >= t.desde && a < t.hasta) ?? tramos.at(-1)!;
+// 2011 y 2018: los años en que llega un presidente nuevo.
+const llegada = (a: number) => tramos.find((t) => Math.floor(t.desde) === a && t.desde > X0 + 0.01);
+const niveles = ['Poco', 'En parte', 'Mucho'];
 // '2025' → 2025; '2026-09' → 2026,7; '2026-Q2' → 2026,4.
 const momento = (p: string) => (p.includes('Q') ? Number(p.slice(0, 4)) + (Number(p.slice(-1)) - 0.5) / 4 : p.length > 4 ? Number(p.slice(0, 4)) + (Number(p.slice(5)) - 0.5) / 12 : Number(p));
 const periodo = (p: string) =>
@@ -71,11 +92,15 @@ function vista(p: Pregunta, L: Lienzo) {
     yUe = medio + (arriba ? 8 : -8);
   }
   const anios = [...new Set([...es.map(([a]) => a), ...ue.map(([a]) => a)])].sort((a, b) => a - b);
+  const gob = (a: number) => {
+    const g = gobiernoEn(a);
+    return `<span class="ec-tip-gob"><i style="background:${colorDe(g.partido)}"></i>Gobernaba ${g.presidente} (${siglas(g.partido)})</span>`;
+  };
   const tips = anios.map((a) => ({
     a,
-    html: [`<b>${a}</b>`, p.es[a] != null ? `España: ${p.fmt(p.es[a])}` : '', p.ue?.[a] != null ? `${p.ref}: ${p.fmt(p.ue[a])}` : ''].filter(Boolean).join('<br>'),
+    html: [`<b>${a}</b>`, p.es[a] != null ? `España: ${p.fmt(p.es[a])}` : '', p.ue?.[a] != null ? `${p.ref}: ${p.fmt(p.ue[a])}` : '', gob(a + 0.5)].filter(Boolean).join('<br>'),
   }));
-  if (conHoy) tips.push({ a: momento(p.hoy.periodo), html: `<b>${periodo(p.hoy.periodo)}</b><br>España: ${p.fmt(p.hoy.valor)}${p.hoy.ue != null ? `<br>UE: ${p.fmt(p.hoy.ue)}` : ''}` });
+  if (conHoy) tips.push({ a: momento(p.hoy.periodo), html: `<b>${periodo(p.hoy.periodo)}</b><br>España: ${p.fmt(p.hoy.valor)}${p.hoy.ue != null ? `<br>UE: ${p.fmt(p.hoy.ue)}` : ''}<br>${gob(momento(p.hoy.periodo))}` });
   return { x, y, marcas, camino, es, ue, conHoy, aFin, vFin, xHoy, cifras: cifras(p), ueFin, yEs, yUe, tips, anios };
 }
 ---
@@ -94,13 +119,19 @@ function vista(p: Pregunta, L: Lienzo) {
         <p class="ec-a">{p.respuesta}</p>
 
         <ul class="ec-cifras">
-          {cifras(p).map((c, i) => (
+          {cifras(p).map((c, i) => {
+            const nuevo = i < 2 ? llegada(c.a) : undefined;
+            const g = i === 2 ? gobiernoEn(c.a) : undefined;
+            return (
             <li class:list={['ec-cifra', { hoy: i === 2 }]}>
               <span class="ec-cifra-t">{c.etiqueta}</span>
+              {nuevo && <span class="ec-cifra-gob"><i style={`background: ${colorDe(nuevo.partido)}`} />Llega {nuevo.presidente} ({siglas(nuevo.partido)})</span>}
+              {g && <span class="ec-cifra-gob"><i style={`background: ${colorDe(g.partido)}`} />Gobierna {g.presidente} ({siglas(g.partido)})</span>}
               <strong>{c.valor != null ? p.fmt(c.valor) : '—'}</strong>
               {p.ref === 'UE' && <span class="ec-cifra-ue">UE: {c.ue != null ? p.fmt(c.ue) : '—'}</span>}
             </li>
-          ))}
+            );
+          })}
         </ul>
 
         <figure class="ec-fig" data-ec-fig>
@@ -113,12 +144,12 @@ function vista(p: Pregunta, L: Lienzo) {
             </span>
           </figcaption>
           {lienzos.map((L) => {
-            const { W, H, M } = L;
+            const { W, H, G, M } = L;
             const v = vista(p, L);
             const x = v.x;
             return (
               <div class={`ec-plot ec-plot-${L.id}`}>
-                <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${p.pregunta} Gráfica de ${v.anios[0]} a hoy. Los datos, en «Saber más».`}>
+                <svg viewBox={`0 0 ${W} ${H + G}`} role="img" aria-label={`${p.pregunta} Gráfica de ${v.anios[0]} a hoy. Los datos, en «Saber más».`}>
                   {v.marcas.map((m) => (
                     <g>
                       <line x1={M.l} x2={W - M.r} y1={v.y(m)} y2={v.y(m)} class="ec-grid" />
@@ -139,9 +170,22 @@ function vista(p: Pregunta, L: Lienzo) {
                   {v.cifras.map((c) => c.valor != null && <circle cx={x(c.a)} cy={v.y(c.valor)} r="5" class="ec-dot" />)}
                   <text x={v.xHoy + 9} y={v.yEs + 4} class="ec-end">{fin(p, p.hoy.valor)}</text>
                   {v.ueFin && <text x={x(v.ueFin[0]) + 9} y={v.yUe + 4} class="ec-end ue">{fin(p, v.ueFin[1])}</text>}
-                  <line class="ec-cross" x1="0" x2="0" y1={M.t} y2={H - M.b} data-ec-cross />
+                  {tramos.map((t) => {
+                    const a = Math.max(x(t.desde), M.l);
+                    const b = Math.min(x(t.hasta), W - M.r);
+                    const ancho = b - a - 2;
+                    if (ancho <= 0) return null;
+                    const texto = ancho > 90 ? `${t.presidente} · ${siglas(t.partido)}` : ancho > 52 ? t.presidente : '';
+                    return (
+                      <g>
+                        <rect x={a + 1} y={H + 2} width={ancho} height={G - 6} rx="4" style={`fill: ${colorDe(t.partido)}`} class="ec-gob"><title>Gobernaba {t.presidente} ({siglas(t.partido)})</title></rect>
+                        {texto && <text x={a + 8} y={H + 2 + (G - 6) / 2 + 4} class="ec-gob-t">{texto}</text>}
+                      </g>
+                    );
+                  })}
+                  <line class="ec-cross" x1="0" x2="0" y1={M.t} y2={H + G - 4} data-ec-cross />
                   {v.tips.map((t) => (
-                    <rect class="ec-hit" x={x(t.a) - (x(1) - x(0)) / 2} y={M.t} width={x(1) - x(0)} height={H - M.t - M.b} data-x={x(t.a)} data-tip={t.html} />
+                    <rect class="ec-hit" x={x(t.a) - (x(1) - x(0)) / 2} y={M.t} width={x(1) - x(0)} height={H + G - M.t} data-x={x(t.a)} data-tip={t.html} />
                   ))}
                 </svg>
                 <div class="ec-tip" role="status" hidden data-ec-tip />
@@ -150,8 +194,33 @@ function vista(p: Pregunta, L: Lienzo) {
           })}
         </figure>
 
+        <section class="ec-ctrl" aria-label="Cuánto depende del Gobierno">
+          <header class="ec-ctrl-h">
+            <h4>¿Cuánto depende del Gobierno?</h4>
+            <span class="ec-meter" role="img" aria-label={`${niveles[p.control - 1]}`}>
+              {niveles.map((n, i) => <span class:list={['ec-meter-s', { on: i < p.control, cur: i === p.control - 1 }]}>{n}</span>)}
+            </span>
+          </header>
+          <div class="ec-cols">
+            <div class="ec-col gob">
+              <h5><span aria-hidden="true">🏛️</span> Lo que hace el Gobierno de España</h5>
+              <ul>{p.palancas.gobierno.map((t) => <li>{t}</li>)}</ul>
+            </div>
+            {p.palancas.otros && (
+              <div class="ec-col otros">
+                <h5><span aria-hidden="true">🗺️</span> Comunidades y ayuntamientos</h5>
+                <ul>{p.palancas.otros.map((t) => <li>{t}</li>)}</ul>
+              </div>
+            )}
+            <div class="ec-col fuera">
+              <h5><span aria-hidden="true">🌍</span> Viene de fuera</h5>
+              <ul>{p.palancas.fuera.map((t) => <li>{t}</li>)}</ul>
+            </div>
+          </div>
+        </section>
+
         <details class="ec-more">
-          <summary>Saber más: qué mide y qué depende del Gobierno</summary>
+          <summary>Saber más: qué mide, matices y los datos año a año</summary>
           <p>{p.que}</p>
           <p><b>El Gobierno:</b> {p.gobierno}</p>
           {p.ojo && <p class="ec-ojo"><b>Ojo:</b> {p.ojo}</p>}
@@ -171,7 +240,7 @@ function vista(p: Pregunta, L: Lienzo) {
     );
   })}
 
-  <p class="ec-note">2011 y 2018 son los años en que cambió el presidente del Gobierno. Un Gobierno influye en la economía, pero no la controla: muchas cifras dependen más de Europa, de los precios de la energía o del Banco Central Europeo, y por eso la UE aparece al lado. Datos de Eurostat, que mide igual a todos los países (por eso algunas cifras difieren unas décimas de las del INE), descargados el {fecha(generado, { day: 'numeric', month: 'long', year: 'numeric' })}. El salario mínimo sale del BOE.</p>
+  <p class="ec-note">Debajo de cada gráfica, quién gobernaba. Un Gobierno influye en la economía, pero no la controla: muchas cifras dependen más de Europa, de los precios de la energía o del Banco Central Europeo, y por eso la UE aparece al lado. Datos de Eurostat, que mide igual a todos los países (por eso algunas cifras difieren unas décimas de las del INE), descargados el {fecha(generado, { day: 'numeric', month: 'long', year: 'numeric' })}. El salario mínimo sale del BOE.</p>
 </div>
 
 <script>
@@ -226,6 +295,29 @@ function vista(p: Pregunta, L: Lienzo) {
   .ec-cifra.hoy { border-color: var(--ink); }
   .ec-cifra-t { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
   .ec-cifra strong { font-family: var(--display); font-size: 26px; font-weight: 800; letter-spacing: -0.6px; color: var(--ink); }
+  .ec-cifra-gob { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--text-soft); }
+  .ec-cifra-gob i, .ec-tip :global(.ec-tip-gob i) { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+  .ec-tip :global(.ec-tip-gob) { display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; color: var(--text-soft); }
+  .ec-gob { opacity: .85; }
+  .ec-gob-t { font-size: 12px; font-weight: 700; fill: #fff; pointer-events: none; }
+
+  .ec-ctrl { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
+  .ec-ctrl-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+  .ec-ctrl-h h4 { margin: 0; font-family: var(--display); font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: var(--ink); }
+  .ec-meter { display: grid; grid-template-columns: repeat(3, minmax(74px, 1fr)); gap: 3px; }
+  .ec-meter-s { padding: 5px 10px; font-size: 12.5px; font-weight: 600; text-align: center; color: var(--muted); background: var(--panel-2); }
+  .ec-meter-s:first-child { border-radius: 999px 0 0 999px; }
+  .ec-meter-s:last-child { border-radius: 0 999px 999px 0; }
+  .ec-meter-s.on { color: var(--bg); background: color-mix(in srgb, var(--accent) 55%, var(--panel-2)); }
+  .ec-meter-s.cur { background: var(--accent); }
+  .ec-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+  .ec-col { padding: 10px 12px; border-radius: 10px; background: var(--panel-2); border-top: 3px solid var(--c); }
+  .ec-col.gob { --c: var(--accent); }
+  .ec-col.otros { --c: var(--gold); }
+  .ec-col.fuera { --c: var(--muted); }
+  .ec-col h5 { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: var(--ink); }
+  .ec-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+  .ec-col li { padding: 3px 9px; font-size: 12.5px; line-height: 1.4; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; }
   .ec-cifra-ue { font-family: var(--mono); font-size: 12px; color: var(--text-soft); }
 
   .ec-fig { margin: 0; padding: 12px 14px 8px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
@@ -279,7 +371,9 @@ function vista(p: Pregunta, L: Lienzo) {
   @media (max-width: 560px) {
     .ec-q { font-size: 23px; }
     .ec-a { font-size: 15.5px; }
-    .ec-cifra { padding: 8px 10px; }
-    .ec-cifra strong { font-size: 19px; }
+    .ec-cifras { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .ec-cifra { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; padding: 8px 12px; }
+    .ec-cifra strong { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 22px; white-space: nowrap; }
+    .ec-cifra-ue { grid-column: 1; }
   }
 </style>
