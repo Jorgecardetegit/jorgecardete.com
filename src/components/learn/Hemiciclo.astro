@@ -1,0 +1,72 @@
+---
+// Los 350 escaños del Congreso en semicírculo, con botones para ver cuántos hacen
+// falta para cada mayoría. Los escaños se cuentan de izquierda a derecha.
+const total = 350;
+const rows = 10;
+const inner = 0.42;
+
+const radii = Array.from({ length: rows }, (_, i) => inner + ((1 - inner) * i) / (rows - 1));
+const sum = radii.reduce((a, b) => a + b, 0);
+const perRow = radii.map((r) => Math.round((total * r) / sum));
+perRow[rows - 1] += total - perRow.reduce((a, b) => a + b, 0);
+
+const seats = radii
+  .flatMap((r, i) =>
+    Array.from({ length: perRow[i] }, (_, j) => {
+      const angle = Math.PI * (1 - j / (perRow[i] - 1));
+      return { angle, x: 1.1 + r * Math.cos(angle), y: 1.06 - r * Math.sin(angle) };
+    }),
+  )
+  .sort((a, b) => b.angle - a.angle);
+const seatRadius = ((1 - inner) / rows) * 0.36;
+
+const majorities = [
+  { seats: 176, label: 'Absoluta', detail: '176 de 350: la mitad más uno. Para investir a un presidente en primera votación, aprobar una ley orgánica o una moción de censura.' },
+  { seats: 210, label: '3/5', detail: '210 diputados: para elegir a parte del Tribunal Constitucional y del Consejo General del Poder Judicial, o para la reforma ordinaria de la Constitución.' },
+  { seats: 234, label: '2/3', detail: '234 diputados: para la reforma agravada de la Constitución.' },
+];
+---
+<figure class="hemi" data-hemiciclo>
+  <svg viewBox="0 0 2.2 1.12" role="img" aria-label="Los 350 escaños del Congreso de los Diputados">
+    {seats.map((s, i) => <circle cx={s.x.toFixed(4)} cy={s.y.toFixed(4)} r={seatRadius.toFixed(4)} data-i={i} class:list={{ on: i < majorities[0].seats }} />)}
+    <text x="1.1" y="0.98" text-anchor="middle" class="hemi-count" data-count>{majorities[0].seats}</text>
+    <text x="1.1" y="1.07" text-anchor="middle" class="hemi-sub">de 350 escaños</text>
+  </svg>
+  <div class="hemi-buttons" role="group" aria-label="Elige una mayoría">
+    {majorities.map((m, i) => (
+      <button type="button" class="pchip" data-seats={m.seats} data-detail={m.detail} aria-pressed={i === 0 ? 'true' : 'false'}>
+        {m.label} · {m.seats}
+      </button>
+    ))}
+  </div>
+  <figcaption data-detail-out>{majorities[0].detail}</figcaption>
+</figure>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-hemiciclo]')) {
+    const circles = [...root.querySelectorAll<SVGCircleElement>('circle')];
+    const count = root.querySelector('[data-count]')!;
+    const detail = root.querySelector('[data-detail-out]')!;
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-seats]')];
+    for (const button of buttons) {
+      button.addEventListener('click', () => {
+        const n = Number(button.dataset.seats);
+        for (const c of circles) c.classList.toggle('on', Number(c.dataset.i) < n);
+        for (const b of buttons) b.setAttribute('aria-pressed', String(b === button));
+        count.textContent = String(n);
+        detail.textContent = button.dataset.detail!;
+      });
+    }
+  }
+</script>
+
+<style>
+  .hemi { margin: 32px 0; padding: 20px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .hemi svg { display: block; width: 100%; max-width: 560px; margin: 0 auto; }
+  .hemi circle { fill: var(--bg); stroke: var(--muted); stroke-width: 0.004; transition: fill .2s; }
+  .hemi circle.on { fill: var(--green); stroke: var(--ink); }
+  .hemi-count { font-family: var(--display); font-weight: 800; font-size: 0.2px; fill: var(--ink); }
+  .hemi-sub { font-family: var(--mono); font-size: 0.055px; fill: var(--muted); }
+  .hemi-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
+  .hemi figcaption { max-width: 560px; margin: 12px auto 0; min-height: 3em; font-size: 14.5px; line-height: 1.55; text-align: center; color: var(--text-soft); }
+</style>

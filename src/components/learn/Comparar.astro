@@ -5,4 +5,6 @@
 
 <style>
   .comparar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 28px 0; }
+  /* Con cuatro tarjetas, mejor 2×2 que tres y una suelta. */
+  .comparar:has(> :nth-child(4):last-child) { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 </style>
