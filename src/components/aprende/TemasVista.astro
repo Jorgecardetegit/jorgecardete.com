@@ -1,0 +1,179 @@
+---
+// Vista de temas: para cada uno, quién decide, con quién coincide cada partido al votar sobre
+// ese tema, todas sus votaciones con la posición de cada partido y, cuando se publiquen, lo que
+// propone cada uno para el 29-N.
+import AfinidadMatriz from './AfinidadMatriz.astro';
+import { temas, temasDe } from '../../data/politica/temas';
+import {
+  escanosActuales, fecha, partidoById, partidos, posicion, proponentes, resultadoTexto, siglasCortas, tipos, tituloCorto, votaciones,
+} from '../../lib/politica';
+
+const orden = [...partidos].sort((a, b) => escanosActuales(b.id) - escanosActuales(a.id)).map((p) => p.id).filter((id) => escanosActuales(id) > 0);
+const todas = [
+  ...votaciones.clave.filter((v) => v.tipo !== 'investidura'),
+  ...votaciones.propuestas,
+].map((v) => ({ v, temas: temasDe(`${v.titulo} ${v.detalle ?? ''}`) }));
+const tipoLabel = (t: string) => tipos[t as keyof typeof tipos]?.label ?? t;
+const pct = (a: number, b: number) => (b ? Math.round((a / b) * 1000) / 10 : null);
+
+const vistas = temas.map((tema) => {
+  const votos = todas.filter((x) => x.temas.includes(tema.id)).map((x) => x.v).sort((a, b) => b.fecha.localeCompare(a.fecha));
+  // Afinidad y cohesión solo con las votaciones de este tema.
+  const pos = votos.map((v) => Object.fromEntries(orden.map((id) => [id, posicion((v.partidos as Record<string, number[]> | null)?.[id])])));
+  const datos = Object.fromEntries(
+    orden.map((p) => {
+      const afinidad: Record<string, number | null> = {};
+      for (const q of orden) {
+        if (q === p) continue;
+        const comparables = pos.filter((x) => x[p] && x[q]);
+        afinidad[q] = comparables.length >= 3 ? pct(comparables.filter((x) => x[p] === x[q]).length, comparables.length) : null;
+      }
+      const conVoto = votos.map((v) => (v.partidos as Record<string, number[]> | null)?.[p]).filter((r): r is number[] => !!r && r[0] + r[1] + r[2] > 0);
+      const unanimes = conVoto.filter((r) => [r[0], r[1], r[2]].filter((n) => n > 0).length === 1).length;
+      return [p, { afinidad, cohesion: conVoto.length >= 3 ? pct(unanimes, conVoto.length) : null }];
+    }),
+  );
+  return { tema, votos, datos };
+});
+---
+<div class="tv" data-temas>
+  <div class="tv-chips" role="tablist" aria-label="Temas">
+    {vistas.map(({ tema, votos }, i) => (
+      <button type="button" class="tv-chip" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-tema={tema.id}>
+        <span aria-hidden="true">{tema.icono}</span>{tema.nombre}<small>{votos.length}</small>
+      </button>
+    ))}
+  </div>
+
+  {vistas.map(({ tema, votos, datos }, i) => (
+    <section class="tv-panel" data-tema-panel={tema.id} hidden={i !== 0} aria-label={tema.nombre}>
+      <h3 class="tv-title"><span aria-hidden="true">{tema.icono}</span> {tema.nombre}</h3>
+
+      <div class="tv-decide">
+        <div class="tv-label">Quién decide</div>
+        <p>{tema.quienDecide}</p>
+        <p class="tv-lessons">{tema.lecciones.map((l) => <a href={`/aprende/politica/${l.slug}/`}>Lección: {l.texto} →</a>)}</p>
+      </div>
+
+      <div class="tv-block">
+        <div class="tv-label">Qué proponen para el 29-N</div>
+        {Object.keys(tema.propuestas).length === 0 ? (
+          <p class="tv-muted">Los partidos aún no han publicado sus programas. Se añadirán aquí todos a la vez cuando salgan, para comparar a todos con el mismo material.</p>
+        ) : (
+          <ul class="tv-props">
+            {orden.filter((id) => tema.propuestas[id]).map((id) => (
+              <li><span class="pt" style={`--pc: ${partidoById.get(id)!.color}`}>{partidoById.get(id)!.siglas}</span> {tema.propuestas[id].texto} <a href={tema.propuestas[id].fuente}>programa</a></li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div class="tv-block">
+        <div class="tv-label">Qué han votado <span class="tv-count">{votos.length} votaciones</span></div>
+        {votos.length > 0 ? (
+          <>
+            <div class="tv-grid-scroll">
+              <table class="tv-grid">
+                <thead>
+                  <tr>
+                    <th scope="col">Votación</th>
+                    {orden.map((id) => <th scope="col" class="tv-p" title={partidoById.get(id)!.siglas}><span style={`--pc: ${partidoById.get(id)!.color}`}>{siglasCortas[id]}</span></th>)}
+                  </tr>
+                </thead>
+                <tbody data-more-list>
+                  {votos.map((v, j) => (
+                    <tr hidden={j >= 12}>
+                      <th scope="row">
+                        <span class="tv-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)}{v.tipo === 'propuesta' ? ` de ${proponentes(v).texto}` : ''} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
+                        <span class="tv-vt">{tituloCorto(v.titulo)}</span>
+                      </th>
+                      {orden.map((id) => {
+                        const r = (v.partidos as Record<string, number[]> | null)?.[id];
+                        const p = posicion(r);
+                        const div = r && [r[0], r[1], r[2]].filter((x) => x > 0).length > 1;
+                        return <td><i class:list={['vt', p ? `vt-${p}` : 'vt-x']} title={`${partidoById.get(id)!.siglas}: ${r ? `${r[0]} sí, ${r[1]} no, ${r[2]} abst.` : 'sin datos'}`}>{p ? (div ? '½' : p) : '·'}</i></td>;
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {votos.length > 12 && <button type="button" class="tv-more" data-more>Ver las {votos.length}</button>}
+            <p class="tv-muted small">En una enmienda a la totalidad, votar «sí» es querer tumbar el texto. «½»: el partido se dividió.</p>
+          </>
+        ) : (
+          <p class="tv-muted">No hay votaciones clave sobre este tema en la legislatura.</p>
+        )}
+      </div>
+
+      {votos.length >= 3 && (
+        <div class="tv-block">
+          <div class="tv-label">Con quién coincide cada partido en este tema</div>
+          <AfinidadMatriz
+            orden={orden}
+            datos={datos}
+            pie={`Porcentaje de las ${votos.length} votaciones de «${tema.nombre}» en que la mayoría de dos partidos votó lo mismo. «—»: menos de tres votaciones comparables.`}
+          />
+        </div>
+      )}
+    </section>
+  ))}
+  <p class="tv-muted small">Cada votación se asigna a un tema por palabras clave de su título, con una regla fija igual para todas. Algunas encajan en varios temas y otras en ninguno; todas están en la pestaña Votaciones.</p>
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-temas]')) {
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-tema]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-tema-panel]')];
+    for (const c of chips) {
+      c.addEventListener('click', () => {
+        for (const x of chips) x.setAttribute('aria-selected', String(x === c));
+        for (const p of panels) p.hidden = p.dataset.temaPanel !== c.dataset.tema;
+      });
+    }
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-more]')) {
+      const body = button.previousElementSibling!.querySelector('[data-more-list]')!;
+      button.addEventListener('click', () => {
+        for (const tr of body.querySelectorAll<HTMLElement>('tr[hidden]')) tr.hidden = false;
+        button.remove();
+      });
+    }
+  }
+</script>
+
+<style>
+  .tv { display: flex; flex-direction: column; gap: 14px; }
+  .tv-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tv-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; cursor: pointer; }
+  .tv-chip small { font-family: var(--mono); font-size: 11px; font-weight: 400; color: var(--muted); }
+  .tv-chip:hover { border-color: var(--accent); }
+  .tv-chip[aria-selected='true'] { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .tv-chip[aria-selected='true'] small { color: rgba(255, 255, 255, .8); }
+  .tv-panel[hidden] { display: none; }
+  .tv-panel { display: flex; flex-direction: column; gap: 18px; }
+  .tv-title { margin: 6px 0 0; font-family: var(--display); font-size: 26px; font-weight: 800; letter-spacing: -0.6px; }
+  .tv-label { margin-bottom: 8px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .7px; text-transform: uppercase; color: var(--accent); }
+  .tv-count { margin-left: 6px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  .tv-decide { padding: 12px 14px; background: var(--bg); border: 1px solid var(--panel-line); border-left: 4px solid var(--accent); border-radius: 10px; }
+  .tv-decide p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--text-soft); }
+  .tv-lessons { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px !important; font-size: 13px; }
+  .tv-lessons a { font-weight: 600; text-decoration: none; }
+  .tv-muted { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .tv-muted.small { font-size: 12.5px; margin-top: 6px; }
+  .tv-props { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+  .tv-grid-scroll { overflow-x: auto; }
+  .tv-grid { width: 100%; border-collapse: collapse; }
+  .tv-grid thead th { position: sticky; top: -18px; z-index: 1; padding: 6px 2px; font-family: var(--mono); font-size: 10.5px; font-weight: 600; color: var(--muted); text-align: left; background: var(--panel); }
+  .tv-grid thead th.tv-p { text-align: center; }
+  .tv-p span { display: inline-block; padding-bottom: 2px; border-bottom: 2px solid var(--pc); }
+  .tv-grid tbody tr { border-top: 1px solid var(--panel-line); }
+  .tv-grid tbody tr[hidden] { display: none; }
+  .tv-grid tbody th { padding: 7px 10px 7px 0; text-align: left; font-weight: 400; min-width: 260px; }
+  .tv-grid td { padding: 0 1px; text-align: center; }
+  .tv-grid .vt { min-width: 22px; height: 22px; padding: 0; font-size: 10.5px; }
+  .tv-meta { display: block; font-size: 11px; color: var(--muted); }
+  .tv-meta b.ok { color: var(--green); }
+  .tv-meta b.ko { color: var(--red); }
+  .tv-vt { display: -webkit-box; font-size: 13.5px; line-height: 1.35; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tv-more { align-self: flex-start; margin-top: 8px; padding: 6px 14px; font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--panel-2); border: 0; border-radius: 999px; cursor: pointer; }
+</style>

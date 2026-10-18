@@ -4,9 +4,16 @@
 // votaciones en que todos los diputados presentes del partido votaron lo mismo.
 import { partidoById, votaciones } from '../../lib/politica';
 
-interface Props { orden: string[]; destacar?: string }
-const { orden, destacar } = Astro.props;
-const datos = votaciones.partidos as Record<string, { afinidad: Record<string, number>; cohesion: number }>;
+// `datos` y `pie` permiten usarla con un subconjunto de votaciones (los temas); por defecto,
+// todas las de la legislatura.
+type Datos = Record<string, { afinidad: Record<string, number | null>; cohesion: number | null }>;
+interface Props { orden: string[]; destacar?: string; datos?: Datos; pie?: string }
+const {
+  orden,
+  destacar,
+  datos = votaciones.partidos as Datos,
+  pie = `Porcentaje de las ${votaciones.total.toLocaleString('es-ES')} votaciones nominales de la legislatura en que la mayoría de los diputados de dos partidos votó lo mismo. En la diagonal, cuántas veces votó cada partido sin ninguna división interna.`,
+} = Astro.props;
 const ids = orden.filter((id) => datos[id]);
 // Color: de crema (poca coincidencia) al color de acento (mucha), empezando a teñir en el 20 %.
 const tono = (v: number) => Math.round(Math.max(0, Math.min(1, (v - 20) / 75)) * 90);
@@ -26,6 +33,7 @@ const tono = (v: number) => Math.round(Math.max(0, Math.min(1, (v - 20) / 75)) *
             <th scope="row"><span class="pt" style={`--pc: ${partidoById.get(row)!.color}`}>{partidoById.get(row)!.siglas}</span></th>
             {ids.map((col) => {
               const v = row === col ? datos[row].cohesion : datos[row].afinidad[col];
+              if (v == null) return <td class="diag" title="Sin votaciones comparables">—</td>;
               const t = tono(v);
               return (
                 <td
@@ -42,9 +50,7 @@ const tono = (v: number) => Math.round(Math.max(0, Math.min(1, (v - 20) / 75)) *
       </tbody>
     </table>
   </div>
-  <figcaption>
-    Porcentaje de las {votaciones.total.toLocaleString('es-ES')} votaciones nominales de la legislatura en que la mayoría de los diputados de dos partidos votó lo mismo. En la diagonal, cuántas veces votó cada partido sin ninguna división interna.
-  </figcaption>
+  <figcaption>{pie}</figcaption>
 </figure>
 
 <style>

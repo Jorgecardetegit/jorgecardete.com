@@ -6,6 +6,7 @@ import MapaEspana from '../../../components/aprende/MapaEspana.astro';
 import MapaFicha from '../../../components/aprende/MapaFicha.astro';
 import EventoFicha from '../../../components/aprende/EventoFicha.astro';
 import LineaTemporal from '../../../components/aprende/LineaTemporal.astro';
+import TemasVista from '../../../components/aprende/TemasVista.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
 import { getArea } from '../../../data/learn';
 import { elecciones, revisadoPartidos } from '../../../data/politica/partidos';
@@ -92,6 +93,16 @@ const jsonLd = [
         <h2 class="ap-view-title sub">Con quién vota cada partido</h2>
         <p class="ap-view-sub">Lo que han hecho, más allá de lo que dicen: coincidencias en las votaciones de esta legislatura.</p>
         <AfinidadMatriz orden={conDiputados} />
+      </div>
+    </section>
+
+    <section class="ap-view ap-panel scroll" data-view-panel="temas" aria-label="Temas" hidden>
+      <div class="pad">
+        <header class="vhead">
+          <h2 class="ap-view-title">Tema a tema</h2>
+          <p class="ap-view-sub">Elige un tema: quién decide sobre él, qué han votado los partidos en esta legislatura y con quién coincide cada uno.</p>
+        </header>
+        <TemasVista />
       </div>
     </section>
 

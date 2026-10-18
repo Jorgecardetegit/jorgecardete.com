@@ -23,7 +23,7 @@ interface Props {
   lessons: Lesson[];
   mode?: Mode;
   /** Pestaña principal activa en páginas de detalle (partido, diputado, lección). */
-  section?: 'partidos' | 'mapa' | 'historia' | 'diputados' | 'votaciones' | 'como-funciona';
+  section?: 'partidos' | 'temas' | 'mapa' | 'historia' | 'diputados' | 'votaciones' | 'como-funciona';
   /** Lección o partido abiertos, para resaltarlos en la navegación. */
   current?: string;
 }
@@ -34,6 +34,7 @@ const comoFunciona = `${base}como-funciona/`;
 
 const tabs = [
   { id: 'partidos', label: 'Partidos' },
+  { id: 'temas', label: 'Temas' },
   { id: 'mapa', label: 'Mapa' },
   { id: 'historia', label: 'Qué ha pasado' },
   { id: 'diputados', label: 'Diputados' },
@@ -100,12 +101,6 @@ const leccionAbierta = lessons.some((l) => l.id === current) || mode === 'como-f
             </ol>
           </div>
 
-          <div class="ap-sec" data-sec>
-            <div class="ap-sec-title">Próximamente</div>
-            <ul class="ap-soon-list">
-              <li><strong>Temas</strong> · qué propone y qué ha votado cada partido, tema a tema</li>
-            </ul>
-          </div>
 
           <details class="ap-sec ap-theory" data-sec open={leccionAbierta}>
             <summary class="ap-sec-title">Cómo funciona <span class="ap-count">{lessons.length} lecciones</span></summary>
