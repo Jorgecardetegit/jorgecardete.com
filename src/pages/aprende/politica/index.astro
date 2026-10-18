@@ -364,6 +364,15 @@ const jsonLd = [
       </ul>
     </section>
 
+    <section class="ap-card ap-panel">
+      <header class="ap-card-head">
+        <h2 class="ap-card-title">El Senado saliente</h2>
+        <a class="ap-card-link" href="/aprende/politica/cortes/">Lección</a>
+      </header>
+      <p>El PP tenía mayoría absoluta: <strong>143</strong> de 266 senadores (la mitad más uno es 134). El 29-N se eligen 208; el resto los designan después los parlamentos autonómicos.</p>
+      <p class="sen-note">Puede enmendar o vetar las leyes, aunque el Congreso puede levantar el veto. Su voto es imprescindible para reformar la Constitución o aplicar el artículo 155. <a href="https://www.senado.es/web/composicionorganizacion/senadores/composicionsenado/consultagrupoparlamentario/index.html">Fuente: Senado</a></p>
+    </section>
+
     <RankCard
       titulo="La legislatura en cifras"
       filas={[
@@ -513,6 +522,7 @@ const jsonLd = [
   .vhead { margin-bottom: 14px; }
   .vhead-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 16px; }
   .afi-head { align-items: center; margin-bottom: 10px; }
+  .sen-note { margin-top: 8px !important; font-size: 13px !important; color: var(--muted) !important; }
   [data-pv-view][hidden], [data-pv-sub][hidden] { display: none; }
   .pv-toggle { display: inline-flex; flex: none; gap: 2px; padding: 3px; background: var(--panel-2); border-radius: 999px; }
   .pv-toggle button { padding: 7px 15px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
