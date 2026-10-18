@@ -1,0 +1,181 @@
+---
+// Calculadora de la ley D'Hondt para una provincia inventada: cambias votos y escaños
+// y se ve quién se lleva cada uno, quién se queda fuera por el 3 % y por cuánto.
+const parties = [
+  { id: 'A', votes: 120000, color: 'var(--green)' },
+  { id: 'B', votes: 95000, color: 'var(--terracotta)' },
+  { id: 'C', votes: 58000, color: 'var(--purple)' },
+  { id: 'D', votes: 25000, color: 'var(--gold)' },
+  { id: 'E', votes: 9000, color: 'var(--red)' },
+];
+const presets: [string, number][] = [['Soria', 2], ['Toledo', 6], ['Sevilla', 12], ['Madrid', 38]];
+---
+<figure class="dh" data-dhondt>
+  <div class="dh-top">
+    <div class="label-pixel">CALCULADORA D'HONDT</div>
+    <label class="dh-seats">
+      <span>Escaños en juego: <output data-seats-out>7</output></span>
+      <input type="range" min="1" max="38" value="7" data-seats />
+    </label>
+    <div class="dh-presets">
+      <span>Como en</span>
+      {presets.map(([name, seats]) => <button type="button" class="pchip" data-preset={seats}>{name} ({seats})</button>)}
+    </div>
+  </div>
+
+  <div class="dh-parties">
+    {parties.map((p) => (
+      <label class="dh-party" style={`--c: ${p.color}`} data-party={p.id}>
+        <span class="dh-swatch">{p.id}</span>
+        <span class="dh-name">Partido {p.id}</span>
+        <input type="number" min="0" max="10000000" step="1000" value={p.votes} inputmode="numeric" data-votes aria-label={`Votos del partido ${p.id}`} />
+      </label>
+    ))}
+    <label class="dh-party is-blank">
+      <span class="dh-swatch">—</span>
+      <span class="dh-name">En blanco</span>
+      <input type="number" min="0" max="10000000" step="1000" value="3000" inputmode="numeric" data-blank aria-label="Votos en blanco" />
+    </label>
+  </div>
+
+  <div class="dh-result" aria-live="polite">
+    <div class="dh-bar" data-bar></div>
+    <ul class="dh-summary" data-summary></ul>
+    <p class="dh-note" data-note></p>
+  </div>
+
+  <details class="dh-details">
+    <summary>Ver la tabla de divisiones</summary>
+    <p class="dh-help">Los votos de cada partido se dividen entre 1, 2, 3... Los escaños van a los resultados más altos, en el orden que marca el número pequeño.</p>
+    <div class="dh-scroll"><table class="dh-table" data-table></table></div>
+  </details>
+</figure>
+
+<script>
+  const fmt = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 });
+  const pct = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-dhondt]')) {
+    const seatsInput = root.querySelector<HTMLInputElement>('[data-seats]')!;
+    const seatsOut = root.querySelector('[data-seats-out]')!;
+    const blankInput = root.querySelector<HTMLInputElement>('[data-blank]')!;
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-party]')];
+    const bar = root.querySelector('[data-bar]')!;
+    const summary = root.querySelector('[data-summary]')!;
+    const note = root.querySelector('[data-note]')!;
+    const table = root.querySelector('[data-table]')!;
+    const presetButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-preset]')];
+
+    const number = (input: HTMLInputElement) => Math.min(10_000_000, Math.max(0, Math.floor(Number(input.value) || 0)));
+
+    const update = () => {
+      const seats = Number(seatsInput.value);
+      seatsOut.textContent = String(seats);
+      for (const b of presetButtons) b.setAttribute('aria-pressed', String(Number(b.dataset.preset) === seats));
+
+      const parties = rows.map((row) => ({
+        id: row.dataset.party!,
+        color: row.style.getPropertyValue('--c'),
+        votes: number(row.querySelector<HTMLInputElement>('[data-votes]')!),
+      }));
+      // El voto en blanco cuenta como válido: sube el listón del 3 % aunque no dé escaños a nadie.
+      const valid = parties.reduce((sum, p) => sum + p.votes, 0) + number(blankInput);
+      const threshold = valid * 0.03;
+      const eligible = parties.filter((p) => p.votes > 0 && p.votes >= threshold);
+
+      // Todas las divisiones; a igualdad de cociente gana quien tiene más votos en total.
+      const quotients = eligible
+        .flatMap((p) => Array.from({ length: seats }, (_, k) => ({ party: p, divisor: k + 1, value: p.votes / (k + 1) })))
+        .sort((a, b) => b.value - a.value || b.party.votes - a.party.votes);
+      const winners = quotients.slice(0, seats);
+      const won = new Map(parties.map((p) => [p.id, 0]));
+      for (const w of winners) won.set(w.party.id, won.get(w.party.id)! + 1);
+
+      bar.innerHTML = winners
+        .map((w, i) => `<span style="background:${w.party.color}" title="Escaño ${i + 1}: partido ${w.party.id}">${w.party.id}</span>`)
+        .join('');
+
+      summary.innerHTML = parties
+        .map((p) => {
+          const share = valid ? (p.votes / valid) * 100 : 0;
+          const seatsWon = won.get(p.id)!;
+          const out = p.votes > 0 && p.votes < threshold;
+          const label = out ? 'no llega al 3 %' : `${seatsWon} ${seatsWon === 1 ? 'escaño' : 'escaños'}`;
+          return `<li class="${out ? 'is-out' : ''}"><span class="dh-swatch" style="--c:${p.color}">${p.id}</span><strong>${label}</strong><span>${pct.format(share)} % de los votos</span></li>`;
+        })
+        .join('');
+
+      // Por cuánto se decidió el último escaño.
+      const last = winners[winners.length - 1];
+      const next = quotients[seats];
+      if (last && next) {
+        const missing = Math.max(1, Math.floor(last.value * next.divisor - next.party.votes) + 1);
+        note.textContent = `El último escaño fue para el partido ${last.party.id}. Al partido ${next.party.id} le habrían bastado unos ${fmt.format(missing)} votos más para quitárselo.`;
+      } else if (!winners.length) {
+        note.textContent = 'Ningún partido llega al 3 %: escribe algunos votos.';
+      } else {
+        note.textContent = '';
+      }
+
+      const columns = Math.min(seats, 10);
+      const order = new Map(winners.map((w, i) => [`${w.party.id}-${w.divisor}`, i + 1]));
+      const head = `<tr><th>Partido</th>${Array.from({ length: columns }, (_, k) => `<th>÷${k + 1}</th>`).join('')}</tr>`;
+      const body = eligible
+        .map((p) => {
+          const cells = Array.from({ length: columns }, (_, k) => {
+            const n = order.get(`${p.id}-${k + 1}`);
+            return `<td class="${n ? 'is-win' : ''}">${fmt.format(p.votes / (k + 1))}${n ? `<sup>${n}</sup>` : ''}</td>`;
+          }).join('');
+          return `<tr><th><span class="dh-swatch" style="--c:${p.color}">${p.id}</span></th>${cells}</tr>`;
+        })
+        .join('');
+      table.innerHTML = head + body;
+    };
+
+    root.addEventListener('input', update);
+    for (const b of presetButtons) {
+      b.addEventListener('click', () => {
+        seatsInput.value = b.dataset.preset!;
+        update();
+      });
+    }
+    update();
+  }
+</script>
+
+<style>
+  .dh { margin: 32px 0; padding: 20px; background: var(--card); border: 3px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--shadow); }
+  .dh-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .dh-top .label-pixel { margin: 0; }
+  .dh-seats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-family: var(--display); font-size: 18px; font-weight: 700; }
+  .dh-seats output { font-family: var(--mono); color: var(--green); }
+  .dh-seats input { flex: 1 1 200px; accent-color: var(--green); }
+  .dh-presets { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .dh-presets .pchip { font-size: 13px; padding: 4px 10px; }
+
+  .dh-parties { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-bottom: 18px; }
+  .dh-party { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 8px; padding: 8px 10px; background: var(--bg); border: 2px solid var(--ink); border-radius: 3px; font-size: 14px; }
+  .dh-party input { grid-column: 1 / -1; width: 100%; min-width: 0; padding: 6px 8px; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--card); border: 2px solid var(--ink); border-radius: 3px; }
+  .dh-party input:focus { outline: 2px solid var(--green); outline-offset: 1px; }
+  .is-blank { --c: var(--line); }
+  .dh-name { font-weight: 600; }
+  .dh :global(.dh-swatch) { display: inline-grid; place-items: center; width: 22px; height: 22px; font-family: var(--mono); font-size: 12px; font-weight: 700; color: #1f1d1a; background: var(--c); border: 2px solid var(--ink); }
+
+  .dh-result { padding-top: 16px; border-top: 2px dashed var(--line); }
+  .dh-bar { display: flex; flex-wrap: wrap; gap: 3px; min-height: 30px; margin-bottom: 14px; }
+  .dh-bar :global(span) { display: grid; place-items: center; width: 26px; height: 26px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: #1f1d1a; border: 2px solid var(--ink); }
+  .dh-summary { list-style: none; margin: 0 0 10px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px 14px; }
+  .dh-summary :global(li) { display: grid; grid-template-columns: auto 1fr; gap: 0 8px; align-items: center; margin: 0; font-size: 14px; }
+  .dh-summary :global(li > span:last-child) { grid-column: 2; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .dh-summary :global(li.is-out strong) { color: var(--red); }
+  .dh-note { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-soft); }
+
+  .dh-details { margin-top: 16px; }
+  .dh-details summary { cursor: pointer; font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--green); }
+  .dh-help { margin: 10px 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .dh-scroll { overflow-x: auto; }
+  .dh-table { border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; }
+  .dh-table :global(th), .dh-table :global(td) { padding: 6px 9px; border: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  .dh-table :global(td.is-win) { background: var(--bg); font-weight: 700; color: var(--green); }
+  .dh-table :global(sup) { margin-left: 3px; font-size: 10px; color: var(--muted); }
+</style>

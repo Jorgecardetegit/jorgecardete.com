@@ -1,0 +1,151 @@
+---
+title: Cómo se convierten los votos en escaños
+description: Provincias, la ley D'Hondt, el 3 %, el Senado de listas abiertas y qué pasa de verdad con el voto en blanco. Con una calculadora para probarlo.
+section: como-funciona
+order: 4
+icon: 🗳️
+summary: Cada provincia reparte sus propios diputados con la ley D'Hondt. Por eso no cuenta solo cuántos votos tiene un partido, sino dónde los tiene.
+keyPoints:
+  - Hay 52 circunscripciones, las 50 provincias más Ceuta y Melilla, y cada una elige sus diputados por separado.
+  - Todas las provincias tienen al menos 2 diputados, así que un voto en Soria pesa más que uno en Madrid.
+  - Para entrar en el reparto hay que superar el 3 % en la provincia. En las pequeñas, el listón real es mucho más alto.
+  - El voto en blanco no va a ningún partido. Solo sube un poco el listón del 3 %. El nulo y la abstención no cuentan.
+  - En el Senado votas personas, hasta 3 en la mayoría de provincias, y puedes elegirlas de partidos distintos.
+sources:
+  - title: Ley Orgánica 5/1985 del Régimen Electoral General (LOREG), artículos 161 a 166 (BOE)
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672
+  - title: Real Decreto 806/2026, de convocatoria de las elecciones del 29 de noviembre (BOE)
+    url: https://www.boe.es/buscar/doc.php?id=BOE-A-2026-20742
+  - title: Constitución Española, artículos 68 y 69 (BOE)
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229
+  - title: Resultados electorales oficiales (Ministerio del Interior)
+    url: https://infoelectoral.interior.gob.es/
+updated: 2026-10-18
+---
+
+## Dos papeletas el mismo día
+
+En unas elecciones generales eliges dos cámaras a la vez, y cada una se vota de forma distinta:
+
+<Comparar>
+  <Lado titulo="Congreso" subtitulo="Papeleta blanca" icono="📄" color="green">
+    Eliges **una lista de un partido**. Es cerrada y bloqueada: no puedes tachar nombres ni cambiar el orden. Si el partido saca 3 escaños en tu provincia, entran los 3 primeros de la lista.
+  </Lado>
+  <Lado titulo="Senado" subtitulo="Papeleta sepia" icono="📜" color="terracotta">
+    Eliges **personas**. Aparecen todos los candidatos y marcas con una cruz hasta 3 (en la mayoría de provincias). Pueden ser de partidos distintos.
+  </Lado>
+</Comparar>
+
+## Tu provincia es tu circunscripción
+
+España no vota como un todo. Cada provincia (más Ceuta y Melilla) es una **circunscripción** que reparte sus propios diputados, sin tener en cuenta lo que pase en el resto. La ley fija las reglas:
+
+- Hay **350 diputados** en total.
+- Cada provincia tiene **un mínimo de 2**, y Ceuta y Melilla 1 cada una.
+- Los **248 restantes** se reparten según la población, y el reparto se actualiza en cada convocatoria.
+
+<EscanosProvincias />
+
+<Nota tipo="clave" titulo="Por qué un voto en Soria pesa más">
+Por el mínimo de 2 diputados, las provincias poco pobladas tienen más escaños de los que les tocarían por habitantes. Soria elige 2 diputados con unos 90.000 habitantes (uno por cada ~45.000). Madrid elige 38 con más de 7 millones (uno por cada ~185.000). Es una decisión de 1977 que se mantuvo para que el mundo rural no quedara sin voz. Tiene defensores y críticos, y cambiarla exige reformar la LOREG y, en parte, la Constitución.
+</Nota>
+
+## La ley D'Hondt, paso a paso
+
+Dentro de cada provincia, los escaños se reparten con el método que propuso el jurista belga Victor D'Hondt en el siglo XIX:
+
+<Pasos>
+  <Paso titulo="Se quitan los partidos con menos del 3 %">
+    Se cuentan los votos válidos, que incluyen el voto en blanco, y quedan fuera las listas que no llegan al 3 % en esa provincia.
+  </Paso>
+  <Paso titulo="Se dividen los votos de cada partido entre 1, 2, 3...">
+    Hasta tantas divisiones como escaños haya en juego.
+  </Paso>
+  <Paso titulo="Los escaños van a los resultados más altos" final>
+    Se ordenan todos los cocientes de mayor a menor y cada escaño se lo lleva el siguiente de la lista. Si hay un empate, gana el partido con más votos en total.
+  </Paso>
+</Pasos>
+
+Pruébalo tú. Cambia los votos o los escaños y mira cómo cambia el reparto:
+
+<CalculadoraDHondt />
+
+Fíjate en lo que pasa con los valores iniciales. El partido D tiene un 8 % de los votos y no saca ningún escaño con 7 en juego. Súbelo a Madrid (38) y lo consigue. El partido E, con un 2,9 %, se queda fuera aunque haya escaños de sobra.
+
+## El 3 % es lo de menos
+
+El umbral legal es el 3 %, pero en la mayoría de provincias es irrelevante: con tan pocos escaños, para sacar uno hace falta mucho más.
+
+<Cifras>
+  <Cifra valor="~33 %" etiqueta="hace falta, a grandes rasgos, para asegurar 1 de 2 escaños (Soria)" color="red" />
+  <Cifra valor="~14 %" etiqueta="para 1 de 6 escaños (Toledo)" color="terracotta" />
+  <Cifra valor="~3 %" etiqueta="para 1 de 38 escaños (Madrid). Aquí sí manda el umbral legal." color="green" />
+</Cifras>
+
+Son aproximaciones: el número exacto depende de cómo se repartan los votos los demás partidos. Pero la idea es clara. **En una provincia pequeña, solo los dos o tres partidos más fuertes tienen opciones reales.**
+
+<Nota tipo="ejemplo" titulo="El mismo voto, distinto premio (elecciones de 2015)">
+Izquierda Unida sacó 926.783 votos en toda España y consiguió 2 escaños. El PNV sacó 302.316 votos, tres veces menos, y consiguió 6. La diferencia es que el PNV concentró sus votos en tres provincias donde era primera o segunda fuerza, mientras que los de IU estaban repartidos por todo el país: en casi todas las provincias se quedaron lejos de lo necesario para un escaño.
+</Nota>
+
+El sistema premia a los partidos grandes y a los que concentran sus votos en un territorio, y castiga a los medianos con votos dispersos. De ahí sale el famoso **voto útil**: votar a un partido con opciones de escaño en tu provincia en lugar de al que más te gusta. Si te conviene o no es decisión tuya. Lo importante es que sepas que en tu provincia, según su tamaño, algunos votos tienen muchas más probabilidades de convertirse en escaño que otros.
+
+## Blanco, nulo o abstención: qué pasa con cada uno
+
+<Comparar>
+  <Lado titulo="Voto en blanco" subtitulo="Sobre vacío o papeleta en blanco" icono="⬜" color="gold">
+    **Cuenta como voto válido**, pero no va a ningún partido. Su único efecto es que sube un poco el listón del 3 %, y eso solo importa a los partidos que rozan ese umbral. Expresa "participo, pero no me convence nadie".
+  </Lado>
+  <Lado titulo="Voto nulo" subtitulo="Papeleta tachada, dos papeletas distintas..." icono="❌" color="red">
+    **No cuenta para nada** en el reparto. Solo aparece en la estadística de participación. A veces se usa como protesta, pero el sistema no lo distingue de un error.
+  </Lado>
+  <Lado titulo="Abstención" subtitulo="No ir a votar" icono="🏠" color="purple">
+    **No cuenta para nada.** Los 350 escaños se reparten igual entre quienes votan, aunque vote la mitad del censo. No hay escaños vacíos.
+  </Lado>
+</Comparar>
+
+<Mito mito="El voto en blanco se lo lleva el partido que gana.">
+  No va a ningún partido. Como cuenta para calcular el 3 %, lo que hace es dificultar un poco que los partidos pequeños lleguen al umbral. En la práctica eso favorece de forma indirecta a los que ya lo superan con holgura, pero no da escaños a nadie en concreto.
+</Mito>
+
+## El Senado: votas personas
+
+<Cifras>
+  <Cifra valor="208" etiqueta="senadores elegidos en las urnas" color="terracotta" />
+  <Cifra valor="58" etiqueta="designados por los parlamentos autonómicos (cifra de la última legislatura)" color="purple" />
+  <Cifra valor="4" etiqueta="senadores por provincia, salvo islas, Ceuta y Melilla" color="green" />
+</Cifras>
+
+En cada provincia se eligen 4 senadores, pero tú solo puedes marcar **3**. Así se garantiza que haya representación de más de un partido. Lo habitual es que el partido más votado saque 3 y el segundo 1, aunque si los votantes mezclan candidatos puede cambiar. En las islas grandes (Mallorca, Gran Canaria y Tenerife) se eligen 3 y marcas 2. En el resto de islas, 1. Ceuta y Melilla eligen 2.
+
+Además, cada parlamento autonómico designa un senador, más otro por cada millón de habitantes de la comunidad. Esa cifra cambia con la población, por eso el total de senadores no es fijo.
+
+## El calendario de las elecciones de 2026
+
+<Pasos>
+  <Paso titulo="Convocatoria" quien="6 de octubre">
+    El BOE publica el decreto que disuelve las Cortes y convoca elecciones para 54 días después. A partir de aquí, el Gobierno sigue en funciones.
+  </Paso>
+  <Paso titulo="Listas de candidatos" quien="finales de octubre">
+    Los partidos presentan sus candidaturas en cada provincia, y la Junta Electoral las revisa y las publica en el BOE.
+  </Paso>
+  <Paso titulo="Plazo para pedir el voto por correo" quien="hasta el 19 de noviembre">
+    Se pide en Correos hasta el décimo día antes de la votación.
+  </Paso>
+  <Paso titulo="Campaña electoral" quien="13 al 27 de noviembre">
+    Quince días de mítines y propaganda. Desde el 24 de noviembre está prohibido publicar encuestas.
+  </Paso>
+  <Paso titulo="Jornada de reflexión" quien="28 de noviembre">
+    No se puede pedir el voto.
+  </Paso>
+  <Paso titulo="Votación" quien="29 de noviembre, de 9 a 20 h">
+    Al cerrar los colegios se cuentan los votos en cada mesa, delante de quien quiera mirar.
+  </Paso>
+  <Paso titulo="Se constituyen las nuevas Cortes" quien="23 de diciembre" final>
+    Diputados y senadores toman posesión. Después llega la investidura del presidente, que verás en la lección sobre el Gobierno.
+  </Paso>
+</Pasos>
+
+<Nota tipo="dato">
+Las mesas electorales las forman ciudadanos elegidos por sorteo entre los vecinos del censo. Si te toca, es obligatorio, salvo causa justificada que la Junta Electoral acepte. Los partidos pueden enviar interventores y apoderados para vigilar el recuento.
+</Nota>
