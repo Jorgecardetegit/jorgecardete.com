@@ -133,7 +133,7 @@ export function proponentes(p: { titulo: string; proponente?: string | null }): 
     const nombres = ids.map((id) => (id === 'mixto' ? 'Grupo Mixto' : partidoById.get(id)?.siglas ?? id));
     return { partidos: ids, texto: nombres.join(', ') };
   }
-  const institucion = t.match(/(?:Del|de la|del) (Parlamento de [A-ZÁÉÍÓÚ][\wáéíóú]+(?: [A-ZÁÉÍÓÚ][\wáéíóú]+)?|Asamblea (?:Regional )?de [A-ZÁÉÍÓÚ][\wáéíóú]+)/);
+  const institucion = t.match(/(?:Del|de la|del) (Parlamento de \p{Lu}\p{L}+(?: \p{Lu}\p{L}+)?|Asamblea (?:Regional )?de \p{Lu}\p{L}+)/u);
   if (institucion) return { partidos: [], texto: institucion[1] };
   if (/Rufián Romero y otros/.test(t)) return { partidos: [], texto: 'Diputados de varios grupos' };
   return { partidos: [], texto: 'Iniciativa legislativa popular u otra' };

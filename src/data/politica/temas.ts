@@ -60,7 +60,7 @@ export const temas: Tema[] = [
   },
   {
     id: 'igualdad', nombre: 'Igualdad y derechos', icono: '🟰',
-    patron: 'igualdad|mujer|violencia|paridad|paritaria|lgtb|discapacidad|eutanasia|aborto|libertad sexual|vicaria|infancia|menores|accesibilidad',
+    patron: 'igualdad|mujer|violencia|paridad|paritaria|lgtb|discapacidad|eutanasia|morir dignamente|aborto|libertad sexual|vicaria|infancia|menores|accesibilidad',
     quienDecide: 'Los derechos fundamentales se regulan por ley orgánica del Estado. Muchos servicios (atención a víctimas, discapacidad) los prestan las comunidades.',
     lecciones: [{ texto: 'La Constitución', slug: 'constitucion' }], propuestas: {},
   },
@@ -98,8 +98,11 @@ export const temas: Tema[] = [
 
 const normalizar = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 
-/** Temas de una votación según su título y detalle. */
+/**
+ * Temas de una votación según su título y detalle. Quién la propone no cuenta: una proposición
+ * «del Parlamento de Cataluña» no es por eso del tema territorial.
+ */
 export function temasDe(texto: string): string[] {
-  const t = normalizar(texto);
+  const t = normalizar(texto).replace(/\b(parlamento|asamblea(?: regional)?) de [a-z]+(?: [a-z]+)?/g, '');
   return temas.filter((tema) => new RegExp(tema.patron).test(t)).map((tema) => tema.id);
 }

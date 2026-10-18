@@ -109,15 +109,17 @@ const vistas = temas.map((tema) => {
                   {votos.map((v, j) => (
                     <tr hidden={j >= 12}>
                       <th scope="row">
-                        <span class="tv-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)}{v.tipo === 'propuesta' ? ` de ${proponentes(v).texto}` : ''} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
+                        <span class="tv-meta">{fecha(v.fecha)} · {tipoLabel(v.tipo)}{v.tipo === 'propuesta' ? ` (${proponentes(v).texto})` : ''} · <b class:list={[v.resultado === 'aprobada' ? 'ok' : 'ko']}>{resultadoTexto(v.tipo, v.resultado)}</b></span>
                         <span class="tv-vt">{tituloCorto(v)}</span>
                       </th>
-                      {orden.map((id) => {
+                      {v.partidos ? orden.map((id) => {
                         const r = (v.partidos as Record<string, number[]> | null)?.[id];
                         const p = posicion(r);
                         const div = r && [r[0], r[1], r[2]].filter((x) => x > 0).length > 1;
                         return <td><i class:list={['vt', p ? `vt-${p}` : 'vt-x']} title={`${partidoById.get(id)!.siglas}: ${r ? `${r[0]} sí, ${r[1]} no, ${r[2]} abst.` : 'sin datos'}`}>{p ? (div ? '½' : p) : '·'}</i></td>;
-                      })}
+                      }) : (
+                        <td colspan={orden.length} class="tv-nodata">Sin voto por partido: el Congreso solo publica el total ({v.totales.si} sí, {v.totales.no} no).</td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -205,6 +207,7 @@ const vistas = temas.map((tema) => {
   .tv-meta { display: block; font-size: 11px; color: var(--muted); }
   .tv-meta b.ok { color: var(--green); }
   .tv-meta b.ko { color: var(--red); }
+  .tv-nodata { font-size: 12.5px; color: var(--muted); }
   .tv-vt { display: -webkit-box; font-size: 13.5px; line-height: 1.35; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .tv-more { align-self: flex-start; margin-top: 8px; padding: 6px 14px; font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--panel-2); border: 0; border-radius: 999px; cursor: pointer; }
 </style>

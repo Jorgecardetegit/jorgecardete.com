@@ -96,7 +96,7 @@ const jsonLd = [
                 <a class="pcard" href={partidoPath(p.id)} style={`--pc: ${p.color}`}>
                   <span class="pcard-top">
                     <span class="pcard-siglas">{p.siglas}</span>
-                    <span class="pcard-seats"><strong>{actuales || '—'}</strong>{actuales ? ' diputados' : ' sin diputados'}</span>
+                    <span class="pcard-seats"><strong>{actuales || '—'}</strong>{actuales === 1 ? ' diputado' : actuales ? ' diputados' : ' sin diputados'}</span>
                   </span>
                   <span class="pcard-name">{p.nombre !== p.siglas ? p.nombre : p.ambito}</span>
                   <span class="pcard-meta">{p.lider.nombre} · {p.lider.cargo.split(' (')[0]}</span>
