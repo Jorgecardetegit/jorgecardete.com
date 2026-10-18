@@ -23,7 +23,7 @@ interface Props {
   lessons: Lesson[];
   mode?: Mode;
   /** Pestaña principal activa en páginas de detalle (partido, diputado, lección). */
-  section?: 'partidos' | 'temas' | 'historia' | 'gobiernos' | 'economia' | 'diputados' | 'votaciones' | 'como-funciona';
+  section?: 'partidos' | 'temas' | 'historia' | 'gobiernos' | 'economia' | 'diputados' | 'votaciones' | 'votar' | 'como-funciona';
   /** Lección o partido abiertos, para resaltarlos en la navegación. */
   current?: string;
 }
@@ -40,6 +40,7 @@ const tabs = [
   { id: 'economia', label: 'Economía' },
   { id: 'diputados', label: 'Diputados' },
   { id: 'votaciones', label: 'Votaciones' },
+  { id: 'votar', label: 'Cómo votar' },
 ] as const;
 
 const escanos = new Map<string, number>();
@@ -148,7 +149,7 @@ const leccionAbierta = lessons.some((l) => l.id === current) || mode === 'como-f
             <a class="ap-tab" href={`${base}#${t.id}`} aria-current={section === t.id ? 'page' : undefined}>{t.label}</a>
           ),
         )}
-        <span class="ap-countdown" data-ap-countdown>Elecciones generales: <strong>29 de noviembre de 2026</strong></span>
+        <a class="ap-countdown" href={`${base}#votar`} data-ap-countdown>Elecciones generales: <strong>29 de noviembre de 2026</strong> · cómo votar</a>
       </nav>
       <slot />
     </main>
@@ -204,9 +205,9 @@ const leccionAbierta = lessons.some((l) => l.id === current) || mode === 'como-f
   // Cuenta atrás hasta el 29 de noviembre de 2026 (hora peninsular).
   const countdown = document.querySelector('[data-ap-countdown]')!;
   const days = Math.ceil((new Date('2026-11-29T09:00:00+01:00').getTime() - Date.now()) / 86_400_000);
-  if (days > 1) countdown.innerHTML = `29-N: faltan <strong>${days} días</strong>`;
-  else if (days === 1) countdown.innerHTML = '29-N: <strong>mañana</strong>';
-  else if (days === 0) countdown.innerHTML = '29-N: <strong>hoy</strong>';
+  if (days > 1) countdown.innerHTML = `29-N: faltan <strong>${days} días</strong> · cómo votar`;
+  else if (days === 1) countdown.innerHTML = '29-N: <strong>mañana</strong> · cómo votar';
+  else if (days === 0) countdown.innerHTML = '29-N: <strong>hoy</strong> · cómo votar';
 
   // Móvil: la navegación se abre y cierra con un botón.
   const left = document.querySelector<HTMLElement>('[data-ap-left]')!;

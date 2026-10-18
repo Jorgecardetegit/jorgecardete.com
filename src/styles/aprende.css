@@ -66,7 +66,8 @@
 .ap-tab { padding: 9px 16px; font: inherit; font-size: 14.5px; font-weight: 600; color: var(--ink); background: var(--panel); border: 1px solid var(--panel-line); border-radius: 999px; box-shadow: var(--panel-shadow); cursor: pointer; text-decoration: none; }
 .ap-tab:hover { color: var(--accent); }
 .ap-tab[aria-selected='true'], .ap-tab[aria-current='page'] { color: #fff; background: var(--accent); border-color: var(--accent); }
-.ap-countdown { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.ap-countdown { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--muted); text-decoration: none; }
+.ap-countdown:hover { color: var(--accent); }
 .ap-countdown strong { color: var(--accent); }
 
 .ap-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; }

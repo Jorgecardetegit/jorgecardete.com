@@ -1,0 +1,101 @@
+---
+// Vista «Cómo votar»: lo práctico del 29-N, en el orden en que se necesita (censo, correo,
+// extranjero, el día de la votación). Las fechas salen de los plazos de la LOREG contados
+// desde el 29 de noviembre; el detalle teórico queda en la lección de elecciones.
+const pasos = [
+  {
+    icono: '🪪', titulo: 'Quién puede votar',
+    texto: [
+      'Quien tenga nacionalidad española, 18 años cumplidos el 29 de noviembre y esté en el censo electoral. Si ya votaste en otras elecciones y no te has mudado, ya estás.',
+      'Las personas extranjeras no votan en las generales, aunque algunas sí pueden hacerlo en las municipales.',
+    ],
+  },
+  {
+    icono: '🔎', titulo: 'Comprueba el censo y tu colegio',
+    texto: [
+      'En la sede electrónica del INE o en tu ayuntamiento puedes ver si estás en el censo y en qué colegio y mesa te toca votar. Si hay un error, se reclama en los días siguientes a la convocatoria.',
+      'Te llegará a casa una tarjeta censal con el colegio y la mesa. No hace falta llevarla.',
+    ],
+  },
+  {
+    icono: '✉️', titulo: 'Si no puedes ir: voto por correo',
+    lista: [
+      ['Hasta el 19 de noviembre', 'Pídelo en cualquier oficina de Correos con tu DNI, o en su web con certificado digital o DNI electrónico. Si no puedes ir por enfermedad, puede pedirlo otra persona con un poder ante notario y un certificado médico.'],
+      ['Después', 'Correos te lleva a casa las papeletas y los sobres. Tienes que recogerlos en persona, con tu DNI.'],
+      ['Hasta el 25 de noviembre', 'Lo envías desde una oficina de Correos, certificado y sin coste.'],
+    ],
+    ojo: 'Si pides el voto por correo, ya no puedes votar en persona en tu mesa, aunque no llegues a enviarlo.',
+  },
+  {
+    icono: '🌍', titulo: 'Si vives fuera de España',
+    texto: [
+      'Si estás en el censo de residentes en el extranjero (el CERA), desde 2022 ya no hace falta pedir el voto: la documentación llega a tu domicilio. Puedes enviarla por correo al consulado o depositarla en la urna del consulado los días anteriores a la votación.',
+      'Si estás fuera solo una temporada, tienes que darte de alta en el consulado y pedir el voto, con plazos más cortos. Consulta los de tu consulado cuanto antes.',
+    ],
+  },
+  {
+    icono: '🗳️', titulo: 'El 29 de noviembre',
+    lista: [
+      ['De 9 a 20 h', 'En tu colegio, con el DNI, el pasaporte o el carné de conducir originales.'],
+      ['Congreso · papeleta blanca', 'Una lista cerrada de un partido. Va dentro del sobre; si tachas o escribes algo, el voto es nulo.'],
+      ['Senado · papeleta sepia', 'Marcas personas, no listas: hasta 3 en la mayoría de provincias, y pueden ser de partidos distintos.'],
+      ['En el trabajo', 'Si tu jornada coincide con el horario de votación, tienes derecho a un permiso pagado de hasta cuatro horas, según cuánto coincidan.'],
+    ],
+    ojo: 'Puedes llevar el voto preparado de casa, con las papeletas que envían los partidos o las que hay en el colegio.',
+  },
+];
+
+const fuentes = [
+  { title: 'Ley Orgánica del Régimen Electoral General (BOE)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672' },
+  { title: 'Censo electoral (INE)', url: 'https://www.ine.es/' },
+  { title: 'Voto por correo (Correos)', url: 'https://www.correos.es/' },
+  { title: 'Información electoral (Ministerio del Interior)', url: 'https://infoelectoral.interior.gob.es/' },
+  { title: 'Voto desde el exterior (Ministerio de Asuntos Exteriores)', url: 'https://www.exteriores.gob.es/' },
+];
+---
+<ol class="cv">
+  {pasos.map((p) => (
+    <li class="cv-step">
+      <h3 class="cv-title"><span aria-hidden="true">{p.icono}</span> {p.titulo}</h3>
+      {p.texto?.map((t) => <p>{t}</p>)}
+      {p.lista && (
+        <dl class="cv-list">
+          {p.lista.map(([cuando, que]) => (
+            <div><dt>{cuando}</dt><dd>{que}</dd></div>
+          ))}
+        </dl>
+      )}
+      {p.ojo && <p class="cv-ojo">{p.ojo}</p>}
+    </li>
+  ))}
+</ol>
+
+<div class="cv-more">
+  <p>
+    <strong>Blanco, nulo o abstención.</strong> El voto en blanco cuenta como voto válido y sube un poco el listón del 3 %, pero no va a ningún partido. El nulo y la abstención no cuentan para el reparto.
+    <a href="/aprende/politica/elecciones/">Lección: cómo se convierten los votos en escaños →</a>
+  </p>
+  <p>
+    <strong>Si te toca estar en una mesa.</strong> Los miembros de las mesas se eligen por sorteo entre los vecinos del censo y te lo notifican. Es obligatorio, salvo una causa justificada que acepte la Junta Electoral de Zona.
+  </p>
+</div>
+
+<p class="cv-src">
+  Fuentes:
+  {fuentes.map((f, i) => <>{i > 0 && ' · '}<a href={f.url}>{f.title}</a></>)}
+</p>
+
+<style>
+  .cv { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+  .cv-step { padding: 14px 16px; background: var(--panel-2); border-radius: 12px; }
+  .cv-title { margin: 0 0 6px; font-family: var(--display); font-size: 15px; font-weight: 800; letter-spacing: -0.2px; }
+  .cv-step p { margin: 0 0 6px; font-size: 14px; line-height: 1.55; color: var(--text-soft); }
+  .cv-list { margin: 4px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .cv-list dt { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); }
+  .cv-list dd { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-soft); }
+  .cv-ojo { margin-top: 10px !important; padding-left: 10px; border-left: 3px solid var(--accent); font-size: 13.5px !important; }
+  .cv-more { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .cv-more p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--text-soft); }
+  .cv-more a { font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .cv-src { margin: 14px 0 0; font-size: 12.5px; color: var(--muted); }
+</style>

@@ -2,6 +2,7 @@
 import Aprende from '../../../layouts/Aprende.astro';
 import AfinidadMatriz from '../../../components/aprende/AfinidadMatriz.astro';
 import CalendarioCard from '../../../components/aprende/CalendarioCard.astro';
+import ComoVotar from '../../../components/aprende/ComoVotar.astro';
 import MapaEspana from '../../../components/aprende/MapaEspana.astro';
 import MapaFicha from '../../../components/aprende/MapaFicha.astro';
 import EconomiaVista from '../../../components/aprende/EconomiaVista.astro';
@@ -168,6 +169,16 @@ const jsonLd = [
           <p class="ap-view-sub">Las preguntas que se hace cualquiera, respondidas con datos oficiales desde 2011 y con Europa al lado. Elige un tema.</p>
         </header>
         <EconomiaVista />
+      </div>
+    </section>
+
+    <section class="ap-view ap-panel scroll" data-view-panel="votar" aria-label="Cómo votar" hidden>
+      <div class="pad">
+        <header class="vhead">
+          <h2 class="ap-view-title">Cómo votar el 29 de noviembre</h2>
+          <p class="ap-view-sub">Lo práctico, en el orden en que lo vas a necesitar: el censo, el voto por correo, el voto desde fuera y el día de la votación.</p>
+        </header>
+        <ComoVotar />
       </div>
     </section>
 
