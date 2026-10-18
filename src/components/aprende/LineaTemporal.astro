@@ -1,0 +1,219 @@
+---
+// Línea temporal: franja con quién gobernaba y un punto por hecho, filtros y la lista año a año.
+// Al pulsar un hecho se abre su ficha en la columna derecha (EventoFicha.astro).
+import { categorias, eventos, gobiernos, type Categoria } from '../../data/politica/linea-temporal';
+import { partidos } from '../../data/politica/partidos';
+import { fecha } from '../../lib/politica';
+
+const W = 1000;
+const inicio = Date.UTC(2011, 0, 1);
+const fin = Date.UTC(2027, 0, 1);
+const x = (iso: string) => {
+  const [y, m, d = '15'] = iso.split('-');
+  return ((Date.UTC(+y, +m - 1, +d) - inicio) / (fin - inicio)) * W;
+};
+const color = new Map(partidos.map((p) => [p.id, p.color]));
+const orden = Object.keys(categorias) as Categoria[];
+const carril = (c: Categoria) => 72 + orden.indexOf(c) * 12;
+const anios = Array.from({ length: 16 }, (_, i) => 2011 + i);
+const porAnio = [...Map.groupBy(eventos.map((e, i) => ({ e, i })), ({ e }) => e.fecha.slice(0, 4))].sort((a, b) => b[0].localeCompare(a[0]));
+const fechaEvento = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { month: 'long', year: 'numeric' }) : fecha(iso, { day: 'numeric', month: 'short' }));
+---
+<div class="lt" data-lt>
+  <figure class="lt-strip">
+    <svg viewBox={`0 0 ${W} 186`} role="img" aria-label="Línea temporal de 2011 a 2026: quién gobernaba y hechos principales">
+      {gobiernos.map((g) => (
+        <g>
+          <rect x={x(g.desde)} y="10" width={Math.max(1, x(g.hasta) - x(g.desde) - 1.5)} height="40" rx="5" style={`fill: ${color.get(g.partido)}`} class:list={['lt-gov', { funciones: g.forma.startsWith('En funciones') }]}><title>{g.presidente}: {g.forma}</title></rect>
+          {x(g.hasta) - x(g.desde) > 80 && <text x={x(g.desde) + 8} y="36" class="lt-gov-t">{g.presidente}</text>}
+        </g>
+      ))}
+      {anios.map((a) => (
+        <g>
+          <line x1={x(`${a}-01-01`)} x2={x(`${a}-01-01`)} y1="56" y2="166" class="lt-tick" />
+          <text x={x(`${a}-07-01`)} y="182" class="lt-year">{a}</text>
+        </g>
+      ))}
+      {eventos.map((e, i) => (
+        <circle
+          cx={x(e.fecha).toFixed(1)}
+          cy={carril(e.categoria)}
+          r={e.clave ? 7.5 : 4.8}
+          style={`fill: ${categorias[e.categoria].color}`}
+          class:list={['lt-dot', { clave: e.clave }]}
+          data-ev={i}
+          data-cat={e.categoria}
+          tabindex="0"
+          role="button"
+          aria-label={`${fechaEvento(e.fecha)}: ${e.titulo}`}
+        ><title>{fechaEvento(e.fecha)} · {e.titulo}</title></circle>
+      ))}
+    </svg>
+    <figcaption>Arriba, quién gobernaba (más claro, en funciones; pasa el ratón para ver si en minoría o en coalición). Debajo, un punto por hecho, en una fila por categoría; los grandes son los que marcan la legislatura.</figcaption>
+  </figure>
+
+  <div class="lt-filters">
+    <input type="search" class="lt-search" placeholder="Busca: amnistía, DANA, investidura..." aria-label="Buscar en la línea temporal" data-lt-q />
+    <button type="button" class="pchip" aria-pressed="false" data-lt-clave>Solo lo clave</button>
+  </div>
+  <div class="lt-cats" role="group" aria-label="Categorías">
+    {orden.map((c) => (
+      <button type="button" class="lt-cat" aria-pressed="true" data-lt-cat={c} style={`--c: ${categorias[c].color}`}>{categorias[c].label}</button>
+    ))}
+  </div>
+
+  <div class="lt-list">
+    {porAnio.map(([anio, items]) => (
+      <section class="lt-year-block" data-lt-year>
+        <h3 class="lt-year-h">{anio}</h3>
+        <ol>
+          {[...items].sort((a, b) => b.e.fecha.localeCompare(a.e.fecha)).map(({ e, i }) => (
+            <li>
+              <button
+                type="button"
+                class:list={['lt-item', { clave: e.clave }]}
+                data-ev={i}
+                data-cat={e.categoria}
+                data-clave={e.clave ? '1' : ''}
+                data-q={`${e.titulo} ${e.texto}`.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()}
+                style={`--c: ${categorias[e.categoria].color}`}
+              >
+                <span class="lt-date">{fechaEvento(e.fecha)}</span>
+                <span class="lt-body">
+                  <span class="lt-cat-l">{categorias[e.categoria].label}</span>
+                  <strong>{e.titulo}</strong>
+                  <span class="lt-text">{e.texto}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+    <p class="lt-empty" hidden data-lt-empty>Ningún hecho coincide con esos filtros.</p>
+  </div>
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-lt]')) {
+    const items = [...root.querySelectorAll<HTMLElement>('.lt-item')];
+    const dots = [...root.querySelectorAll<SVGCircleElement>('.lt-dot')];
+    const cats = [...root.querySelectorAll<HTMLButtonElement>('[data-lt-cat]')];
+    const q = root.querySelector<HTMLInputElement>('[data-lt-q]')!;
+    const soloClave = root.querySelector<HTMLButtonElement>('[data-lt-clave]')!;
+    const empty = root.querySelector<HTMLElement>('[data-lt-empty]')!;
+    const ficha = document.querySelector<HTMLElement>('[data-evento-ficha]');
+    const columna = ficha?.closest<HTMLElement>('.ap-right');
+    const norm = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+
+    const filtra = () => {
+      const activas = new Set(cats.filter((c) => c.getAttribute('aria-pressed') === 'true').map((c) => c.dataset.ltCat));
+      const clave = soloClave.getAttribute('aria-pressed') === 'true';
+      const texto = norm(q.value);
+      let n = 0;
+      for (const it of items) {
+        const ok = activas.has(it.dataset.cat) && (!clave || it.dataset.clave) && (!texto || it.dataset.q!.includes(texto));
+        it.parentElement!.hidden = !ok;
+        if (ok) n++;
+      }
+      for (const d of dots) {
+        const it = items.find((i) => i.dataset.ev === d.dataset.ev)!;
+        d.classList.toggle('off', it.parentElement!.hidden);
+      }
+      for (const y of root.querySelectorAll<HTMLElement>('[data-lt-year]')) {
+        y.hidden = ![...y.querySelectorAll('li')].some((li) => !li.hidden);
+      }
+      empty.hidden = n > 0;
+    };
+
+    const abre = (ev: string | null, desdePunto = false) => {
+      for (const el of [...items, ...dots]) el.classList.toggle('on', el.dataset.ev === ev);
+      if (!ficha) return;
+      for (const a of ficha.querySelectorAll<HTMLElement>('[data-evento]')) a.hidden = a.dataset.evento !== ev;
+      ficha.hidden = !ev;
+      columna?.classList.toggle('con-ficha', !!ev);
+      if (!ev) return;
+      if (desdePunto) items.find((i) => i.dataset.ev === ev)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (matchMedia('(max-width: 1180px)').matches) ficha.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    for (const it of items) it.addEventListener('click', () => abre(it.classList.contains('on') ? null : it.dataset.ev!));
+    for (const d of dots) {
+      const go = () => abre(d.classList.contains('on') ? null : d.dataset.ev!, true);
+      d.addEventListener('click', go);
+      d.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          go();
+        }
+      });
+    }
+    ficha?.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('[data-ev-close]')) abre(null);
+    });
+    for (const c of cats) {
+      c.addEventListener('click', () => {
+        c.setAttribute('aria-pressed', String(c.getAttribute('aria-pressed') !== 'true'));
+        filtra();
+      });
+    }
+    soloClave.addEventListener('click', () => {
+      soloClave.setAttribute('aria-pressed', String(soloClave.getAttribute('aria-pressed') !== 'true'));
+      filtra();
+    });
+    q.addEventListener('input', filtra);
+    document.addEventListener('ap:reset', () => abre(null));
+  }
+</script>
+
+<style>
+  .lt { display: flex; flex-direction: column; gap: 12px; }
+  .lt-strip { margin: 0; padding: 12px 14px 10px; background: var(--bg); border: 1px solid var(--panel-line); border-radius: 12px; }
+  .lt-strip svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .lt-gov { opacity: .92; }
+  .lt-gov.funciones { opacity: .45; }
+  .lt-gov-t { font-family: var(--display); font-size: 19px; font-weight: 800; fill: #fff; pointer-events: none; }
+  .lt-tick { stroke: var(--panel-line); }
+  .lt-year { font-family: var(--mono); font-size: 13px; fill: var(--muted); text-anchor: middle; }
+  .lt-dot { stroke: var(--bg); stroke-width: 1.5; cursor: pointer; transition: opacity .2s; }
+  .lt-dot.clave { stroke: var(--ink); stroke-width: 1.8; }
+  .lt-dot:hover, .lt-dot:focus-visible { stroke: var(--ink); stroke-width: 2.2; outline: none; }
+  .lt-dot.on { stroke: var(--ink); stroke-width: 3.5; }
+  .lt-dot.off { opacity: .12; pointer-events: none; }
+  .lt-strip figcaption { margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--muted); }
+
+  .lt-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .lt-search { flex: 1 1 220px; min-width: 0; padding: 7px 12px; font: inherit; font-size: 13.5px; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; }
+  .lt-search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .lt-filters .pchip { font-size: 13px; padding: 5px 12px; }
+  .lt-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+  .lt-cat { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--muted); background: transparent; border: 1px dashed var(--line); border-radius: 999px; cursor: pointer; }
+  .lt-cat::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); opacity: .35; }
+  .lt-cat[aria-pressed='true'] { color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); }
+  .lt-cat[aria-pressed='true']::before { opacity: 1; }
+
+  .lt-year-block { margin: 0 0 6px; }
+  .lt-year-block[hidden] { display: none; }
+  .lt-year-h { position: sticky; top: -18px; z-index: 1; margin: 0; padding: 8px 0 6px; font-family: var(--display); font-size: 26px; font-weight: 800; letter-spacing: -0.6px; color: var(--accent); background: var(--panel); }
+  .lt-year-block ol { list-style: none; margin: 0; padding: 0 0 0 10px; border-left: 2px solid var(--panel-line); }
+  .lt-year-block li { margin: 0; }
+  .lt-year-block li[hidden] { display: none; }
+  .lt-item { position: relative; display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; width: 100%; padding: 9px 10px 9px 14px; font: inherit; text-align: left; color: var(--ink); background: none; border: 0; border-radius: 10px; cursor: pointer; }
+  .lt-item::before { content: ''; position: absolute; left: -17px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--c); border: 2px solid var(--panel); }
+  .lt-item.clave::before { width: 14px; height: 14px; left: -19px; top: 13px; box-shadow: 0 0 0 2px var(--ink); }
+  .lt-item:hover { background: var(--panel-2); }
+  .lt-item.on { background: color-mix(in srgb, var(--c) 14%, transparent); }
+  .lt-date { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-top: 3px; }
+  .lt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .lt-cat-l { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .lt-body strong { font-family: var(--display); font-size: 16px; font-weight: 800; line-height: 1.25; letter-spacing: -0.2px; }
+  .lt-item.clave strong { font-size: 17.5px; }
+  .lt-text { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .lt-empty { color: var(--muted); font-size: 14px; }
+  @media (max-width: 640px) {
+    .lt-item { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    /* La franja no se lee encogida: se desliza en horizontal. */
+    .lt-strip { overflow-x: auto; }
+    .lt-strip svg { min-width: 760px; }
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+// Ficha de un hecho de la línea temporal, en la columna derecha. Se generan todas al compilar
+// y LineaTemporal muestra la que toca.
+import { categorias, eventos } from '../../data/politica/linea-temporal';
+import { fecha } from '../../lib/politica';
+
+const fechaLarga = (iso: string) => (iso.length === 7 ? fecha(`${iso}-01`, { month: 'long', year: 'numeric' }) : fecha(iso, { day: 'numeric', month: 'long', year: 'numeric' }));
+---
+<section class="ap-card ap-panel ev-ficha" data-ficha data-evento-ficha aria-live="polite" hidden>
+  {eventos.map((e, i) => (
+    <article data-evento={String(i)} hidden style={`--c: ${categorias[e.categoria].color}`}>
+      <div class="ev-head">
+        <span class="ev-cat">{categorias[e.categoria].label}</span>
+        <button type="button" class="ev-close" data-ev-close>✕ Cerrar</button>
+      </div>
+      <p class="ev-date">{fechaLarga(e.fecha)}</p>
+      <h3>{e.titulo}</h3>
+      <p class="ev-text">{e.texto}</p>
+      {e.enlaces && e.enlaces.length > 0 && (
+        <div class="ev-links">
+          <div class="ev-label">Para entenderlo</div>
+          <ul>{e.enlaces.map((l) => <li><a href={l.href}>{l.texto} →</a></li>)}</ul>
+        </div>
+      )}
+      {e.fuente && <p class="ev-src">Fuente: <a href={e.fuente.url} rel="noopener">{e.fuente.titulo}</a></p>}
+    </article>
+  ))}
+</section>
+
+<style>
+  .ev-ficha[hidden], .ev-ficha article[hidden] { display: none; }
+  .ev-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .ev-cat { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--ink); }
+  .ev-cat::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+  .ev-close { margin-left: auto; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); background: none; border: 0; cursor: pointer; }
+  .ev-date { margin: 0 0 4px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  h3 { margin: 0 0 10px; font-family: var(--display); font-size: 22px; font-weight: 800; line-height: 1.15; letter-spacing: -0.4px; }
+  .ev-text { margin: 0 0 14px; font-size: 14.5px; line-height: 1.6; color: var(--text-soft); }
+  .ev-label { margin-bottom: 6px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); }
+  .ev-links ul { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
+  .ev-links a { font-weight: 600; text-decoration: none; }
+  .ev-links a:hover { text-decoration: underline; }
+  .ev-src { margin: 0; padding-top: 10px; border-top: 1px solid var(--panel-line); font-size: 12px; line-height: 1.5; color: var(--muted); }
+  .ev-src a { font-weight: 500; }
+</style>

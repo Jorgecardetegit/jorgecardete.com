@@ -4,6 +4,8 @@ import AfinidadMatriz from '../../../components/aprende/AfinidadMatriz.astro';
 import CalendarioCard from '../../../components/aprende/CalendarioCard.astro';
 import MapaEspana from '../../../components/aprende/MapaEspana.astro';
 import MapaFicha from '../../../components/aprende/MapaFicha.astro';
+import EventoFicha from '../../../components/aprende/EventoFicha.astro';
+import LineaTemporal from '../../../components/aprende/LineaTemporal.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
 import { getArea } from '../../../data/learn';
 import { elecciones, revisadoPartidos } from '../../../data/politica/partidos';
@@ -102,6 +104,16 @@ const jsonLd = [
         <div class="mapa-layout">
           <MapaEspana />
         </div>
+      </div>
+    </section>
+
+    <section class="ap-view ap-panel scroll" data-view-panel="historia" aria-label="Qué ha pasado" hidden>
+      <div class="pad">
+        <header class="vhead">
+          <h2 class="ap-view-title">Qué ha pasado desde 2011</h2>
+          <p class="ap-view-sub">Los hechos que cambiaron quién gobierna, qué leyes rigen o el contexto en que vamos a votar, contados sin adjetivos y con fuente. Pulsa uno para ver el detalle.</p>
+        </header>
+        <LineaTemporal />
       </div>
     </section>
 
@@ -215,6 +227,7 @@ const jsonLd = [
 
   <Fragment slot="aside">
     <MapaFicha />
+    <EventoFicha />
     <CalendarioCard />
 
     <section class="ap-card ap-panel">
