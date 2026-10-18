@@ -9,6 +9,7 @@ import EconomiaVista from '../../../components/aprende/EconomiaVista.astro';
 import EventoFicha from '../../../components/aprende/EventoFicha.astro';
 import GobiernosVista from '../../../components/aprende/GobiernosVista.astro';
 import LineaTemporal from '../../../components/aprende/LineaTemporal.astro';
+import TemasAside from '../../../components/aprende/TemasAside.astro';
 import TemasVista from '../../../components/aprende/TemasVista.astro';
 import RankCard from '../../../components/aprende/RankCard.astro';
 import { getArea } from '../../../data/learn';
@@ -170,10 +171,6 @@ const jsonLd = [
 
     <section class="ap-view ap-panel scroll" data-view-panel="temas" aria-label="Temas" hidden>
       <div class="pad">
-        <header class="vhead">
-          <h2 class="ap-view-title">Tema a tema</h2>
-          <p class="ap-view-sub">Elige un tema para ver qué han votado y qué proponen los partidos.</p>
-        </header>
         <TemasVista />
       </div>
     </section>
@@ -363,6 +360,10 @@ const jsonLd = [
   <Fragment slot="aside">
     <MapaFicha />
     <EventoFicha />
+    <TemasAside />
+
+    {/* Lo general (calendario, cámaras, cifras), en las pestañas que no tienen columna propia. */}
+    <div class="aside-group" data-aside="partidos historia diputados votaciones votar economia">
     <CalendarioCard />
 
     <section class="ap-card ap-panel">
@@ -410,6 +411,7 @@ const jsonLd = [
       <p>Diputados y votaciones salen de los datos abiertos del Congreso, procesados sin seleccionar a mano: se incluyen todas las votaciones de cada tipo. Las pocas que el Congreso solo publica como imagen se añadieron a mano con su fuente.</p>
       <p class="sen-note"><strong>Sin encuestas.</strong> Aquí solo hay hechos: lo que se ha votado, lo que se ha dicho y lo que se ha medido. Las encuestas estiman lo que pasará, difieren mucho entre empresas y métodos, y pueden influir en el propio voto. Se pueden publicar hasta el 23 de noviembre.</p>
     </section>
+    </div>
   </Fragment>
 </Aprende>
 
@@ -449,6 +451,8 @@ const jsonLd = [
     if (view === 'mapa' || !panels.some((p) => p.dataset.viewPanel === view)) view = 'partidos';
     for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.viewTab === view));
     for (const p of panels) p.hidden = p.dataset.viewPanel !== view;
+    // La columna derecha enseña lo que corresponde a la pestaña abierta.
+    for (const el of document.querySelectorAll<HTMLElement>('[data-aside]')) el.hidden = !el.dataset.aside!.split(' ').includes(view);
     document.dispatchEvent(new Event('ap:reset'));
   };
   for (const b of pvBotones) {
@@ -556,6 +560,8 @@ const jsonLd = [
   .vhead { margin-bottom: 14px; }
   .vhead-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 16px; }
   .afi-head { align-items: center; margin-bottom: 10px; }
+  :global(.aside-group) { display: contents; }
+  :global(.aside-group[hidden]), :global([data-aside][hidden]) { display: none; }
   .sen-note { margin-top: 8px !important; font-size: 13px !important; color: var(--muted) !important; }
   [data-pv-view][hidden], [data-pv-sub][hidden], [data-hv-view][hidden], [data-hv-sub][hidden] { display: none; }
   .pv-toggle { display: inline-flex; flex: none; gap: 2px; padding: 3px; background: var(--panel-2); border-radius: 999px; }

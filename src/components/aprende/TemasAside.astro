@@ -1,0 +1,41 @@
+---
+// Columna derecha de la pestaña Temas: la lista de temas (el menú) y, del elegido, quién decide
+// sobre él. TemasVista sincroniza la selección con estos botones y su desplegable para móvil.
+import { temas } from '../../data/politica/temas';
+import { votosPorTema } from '../../lib/temas';
+---
+<section class="ap-card ap-panel ta" data-aside="temas" hidden>
+  <header class="ap-card-head"><h2 class="ap-card-title">Temas</h2></header>
+  <ol class="ta-list" role="tablist" aria-label="Temas">
+    {temas.map((t, i) => (
+      <li>
+        <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-tema={t.id}>
+          <span aria-hidden="true">{t.icono}</span>
+          <span class="ta-n">{t.nombre}</span>
+          <small>{votosPorTema.get(t.id)!.length}</small>
+        </button>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<section class="ap-card ap-panel" data-aside="temas" hidden>
+  {temas.map((t, i) => (
+    <div data-tema-decide={t.id} hidden={i !== 0}>
+      <header class="ap-card-head"><h2 class="ap-card-title">Quién decide</h2></header>
+      <p>{t.quienDecide}</p>
+      <p class="ta-lessons">{t.lecciones.map((l) => <a href={`/aprende/politica/${l.slug}/`}>Lección: {l.texto} →</a>)}</p>
+    </div>
+  ))}
+</section>
+
+<style>
+  .ta-list { list-style: none; margin: 0 -8px; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+  .ta-list button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 8px; font: inherit; font-size: 14px; text-align: left; color: var(--ink); background: none; border: 0; border-radius: 8px; cursor: pointer; }
+  .ta-list button:hover { background: var(--panel-2); }
+  .ta-list button[aria-selected='true'] { font-weight: 600; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .ta-n { flex: 1; min-width: 0; }
+  .ta-list small { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .ta-lessons { display: flex; flex-direction: column; gap: 2px; margin-top: 8px !important; font-size: 13px !important; }
+  .ta-lessons a { font-weight: 600; text-decoration: none; }
+</style>

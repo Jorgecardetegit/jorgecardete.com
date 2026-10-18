@@ -1,57 +1,45 @@
 ---
-// Vista de temas: para cada uno, quién decide en una línea y tres subpestañas para no verlo todo a
-// la vez: qué han votado los partidos, qué proponen (el 29-N cuando se publique y, mientras, 2023)
-// y con quién coincide cada uno al votar sobre ese tema.
+// Vista de temas: del tema elegido, qué han votado los partidos y, plegado debajo, qué proponen
+// (el 29-N cuando se publique y, mientras, 2023) y con quién coincide cada uno. El menú de temas y
+// «Quién decide» van en la columna derecha (TemasAside); en pantallas estrechas, donde esa columna
+// cae debajo, el tema se elige con un desplegable.
 import AfinidadMatriz from './AfinidadMatriz.astro';
-import { temas, temasDe } from '../../data/politica/temas';
+import { temas } from '../../data/politica/temas';
+import { votosPorTema } from '../../lib/temas';
 import { programas2023, propuestas2023, sinPrograma2023 } from '../../data/politica/programas-2023';
 import {
-  afinidadDe, escanosActuales, fecha, partidoById, partidos, posicion, proponentes, resultadoTexto, siglasCortas, tipos, tituloCorto, votaciones,
+  afinidadDe, escanosActuales, fecha, partidoById, partidos, posicion, proponentes, resultadoTexto, siglasCortas, tipos, tituloCorto,
 } from '../../lib/politica';
 
 const orden = [...partidos].sort((a, b) => escanosActuales(b.id) - escanosActuales(a.id)).map((p) => p.id).filter((id) => escanosActuales(id) > 0);
-const todas = [
-  ...votaciones.clave.filter((v) => v.tipo !== 'investidura'),
-  ...votaciones.propuestas,
-].map((v) => ({ v, temas: temasDe(`${v.titulo} ${v.detalle ?? ''}`) }));
 // Para 2023 cuentan todos los partidos de la lista, tengan o no escaño hoy.
 const orden2023 = [...partidos].sort((a, b) => escanosActuales(b.id) - escanosActuales(a.id)).map((p) => p.id);
 const traducidos = Object.values(programas2023).filter((p) => p.idioma).map((p) => p.idioma);
 const tipoLabel = (t: string) => tipos[t as keyof typeof tipos]?.label ?? t;
 
 const vistas = temas.map((tema) => {
-  const votos = todas.filter((x) => x.temas.includes(tema.id)).map((x) => x.v).sort((a, b) => b.fecha.localeCompare(a.fecha));
+  const votos = votosPorTema.get(tema.id)!;
   // Afinidad y cohesión solo con las votaciones de este tema.
   const datos = afinidadDe(votos, orden);
   return { tema, votos, datos };
 });
 ---
 <div class="tv" data-temas>
-  <div class="tv-chips" role="tablist" aria-label="Temas">
-    {vistas.map(({ tema, votos }, i) => (
-      <button type="button" class="tv-chip" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-tema={tema.id}>
-        <span aria-hidden="true">{tema.icono}</span>{tema.nombre}<small>{votos.length}</small>
-      </button>
-    ))}
-  </div>
+  <label class="tv-pick">
+    <span>Tema</span>
+    <select data-tema-select>
+      {vistas.map(({ tema, votos }) => <option value={tema.id}>{tema.icono} {tema.nombre} ({votos.length})</option>)}
+    </select>
+  </label>
 
   {vistas.map(({ tema, votos, datos }, i) => {
     const con2023 = orden2023.filter((id) => propuestas2023[tema.id]?.[id]);
     const conPropuesta = orden.filter((id) => tema.propuestas[id]);
     return (
     <section class="tv-panel" data-tema-panel={tema.id} hidden={i !== 0} aria-label={tema.nombre}>
-      <header class="tv-head">
-        <h3 class="tv-title"><span aria-hidden="true">{tema.icono}</span> {tema.nombre}</h3>
-        <p class="tv-decide"><b>Quién decide:</b> {tema.quienDecide} {tema.lecciones.map((l) => <a href={`/aprende/politica/${l.slug}/`}>{l.texto} →</a>)}</p>
-      </header>
+      <h3 class="tv-title"><span aria-hidden="true">{tema.icono}</span> {tema.nombre} <small>{votos.length} votaciones</small></h3>
 
-      <div class="tv-subs" role="tablist" aria-label={`Qué ver de ${tema.nombre}`}>
-        <button type="button" role="tab" aria-selected="true" data-sub="votado">Votaciones <small>{votos.length}</small></button>
-        <button type="button" role="tab" aria-selected="false" data-sub="proponen">Propuestas</button>
-        {votos.length >= 3 && <button type="button" role="tab" aria-selected="false" data-sub="coincide">Coincidencias</button>}
-      </div>
-
-      <div class="tv-sub" data-sub-panel="votado">
+      <div>
         {votos.length > 0 ? (
           <>
             <div class="tv-grid-scroll">
@@ -90,7 +78,8 @@ const vistas = temas.map((tema) => {
         )}
       </div>
 
-      <div class="tv-sub" data-sub-panel="proponen" hidden>
+      <details class="tv-fold">
+        <summary>Qué proponen</summary>
         {conPropuesta.length === 0 ? (
           <p class="tv-pending"><b>29-N:</b> aún no hay programas. Se añadirán todos a la vez cuando se publiquen. Mientras, lo que propuso cada uno en 2023:</p>
         ) : (
@@ -122,16 +111,17 @@ const vistas = temas.map((tema) => {
             {' '}{programas2023.podemos.nota} {Object.values(sinPrograma2023).join(' ')} Los programas en {[...new Set(traducidos)].join(' y ')} están traducidos. El de Junts enlaza a una copia de Betevé porque el partido ya no lo tiene en su web.
           </p>
         </details>
-      </div>
+      </details>
 
       {votos.length >= 3 && (
-        <div class="tv-sub" data-sub-panel="coincide" hidden>
+        <details class="tv-fold">
+          <summary>Con quién coincide cada partido</summary>
           <AfinidadMatriz
             orden={orden}
             datos={datos}
             pie={`En cuántas de las ${votos.length} votaciones de este tema votó lo mismo la mayoría de cada par de partidos (%). «—»: menos de tres comparables.`}
           />
-        </div>
+        </details>
       )}
     </section>
     );
@@ -144,24 +134,19 @@ const vistas = temas.map((tema) => {
 
 <script>
   for (const root of document.querySelectorAll<HTMLElement>('[data-temas]')) {
-    const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-tema]')];
+    // El menú está en la columna derecha (fuera de root) y el desplegable, dentro: los dos eligen tema.
+    const botones = [...document.querySelectorAll<HTMLButtonElement>('[data-tema]')];
+    const select = root.querySelector<HTMLSelectElement>('[data-tema-select]')!;
     const panels = [...root.querySelectorAll<HTMLElement>('[data-tema-panel]')];
-    for (const c of chips) {
-      c.addEventListener('click', () => {
-        for (const x of chips) x.setAttribute('aria-selected', String(x === c));
-        for (const p of panels) p.hidden = p.dataset.temaPanel !== c.dataset.tema;
-        c.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
-      });
-    }
-    for (const panel of panels) {
-      const subs = [...panel.querySelectorAll<HTMLButtonElement>('[data-sub]')];
-      for (const b of subs) {
-        b.addEventListener('click', () => {
-          for (const x of subs) x.setAttribute('aria-selected', String(x === b));
-          for (const sp of panel.querySelectorAll<HTMLElement>('[data-sub-panel]')) sp.hidden = sp.dataset.subPanel !== b.dataset.sub;
-        });
-      }
-    }
+    const decide = [...document.querySelectorAll<HTMLElement>('[data-tema-decide]')];
+    const elige = (id: string) => {
+      for (const b of botones) b.setAttribute('aria-selected', String(b.dataset.tema === id));
+      for (const p of panels) p.hidden = p.dataset.temaPanel !== id;
+      for (const d of decide) d.hidden = d.dataset.temaDecide !== id;
+      select.value = id;
+    };
+    for (const b of botones) b.addEventListener('click', () => elige(b.dataset.tema!));
+    select.addEventListener('change', () => elige(select.value));
     for (const button of root.querySelectorAll<HTMLButtonElement>('[data-more]')) {
       const body = button.previousElementSibling!.querySelector('[data-more-list]')!;
       button.addEventListener('click', () => {
@@ -174,26 +159,18 @@ const vistas = temas.map((tema) => {
 
 <style>
   .tv { display: flex; flex-direction: column; gap: 14px; }
-  .tv-chips { display: flex; gap: 6px; margin: 0 -4px; padding: 2px 4px 6px; overflow-x: auto; scrollbar-width: thin; mask-image: linear-gradient(to right, #000 92%, transparent); }
-  .tv-chip { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 999px; cursor: pointer; }
-  .tv-chip small { font-family: var(--mono); font-size: 11px; font-weight: 400; color: var(--muted); }
-  .tv-chip:hover { border-color: var(--accent); }
-  .tv-chip[aria-selected='true'] { color: #fff; background: var(--accent); border-color: var(--accent); }
-  .tv-chip[aria-selected='true'] small { color: rgba(255, 255, 255, .8); }
+  .tv-pick { display: none; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .tv-pick select { flex: 1; min-width: 0; padding: 8px 10px; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--panel-line); border-radius: 10px; }
+  @media (max-width: 1180px) { .tv-pick { display: flex; } }
   .tv-panel[hidden] { display: none; }
   .tv-panel { display: flex; flex-direction: column; gap: 14px; }
-  .tv-head { display: flex; flex-direction: column; gap: 4px; }
-  .tv-title { margin: 6px 0 0; font-family: var(--display); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-  .tv-decide { margin: 0; max-width: 760px; font-size: 13.5px; line-height: 1.5; color: var(--text-soft); }
-  .tv-decide b { font-weight: 600; color: var(--ink); }
-  .tv-decide a { margin-left: 6px; font-weight: 600; text-decoration: none; white-space: nowrap; }
-  .tv-subs { display: flex; flex-wrap: wrap; gap: 2px; padding: 3px; align-self: flex-start; background: var(--panel-2); border-radius: 999px; }
-  .tv-subs button { padding: 7px 14px; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
-  .tv-subs button:hover { color: var(--ink); }
-  .tv-subs button[aria-selected='true'] { color: var(--bg); background: var(--ink); }
-  @media (max-width: 520px) { .tv-subs { flex-wrap: nowrap; } .tv-subs button { padding: 7px 10px; font-size: 12.5px; white-space: nowrap; } }
-  .tv-subs small { font-family: var(--mono); font-size: 11px; font-weight: 400; opacity: .75; }
-  .tv-sub[hidden] { display: none; }
+  .tv-title { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .tv-title small { font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+  .tv-fold { border-top: 1px solid var(--panel-line); padding-top: 12px; }
+  .tv-fold > summary { cursor: pointer; font-family: var(--display); font-size: 17px; font-weight: 800; letter-spacing: -0.2px; list-style: none; }
+  .tv-fold > summary::before { content: '+'; display: inline-block; width: 20px; color: var(--accent); }
+  .tv-fold[open] > summary::before { content: '−'; }
+  .tv-fold[open] > summary { margin-bottom: 12px; }
   .tv-muted { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
   .tv-muted.small { font-size: 12.5px; margin-top: 6px; }
   .tv-pending { margin: 0 0 10px; font-size: 13.5px; color: var(--muted); }
