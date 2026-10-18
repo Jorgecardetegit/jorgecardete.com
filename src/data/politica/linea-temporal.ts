@@ -472,4 +472,7 @@ export const eventos: Evento[] = [
   { fecha: '2026-10-12', titulo: 'La izquierda alternativa propone a Ada Colau', categoria: 'elecciones',
     texto: 'Movimiento Sumar, IU, Más Madrid y Comuns proponen a la exalcaldesa de Barcelona como candidata. Podemos no se ha sumado.',
     fuente: { titulo: 'COPE', url: 'https://www.cope.es/actualidad/espana/noticias/frente-amplio-propone-ada-colau-candidata-elecciones-generales-sigue-abierto-20261012_3454170.html' }, enlaces: [P('sumar', 'Sumar'), P('podemos', 'Podemos')] },
+  { fecha: '2026-10-16', titulo: 'La izquierda alternativa irá dividida', categoria: 'elecciones',
+    texto: 'Se agota el plazo para registrar coaliciones sin acuerdo entre el Frente Amplio de Colau y Podemos, que irán por separado en 47 circunscripciones, Madrid incluida, y juntos solo en la Comunitat Valenciana y Canarias. En Cataluña, Podemos se integra en las listas de ERC.',
+    fuente: { titulo: 'eldiario.es', url: 'https://www.eldiario.es/politica/frente-amplio-fracasan-negociaciones-iran-canarias-comunitat-valenciana_1_13592471.html' }, enlaces: [P('sumar', 'Sumar'), P('podemos', 'Podemos'), P('erc', 'ERC')] },
 ];

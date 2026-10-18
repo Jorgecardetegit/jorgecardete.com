@@ -67,8 +67,8 @@ export const partidos: Partido[] = [
   {
     id: 'sumar', nombre: 'Sumar', siglas: 'Sumar', color: '#d6215f', ambito: 'Toda España', fundacion: 2023,
     lider: { nombre: 'Verónica Martínez Barbero y Rosa Martínez', cargo: 'Co-coordinadoras de Movimiento Sumar (desde julio de 2026)' },
-    candidatura: { texto: 'Ada Colau, propuesta el 12 de octubre por Movimiento Sumar, IU, Más Madrid y Comuns', estado: 'anunciada' },
-    resumen: 'Plataforma creada en 2023 en torno a Yolanda Díaz que agrupó a una quincena de partidos de izquierda: IU, Más Madrid, Comuns, Compromís y otros, y al principio también Podemos. Fue cuarta fuerza en 2023 y ha formado parte del Gobierno de coalición con el PSOE.',
+    candidatura: { texto: 'Ada Colau, cabeza de lista por Barcelona del Frente Amplio (Movimiento Sumar, IU, Más Madrid, Comuns y otras organizaciones; en Aragón, con Chunta, y en Baleares, con Més). En la Comunitat Valenciana (Compromís-Front Valencià) y en Canarias (con Nueva Canarias) va en listas conjuntas con Podemos', estado: 'anunciada' },
+    resumen: 'Plataforma creada en 2023 en torno a Yolanda Díaz que agrupó a una quincena de partidos de izquierda: IU, Más Madrid, Comuns, Compromís y otros, y al principio también Podemos. Fue cuarta fuerza en 2023 y ha formado parte del Gobierno de coalición con el PSOE. Al 29-N se presenta como Frente Amplio, sin Podemos y con Compromís y Chunta en listas propias o regionales.',
     web: 'https://movimientosumar.es/', voto2023: 12.33,
     resultados: [{ eleccion: '2023', escanos: 31 }],
     europa2024: { escanos: 3, pct: 4.67 },
@@ -76,7 +76,7 @@ export const partidos: Partido[] = [
   {
     id: 'podemos', nombre: 'Podemos', siglas: 'Podemos', color: '#6b2e7f', ambito: 'Toda España', fundacion: 2014,
     lider: { nombre: 'Ione Belarra', cargo: 'Secretaria general' },
-    candidatura: { texto: 'Irene Montero, designada por el partido', estado: 'anunciada' },
+    candidatura: { texto: 'Irene Montero, cabeza de lista por Madrid. Se presenta por separado del Frente Amplio salvo en la Comunitat Valenciana y Canarias; en Cataluña sus candidatos van en las listas de ERC', estado: 'anunciada' },
     resumen: 'Nació en 2014, tras el 15M y la crisis económica, con Pablo Iglesias al frente. Con sus aliados (Unidos y después Unidas Podemos) fue tercera fuerza en 2015 y 2016 y formó parte del Gobierno de coalición entre 2020 y 2023. En 2023 se presentó dentro de Sumar y en diciembre de ese año sus diputados pasaron al Grupo Mixto.',
     web: 'https://podemos.info/',
     resultados: [
