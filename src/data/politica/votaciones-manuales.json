@@ -1,0 +1,260 @@
+{
+  "_nota": "Votaciones clave que el Congreso publica solo como imagen (votaciones públicas por llamamiento, repeticiones tras empate). Totales leídos de la imagen oficial; la posición de cada candidatura, de las fuentes indicadas. `posiciones` va por candidatura de origen (formación electoral) y solo se usa cuando todos sus diputados votaron igual, de modo que la suma cuadra con los totales.",
+  "votaciones": [
+    {
+      "id": "5-1",
+      "fecha": "2023-09-27",
+      "tipo": "investidura",
+      "titulo": "Investidura de Alberto Núñez Feijóo (primera votación)",
+      "resultado": "rechazada",
+      "totales": {
+        "si": 172,
+        "no": 178,
+        "abs": 0,
+        "nv": 0
+      },
+      "posiciones": {
+        "pp": "S",
+        "vox": "S",
+        "upn": "S",
+        "cc": "S",
+        "psoe": "N",
+        "sumar": "N",
+        "erc": "N",
+        "junts": "N",
+        "bildu": "N",
+        "pnv": "N",
+        "bng": "N"
+      },
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "6-1",
+      "fecha": "2023-09-29",
+      "tipo": "investidura",
+      "titulo": "Investidura de Alberto Núñez Feijóo (segunda votación)",
+      "resultado": "rechazada",
+      "totales": {
+        "si": 172,
+        "no": 177,
+        "abs": 0,
+        "nv": 1
+      },
+      "nota": "Un voto se declaró nulo.",
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "8-1",
+      "fecha": "2023-11-16",
+      "tipo": "investidura",
+      "titulo": "Investidura de Pedro Sánchez",
+      "resultado": "aprobada",
+      "totales": {
+        "si": 179,
+        "no": 171,
+        "abs": 0,
+        "nv": 0
+      },
+      "posiciones": {
+        "psoe": "S",
+        "sumar": "S",
+        "erc": "S",
+        "junts": "S",
+        "bildu": "S",
+        "pnv": "S",
+        "bng": "S",
+        "cc": "S",
+        "pp": "N",
+        "vox": "N",
+        "upn": "N"
+      },
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "11-1",
+      "fecha": "2023-12-12",
+      "tipo": "propuesta",
+      "titulo": "Proposición de Ley Orgánica de amnistía para la normalización institucional, política y social en Cataluña",
+      "proponente": "Socialista",
+      "resultado": "aprobada",
+      "totales": {
+        "si": 178,
+        "no": 172,
+        "abs": 0,
+        "nv": 0
+      },
+      "posiciones": {
+        "psoe": "S",
+        "sumar": "S",
+        "erc": "S",
+        "junts": "S",
+        "bildu": "S",
+        "pnv": "S",
+        "bng": "S",
+        "pp": "N",
+        "vox": "N",
+        "upn": "N",
+        "cc": "N"
+      },
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "17-1",
+      "fecha": "2024-01-18",
+      "tipo": "ley",
+      "titulo": "Reforma del artículo 49 de la Constitución",
+      "detalle": "Votación de conjunto",
+      "resultado": "aprobada",
+      "totales": {
+        "si": 312,
+        "no": 32,
+        "abs": 0,
+        "nv": 0
+      },
+      "nota": "Votaron en contra los diputados de Vox; el resto de grupos, a favor.",
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "18-10",
+      "fecha": "2024-01-30",
+      "tipo": "ley",
+      "titulo": "Proposición de Ley Orgánica de amnistía para la normalización institucional, política y social en Cataluña",
+      "detalle": "Votación de conjunto. No alcanzó la mayoría absoluta y volvió a comisión.",
+      "resultado": "rechazada",
+      "totales": {
+        "si": 171,
+        "no": 179,
+        "abs": 0,
+        "nv": 0
+      },
+      "posiciones": {
+        "psoe": "S",
+        "sumar": "S",
+        "erc": "S",
+        "bildu": "S",
+        "pnv": "S",
+        "bng": "S",
+        "junts": "N",
+        "pp": "N",
+        "vox": "N",
+        "upn": "N",
+        "cc": "N"
+      },
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "30-2",
+      "fecha": "2024-03-14",
+      "tipo": "ley",
+      "titulo": "Proposición de Ley Orgánica de amnistía para la normalización institucional, política y social en Cataluña",
+      "detalle": "Votación de conjunto",
+      "resultado": "aprobada",
+      "totales": {
+        "si": 178,
+        "no": 172,
+        "abs": 0,
+        "nv": 0
+      },
+      "posiciones": {
+        "psoe": "S",
+        "sumar": "S",
+        "erc": "S",
+        "junts": "S",
+        "bildu": "S",
+        "pnv": "S",
+        "bng": "S",
+        "pp": "N",
+        "vox": "N",
+        "upn": "N",
+        "cc": "N"
+      },
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "43-37",
+      "fecha": "2024-05-30",
+      "tipo": "ley",
+      "titulo": "Proposición de Ley Orgánica de amnistía para la normalización institucional, política y social en Cataluña",
+      "detalle": "Votación de conjunto tras el veto del Senado. Aprobación definitiva.",
+      "resultado": "aprobada",
+      "totales": {
+        "si": 177,
+        "no": 172,
+        "abs": 0,
+        "nv": 1
+      },
+      "fuente": "https://www.congreso.es/es/opendata/votaciones"
+    },
+    {
+      "id": "15-9",
+      "fecha": "2024-01-10",
+      "tipo": "decreto",
+      "titulo": "Real Decreto-ley 8/2023, de 27 de diciembre, de medidas para afrontar las consecuencias de los conflictos en Ucrania y Oriente Próximo y paliar la sequía",
+      "detalle": "Repetición tras el empate a 171 de la primera votación.",
+      "resultado": "aprobada",
+      "totales": {
+        "si": 172,
+        "no": 171,
+        "abs": 7,
+        "nv": 0
+      },
+      "nota": "Se convalidó gracias a la abstención de los siete diputados de Junts.",
+      "fuente": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2024-666"
+    },
+    {
+      "id": "vivienda-1",
+      "fecha": "2026-10-02",
+      "tipo": "decreto",
+      "titulo": "Real Decreto-ley 26/2026, de 29 de septiembre, por el que se adoptan medidas urgentes para la protección de la función social de la vivienda y la ampliación de la oferta de vivienda asequible",
+      "resultado": "rechazada",
+      "totales": {
+        "si": 172,
+        "no": 178,
+        "abs": 0,
+        "nv": 0
+      },
+      "posiciones": {
+        "psoe": "S",
+        "sumar": "S",
+        "erc": "S",
+        "bildu": "S",
+        "pnv": "S",
+        "bng": "S",
+        "cc": "S",
+        "pp": "N",
+        "vox": "N",
+        "junts": "N",
+        "upn": "N"
+      },
+      "nota": "Su derogación, junto a la del decreto 27/2026, precedió al anuncio del adelanto electoral del 5 de octubre.",
+      "fuente": "https://www.boe.es/buscar/doc.php?id=BOE-A-2026-20526"
+    },
+    {
+      "id": "vivienda-2",
+      "fecha": "2026-10-02",
+      "tipo": "decreto",
+      "titulo": "Real Decreto-ley 27/2026, de 29 de septiembre, por el que se adoptan medidas urgentes para reforzar la estabilidad de los contratos de arrendamiento de vivienda habitual",
+      "resultado": "rechazada",
+      "totales": {
+        "si": 166,
+        "no": 184,
+        "abs": 0,
+        "nv": 0
+      },
+      "posiciones": {
+        "psoe": "S",
+        "sumar": "S",
+        "erc": "S",
+        "bildu": "S",
+        "pnv": "N",
+        "bng": "S",
+        "cc": "N",
+        "pp": "N",
+        "vox": "N",
+        "junts": "N",
+        "upn": "N"
+      },
+      "fuente": "https://www.boe.es/buscar/doc.php?id=BOE-A-2026-20527"
+    }
+  ]
+}
