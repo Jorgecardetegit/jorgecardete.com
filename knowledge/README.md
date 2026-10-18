@@ -55,6 +55,7 @@ El panel (`/aprende/politica/`) gira en torno a las elecciones: partidos, diputa
 | `src/data/politica/partidos.ts` | Ficha de cada partido, líder y candidatura (con fecha de revisión) | A mano, con fuentes |
 | `src/data/politica/diputados.json` | Los 350 diputados de la legislatura, con biografía oficial | `node scripts/aprende/diputados.mjs <activos.json> <bajas.json> <histórico.json> <fecha disolución>` |
 | `src/data/politica/votaciones.json` | Votaciones clave, propuestas, afinidad entre partidos y estadísticas por diputado | `node scripts/aprende/votaciones.mjs <carpeta con los JSON de votaciones>` |
+| `src/data/politica/resultados-2023.json` | Votos y escaños de 2023 por provincia (mapa) | `node scripts/aprende/resultados.mjs <carpeta con 03022307.DAT, 07022307.DAT y 08022307.DAT>` del `02202307_TOTA.zip` de [infoelectoral.interior.gob.es](https://infoelectoral.interior.gob.es/) |
 | `src/data/politica/votaciones-manuales.json` | Votaciones clave que el Congreso publica solo como imagen | A mano, con fuente en cada una |
 
 Los JSON de origen son los de [datos abiertos del Congreso](https://www.congreso.es/es/opendata) (diputados y votaciones por sesión). Criterio de partidos: escaño en el Congreso al disolverse las Cortes o eurodiputados.
