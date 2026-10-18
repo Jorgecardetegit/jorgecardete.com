@@ -34,6 +34,8 @@ export interface Gobierno {
   };
   /** Escaños propios y apoyos. */
   forma: string;
+  /** Escaños del partido del presidente y, en coalición, los del socio que entra en el Gobierno. Sin Congreso elegido, nada. */
+  escanos?: { propios: number; socio?: { siglas: string; n: number } };
   resumen: string;
   apartados: { titulo: string; puntos: string[] }[];
   final: string;
@@ -97,6 +99,7 @@ export const gobiernos: Gobierno[] = [
     id: 'suarez-2', nombre: 'Segundo Gobierno de Adolfo Suárez', presidente: 'Adolfo Suárez', partido: 'ucd', color: '#3f9a54', siglas: 'UCD',
     desde: '1977-06-17', hasta: '1979-03-30', legislatura: 'Constituyente',
     llegada: { tipo: 'designacion', fecha: '1977-06-17', nota: 'Confirmado por el Rey tras ganar las elecciones de 1977. Todavía no existía la investidura en el Congreso.' },
+    escanos: { propios: 165 },
     forma: 'UCD en minoría, con 165 de 350 escaños. Gobierna buscando acuerdos con todos los partidos para hacer la Constitución.',
     resumen: 'La legislatura del consenso: las primeras Cortes elegidas redactan y aprueban la Constitución, y Gobierno y oposición pactan las reformas económicas.',
     apartados: [
@@ -120,6 +123,7 @@ export const gobiernos: Gobierno[] = [
     id: 'suarez-3', nombre: 'Tercer Gobierno de Adolfo Suárez', presidente: 'Adolfo Suárez', partido: 'ucd', color: '#3f9a54', siglas: 'UCD',
     desde: '1979-03-30', hasta: '1981-02-25', legislatura: 'I',
     llegada: { tipo: 'investidura', fecha: '1979-03-30', si: 183, no: 149, abst: 8, nota: 'Primera investidura según la Constitución.' },
+    escanos: { propios: 168 },
     forma: 'UCD en minoría, con 168 escaños, con el apoyo puntual de otros grupos.',
     resumen: 'Pone en marcha las instituciones de la Constitución y los primeros estatutos de autonomía, en años de crisis económica, de los atentados más mortíferos de ETA y de divisiones crecientes dentro de la UCD.',
     apartados: [
@@ -145,6 +149,7 @@ export const gobiernos: Gobierno[] = [
     id: 'calvo-sotelo', nombre: 'Gobierno de Leopoldo Calvo-Sotelo', presidente: 'Leopoldo Calvo-Sotelo', partido: 'ucd', color: '#3f9a54', siglas: 'UCD',
     desde: '1981-02-25', hasta: '1982-12-01', legislatura: 'I',
     llegada: { tipo: 'investidura', fecha: '1981-02-25', si: 186, no: 158, abst: 0, nota: 'El 20 de febrero se quedó en 169 votos, sin mayoría absoluta. La segunda votación, el 23, la interrumpió el golpe; se repitió el 25.' },
+    escanos: { propios: 168 },
     forma: 'UCD en minoría, con 168 escaños.',
     resumen: 'Un gobierno marcado por el 23-F y por la descomposición de la UCD. Aprueba el divorcio, mete a España en la OTAN y pacta con el PSOE cómo generalizar las autonomías.',
     apartados: [
@@ -169,6 +174,7 @@ export const gobiernos: Gobierno[] = [
     id: 'gonzalez-1', nombre: 'Primer Gobierno de Felipe González', presidente: 'Felipe González', partido: 'psoe', siglas: 'PSOE',
     desde: '1982-12-01', hasta: '1986-07-23', legislatura: 'II',
     llegada: { tipo: 'investidura', fecha: '1982-12-01', si: 207, no: 115, abst: 22 },
+    escanos: { propios: 202 },
     forma: 'PSOE con mayoría absoluta: 202 escaños, la mayor de la democracia.',
     resumen: 'Primera alternancia en el poder. Combina reformas sociales y de modernización del Estado con una dura reconversión industrial, y culmina la entrada de España en la Comunidad Europea.',
     apartados: [
@@ -200,6 +206,7 @@ export const gobiernos: Gobierno[] = [
     id: 'gonzalez-2', nombre: 'Segundo Gobierno de Felipe González', presidente: 'Felipe González', partido: 'psoe', siglas: 'PSOE',
     desde: '1986-07-23', hasta: '1989-12-05', legislatura: 'III',
     llegada: { tipo: 'investidura', fecha: '1986-07-23', si: 184, no: 144, abst: 6 },
+    escanos: { propios: 184 },
     forma: 'PSOE con mayoría absoluta: 184 escaños.',
     resumen: 'Años de fuerte crecimiento tras la entrada en Europa, pero también de ruptura del PSOE con los sindicatos, que culmina en la huelga general del 14-D.',
     apartados: [
@@ -222,6 +229,7 @@ export const gobiernos: Gobierno[] = [
     id: 'gonzalez-3', nombre: 'Tercer Gobierno de Felipe González', presidente: 'Felipe González', partido: 'psoe', siglas: 'PSOE',
     desde: '1989-12-05', hasta: '1993-07-09', legislatura: 'IV',
     llegada: { tipo: 'investidura', fecha: '1989-12-05', si: 176, no: 155, abst: 6 },
+    escanos: { propios: 175 },
     forma: 'PSOE con 175 escaños, justo la mitad; los diputados de Herri Batasuna no ocupan su escaño.',
     resumen: 'La legislatura de 1992 (Juegos de Barcelona, Expo de Sevilla y primer AVE) y del Tratado de Maastricht, que acaba con una crisis económica y los primeros grandes casos de corrupción del PSOE.',
     apartados: [
@@ -249,6 +257,7 @@ export const gobiernos: Gobierno[] = [
     id: 'gonzalez-4', nombre: 'Cuarto Gobierno de Felipe González', presidente: 'Felipe González', partido: 'psoe', siglas: 'PSOE',
     desde: '1993-07-09', hasta: '1996-05-04', legislatura: 'V',
     llegada: { tipo: 'investidura', fecha: '1993-07-09', si: 181, no: 165, abst: 1 },
+    escanos: { propios: 159 },
     forma: 'PSOE en minoría, con 159 escaños, apoyado por CiU (17) y PNV (5).',
     resumen: 'Una legislatura corta dominada por los escándalos (Roldán, los GAL, las escuchas del CESID) y por la dependencia de CiU, que acaba retirando su apoyo.',
     apartados: [
@@ -277,6 +286,7 @@ export const gobiernos: Gobierno[] = [
     id: 'aznar-1', nombre: 'Primer Gobierno de José María Aznar', presidente: 'José María Aznar', partido: 'pp', siglas: 'PP',
     desde: '1996-05-04', hasta: '2000-04-26', legislatura: 'VI',
     llegada: { tipo: 'investidura', fecha: '1996-05-04', si: 181, no: 166, abst: 1 },
+    escanos: { propios: 156 },
     forma: 'PP en minoría, con 156 escaños, apoyado por CiU (16), PNV (5) y Coalición Canaria (4) tras el Pacto del Majestic.',
     resumen: 'Primer gobierno del PP. Se centra en cumplir los requisitos para entrar en el euro, privatiza las grandes empresas públicas y cede más competencias a las comunidades a cambio del apoyo nacionalista.',
     apartados: [
@@ -302,6 +312,7 @@ export const gobiernos: Gobierno[] = [
     id: 'aznar-2', nombre: 'Segundo Gobierno de José María Aznar', presidente: 'José María Aznar', partido: 'pp', siglas: 'PP',
     desde: '2000-04-26', hasta: '2004-04-16', legislatura: 'VII',
     llegada: { tipo: 'investidura', fecha: '2000-04-26', si: 202, no: 148, abst: 0 },
+    escanos: { propios: 183 },
     forma: 'PP con mayoría absoluta: 183 escaños. CiU y Coalición Canaria también votan la investidura.',
     resumen: 'Sin necesidad de socios, el Gobierno endurece la lucha contra ETA, apoya la invasión de Irak y aprueba reformas muy contestadas. Termina con los atentados del 11-M, tres días antes de las elecciones.',
     apartados: [
@@ -332,6 +343,7 @@ export const gobiernos: Gobierno[] = [
     id: 'zapatero-1', nombre: 'Primer Gobierno de José Luis Rodríguez Zapatero', presidente: 'José Luis Rodríguez Zapatero', partido: 'psoe', siglas: 'PSOE',
     desde: '2004-04-16', hasta: '2008-04-11', legislatura: 'VIII',
     llegada: { tipo: 'investidura', fecha: '2004-04-16', si: 183, no: 148, abst: 19 },
+    escanos: { propios: 164 },
     forma: 'PSOE en minoría, con 164 escaños, apoyado en la investidura por ERC, IU-ICV, Coalición Canaria, BNG y CHA.',
     resumen: 'Primer gobierno paritario. Legislatura de ampliación de derechos civiles y sociales, en plena expansión económica e inmobiliaria, y de reformas de los estatutos de autonomía, con el del Estatut catalán como el más polémico.',
     apartados: [
@@ -364,6 +376,7 @@ export const gobiernos: Gobierno[] = [
     id: 'zapatero-2', nombre: 'Segundo Gobierno de José Luis Rodríguez Zapatero', presidente: 'José Luis Rodríguez Zapatero', partido: 'psoe', siglas: 'PSOE',
     desde: '2008-04-11', hasta: '2011-12-20', legislatura: 'IX',
     llegada: { tipo: 'investidura', fecha: '2008-04-11', si: 169, no: 158, abst: 23, nota: 'En la primera votación, el 9 de abril, se quedó en 168 votos, sin mayoría absoluta; salió en la segunda, por mayoría simple.' },
+    escanos: { propios: 169 },
     forma: 'PSOE en minoría, con 169 escaños.',
     resumen: 'La legislatura de la Gran Recesión. El Gobierno pasa de los estímulos de 2008-2009 a los recortes de 2010 por la presión de los mercados y de la UE, y termina con un paro por encima del 20 %.',
     apartados: [
@@ -393,6 +406,7 @@ export const gobiernos: Gobierno[] = [
     id: 'rajoy-1', nombre: 'Primer Gobierno de Mariano Rajoy', presidente: 'Mariano Rajoy', partido: 'pp', siglas: 'PP',
     desde: '2011-12-20', hasta: '2016-10-29', legislatura: 'X (y XI en funciones)',
     llegada: { tipo: 'investidura', fecha: '2011-12-20', si: 187, no: 149, abst: 14 },
+    escanos: { propios: 186 },
     forma: 'PP con mayoría absoluta: 186 escaños. Desde diciembre de 2015, en funciones durante diez meses.',
     resumen: 'Gobierno de ajustes en lo peor de la crisis: subidas de impuestos, recortes, reforma laboral y rescate bancario europeo. La economía vuelve a crecer desde 2014, pero los casos de corrupción del PP y el desgaste social acaban con el bipartidismo en 2015.',
     apartados: [
@@ -424,6 +438,7 @@ export const gobiernos: Gobierno[] = [
     id: 'rajoy-2', nombre: 'Segundo Gobierno de Mariano Rajoy', presidente: 'Mariano Rajoy', partido: 'pp', siglas: 'PP',
     desde: '2016-10-29', hasta: '2018-06-01', legislatura: 'XII',
     llegada: { tipo: 'investidura', fecha: '2016-10-29', si: 170, no: 111, abst: 68, nota: 'Rechazado dos veces en septiembre. En octubre sale adelante en segunda votación gracias a la abstención del PSOE, después de que Pedro Sánchez dimitiera como líder socialista.' },
+    escanos: { propios: 137 },
     forma: 'PP en minoría, con 137 escaños, apoyado por Ciudadanos y Coalición Canaria.',
     resumen: 'Un gobierno en minoría que necesita pactar cada presupuesto, marcado por la crisis de Cataluña y por la sentencia del caso Gürtel, que provoca la primera moción de censura que prospera.',
     apartados: [
@@ -447,6 +462,7 @@ export const gobiernos: Gobierno[] = [
     id: 'sanchez-1', nombre: 'Primer Gobierno de Pedro Sánchez', presidente: 'Pedro Sánchez', partido: 'psoe', siglas: 'PSOE',
     desde: '2018-06-01', hasta: '2020-01-07', legislatura: 'XII (y XIII en funciones)',
     llegada: { tipo: 'mocion', fecha: '2018-06-01', si: 180, no: 169, abst: 1, nota: 'Moción de censura contra Rajoy, apoyada por PSOE, Unidos Podemos, ERC, PDeCAT, PNV, EH Bildu, Compromís y Nueva Canarias.' },
+    escanos: { propios: 84 },
     forma: 'PSOE en solitario con solo 84 escaños, el gobierno con menos apoyo propio de la democracia. En funciones desde abril de 2019.',
     resumen: 'Un gobierno de transición que gobierna sobre todo por decreto-ley, con los presupuestos de Rajoy, hasta que los socios de la moción le tumban los suyos y convoca elecciones.',
     apartados: [
@@ -470,6 +486,7 @@ export const gobiernos: Gobierno[] = [
     id: 'sanchez-2', nombre: 'Segundo Gobierno de Pedro Sánchez', presidente: 'Pedro Sánchez', partido: 'psoe', siglas: 'PSOE y Unidas Podemos',
     desde: '2020-01-07', hasta: '2023-11-16', legislatura: 'XIV',
     llegada: { tipo: 'investidura', fecha: '2020-01-07', si: 167, no: 165, abst: 18, nota: 'En segunda votación, por mayoría simple. Votan a favor PSOE, Unidas Podemos, PNV, Más País, Compromís, BNG, Nueva Canarias y Teruel Existe; ERC y EH Bildu se abstienen.' },
+    escanos: { propios: 120, socio: { siglas: 'Unidas Podemos', n: 35 } },
     forma: 'Coalición PSOE (120) y Unidas Podemos (35), la primera desde la Segunda República: 155 escaños, en minoría.',
     resumen: 'La legislatura de la pandemia y de la guerra de Ucrania. El Gobierno aprueba un gran número de leyes sociales con una mayoría de varios partidos, gestiona los fondos europeos y concede los indultos del procés.',
     apartados: [
@@ -506,6 +523,7 @@ export const gobiernos: Gobierno[] = [
     id: 'sanchez-3', nombre: 'Tercer Gobierno de Pedro Sánchez', presidente: 'Pedro Sánchez', partido: 'psoe', siglas: 'PSOE y Sumar',
     desde: '2023-11-16', hasta: null, legislatura: 'XV',
     llegada: { tipo: 'investidura', fecha: '2023-11-16', si: 179, no: 171, abst: 0, nota: 'En primera votación. Votan a favor PSOE, Sumar, ERC, Junts, EH Bildu, PNV, BNG y Coalición Canaria; Junts, tras pactar la ley de amnistía.' },
+    escanos: { propios: 121, socio: { siglas: 'Sumar', n: 31 } },
     forma: 'Coalición PSOE (121) y Sumar (31): 152 escaños, que bajan a 148 cuando Podemos deja el grupo de Sumar en diciembre de 2023. El PP tiene mayoría absoluta en el Senado.',
     resumen: 'Una legislatura que depende en cada votación de siete partidos con intereses distintos. Arranca con la amnistía, queda marcada por varios casos judiciales que afectan al entorno del Gobierno y del PSOE, y termina con la ruptura de Junts y el adelanto electoral.',
     apartados: [

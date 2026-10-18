@@ -1,45 +1,59 @@
 ---
-// Vista de gobiernos: todos desde 1975, uno por investidura, agrupados por etapas. Cada tarjeta
-// lleva a la página del gobierno con todo lo que hizo.
-import { duracion, etapas, gobiernoPath, gobiernos, llegadaTexto, ordinal } from '../../data/politica/gobiernos';
-import { fecha, partidoById } from '../../lib/politica';
+// Vista de gobiernos: todos desde 1975, uno por investidura, agrupados por etapas. Una fila por
+// gobierno con lo que se lee de un vistazo: quién, cuándo, con cuántos escaños frente a la
+// mayoría absoluta y cómo llegó. El resto (qué hizo, cómo acabó) está en la página de cada uno.
+import { duracion, etapas, gobiernoPath, gobiernos, ordinal } from '../../data/politica/gobiernos';
+import { partidoById } from '../../lib/politica';
 
-const color = (g: (typeof gobiernos)[number]) => g.color ?? partidoById.get(g.partido)?.color ?? 'var(--muted)';
-const mes = (iso: string) => fecha(iso, { month: 'short', year: 'numeric' });
+type G = (typeof gobiernos)[number];
+const color = (g: G) => g.color ?? partidoById.get(g.partido)?.color ?? 'var(--muted)';
+const anio = (iso: string) => iso.slice(0, 4);
 const porEtapa = etapas.map((e, i) => ({
   ...e,
   items: gobiernos.filter((g) => g.desde >= e.desde && (i === etapas.length - 1 || g.desde < etapas[i + 1].desde)),
 }));
-const pct = (n = 0) => `${(n / 350) * 100}%`;
+const pct = (n: number) => `${(n / 350) * 100}%`;
+
+function escanosTexto(g: G) {
+  const e = g.escanos;
+  if (!e) return 'Sin Congreso elegido';
+  const total = e.propios + (e.socio?.n ?? 0);
+  const mayoria = total >= 176 ? 'mayoría absoluta' : 'sin mayoría';
+  return e.socio ? `${e.propios} + ${e.socio.n} (${e.socio.siglas}) · coalición ${mayoria}` : `${e.propios} escaños · ${mayoria}`;
+}
+function llegada(g: G) {
+  const l = g.llegada;
+  if (l.tipo === 'designacion') return { t: 'Sin investidura', v: 'Rey' };
+  return { t: l.tipo === 'mocion' ? 'Moción de censura' : 'Investidura', v: `${l.si}–${l.no}` };
+}
 ---
 <div class="gv">
   {porEtapa.map((e) => (
     <section class="gv-etapa">
       <h3 class="gv-etapa-t">{e.titulo}</h3>
-      <p class="gv-etapa-p">{e.texto}</p>
       <ol class="gv-list">
         {e.items.map((g) => {
           const o = ordinal(g);
+          const l = llegada(g);
           return (
             <li>
-              <a class="gv-card" href={gobiernoPath(g.id)} style={`--pc: ${color(g)}`}>
-                <span class="gv-top">
-                  <span class="gv-fechas">{mes(g.desde)} – {g.hasta ? mes(g.hasta) : 'hoy'} · {duracion(g)}</span>
-                  <span class="gv-leg">{g.legislatura.startsWith('C') ? g.legislatura : `Legislatura ${g.legislatura}`}</span>
+              <a class="gv-row" href={gobiernoPath(g.id)} style={`--pc: ${color(g)}`}>
+                <span class="gv-who">
+                  <span class="gv-name">{g.presidente}{o.de > 1 && <small> {o.n}.º</small>}</span>
+                  <span class="gv-when">{anio(g.desde)}–{g.hasta ? anio(g.hasta) : 'hoy'}<span class="gv-dur"> · {duracion(g)}</span></span>
                 </span>
-                <span class="gv-name">{g.presidente}{o.de > 1 && <small> · {o.n}.º gobierno</small>}</span>
-                <span class="gv-forma">{g.forma}</span>
-                <span class="gv-llegada">
-                  <b>{llegadaTexto(g)}</b>
-                  {g.llegada.si != null ? (
-                    <>
-                      <span class="gv-bar" aria-hidden="true"><i class="s" style={`width: ${pct(g.llegada.si)}`} /><i class="n" style={`width: ${pct(g.llegada.no)}`} /><i class="a" style={`width: ${pct(g.llegada.abst)}`} /></span>
-                      <span class="gv-num">{g.llegada.si} sí · {g.llegada.no} no{g.llegada.abst ? ` · ${g.llegada.abst} abst.` : ''}</span>
-                    </>
-                  ) : <span class="gv-num">sin votación en el Congreso</span>}
+                <span class="gv-seats">
+                  {g.escanos && (
+                    <span class="gv-bar" aria-hidden="true">
+                      <i class="p" style={`width: ${pct(g.escanos.propios)}`} />
+                      {g.escanos.socio && <i class="s" style={`width: ${pct(g.escanos.socio.n)}`} />}
+                      <b class="gv-176" />
+                    </span>
+                  )}
+                  <span class="gv-seats-t">{escanosTexto(g)}</span>
                 </span>
-                <span class="gv-res">{g.resumen}</span>
-                <span class="gv-more">Qué hizo este gobierno →</span>
+                <span class="gv-in"><span>{l.t}</span>{l.v && <strong>{l.v}</strong>}</span>
+                <span class="gv-go" aria-hidden="true">→</span>
               </a>
             </li>
           );
@@ -47,26 +61,33 @@ const pct = (n = 0) => `${(n / 350) * 100}%`;
       </ol>
     </section>
   ))}
+  <p class="gv-note">La raya de cada barra marca los 176 escaños de la mayoría absoluta. En la investidura, votos a favor y en contra; antes de la Constitución, al presidente lo nombraba el Rey. Pulsa un gobierno para ver qué hizo y cómo terminó.</p>
 </div>
 
 <style>
-  .gv { display: flex; flex-direction: column; gap: 26px; }
-  .gv-etapa-t { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
-  .gv-etapa-p { margin: 2px 0 12px; font-size: 14px; color: var(--muted); }
-  .gv-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
-  .gv-card { display: flex; flex-direction: column; gap: 7px; height: 100%; padding: 14px 16px 12px; color: var(--ink); text-decoration: none; background: var(--bg); border: 1px solid var(--panel-line); border-top: 5px solid var(--pc); border-radius: 12px; transition: border-color .15s, transform .15s; }
-  .gv-card:hover { border-color: var(--pc); transform: translateY(-1px); }
-  .gv-top { display: flex; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
-  .gv-name { font-family: var(--display); font-size: 20px; font-weight: 800; line-height: 1.15; letter-spacing: -0.3px; }
-  .gv-name small { font-family: var(--mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0; color: var(--muted); }
-  .gv-forma { font-size: 13px; line-height: 1.45; color: var(--text-soft); }
-  .gv-llegada { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px 10px; font-size: 12px; }
-  .gv-llegada b { font-family: var(--mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
-  .gv-bar { display: flex; height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
-  .gv-bar .s { background: var(--green); }
-  .gv-bar .n { background: var(--red); }
-  .gv-bar .a { background: var(--gold); }
-  .gv-num { grid-column: 2; font-family: var(--mono); font-size: 11px; color: var(--muted); }
-  .gv-res { font-size: 13.5px; line-height: 1.5; color: var(--text-soft); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .gv-more { margin-top: auto; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .gv { display: flex; flex-direction: column; gap: 22px; }
+  .gv-etapa-t { margin: 0 0 8px; font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); }
+  .gv-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .gv-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) 150px 16px; align-items: center; gap: 6px 22px; padding: 10px 14px 10px 16px; color: var(--ink); text-decoration: none; background: var(--bg); border: 1px solid var(--panel-line); border-left: 5px solid var(--pc); border-radius: 10px; transition: border-color .15s, transform .15s; }
+  .gv-row:hover { border-color: var(--pc); transform: translateX(2px); }
+  .gv-who { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .gv-name { font-family: var(--display); font-size: 17px; font-weight: 800; line-height: 1.2; letter-spacing: -0.2px; }
+  .gv-name small { font-family: var(--mono); font-size: 11.5px; font-weight: 500; color: var(--muted); }
+  .gv-when { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .gv-seats { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .gv-bar { position: relative; display: flex; height: 10px; background: color-mix(in srgb, var(--ink) 9%, transparent); border-radius: 999px; overflow: hidden; }
+  .gv-bar .p { background: var(--pc); }
+  .gv-bar .s { background: color-mix(in srgb, var(--pc) 45%, var(--bg)); }
+  .gv-176 { position: absolute; left: calc(176 / 350 * 100%); top: 0; bottom: 0; width: 2px; background: var(--ink); }
+  .gv-seats-t { font-size: 12.5px; color: var(--text-soft); }
+  .gv-in { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); }
+  .gv-in strong { font-family: var(--mono); font-size: 14px; color: var(--ink); }
+  .gv-go { color: var(--accent); font-weight: 700; }
+  .gv-note { margin: 0; font-size: 12.5px; color: var(--muted); }
+  @media (max-width: 700px) {
+    .gv-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .gv-seats { grid-column: 1 / -1; grid-row: 2; }
+    .gv-in { grid-column: 2; grid-row: 1; align-items: flex-end; text-align: right; }
+    .gv-go, .gv-dur { display: none; }
+  }
 </style>
