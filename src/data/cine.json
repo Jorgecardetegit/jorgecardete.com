@@ -746,5 +746,73 @@
     ],
     "note": "13 largometrajes como director. 4 marcados como vistos. Fuera quedan sus cortos documentales (Day of the Fight, Flying Padre, The Seafarers).",
     "source": "https://es.wikipedia.org/wiki/Anexo:Filmograf%C3%ADa_de_Stanley_Kubrick"
+  },
+  {
+    "id": "fincher",
+    "name": "David Fincher",
+    "films": [
+      {
+        "title": "Alien 3",
+        "year": 1992,
+        "status": "unknown"
+      },
+      {
+        "title": "Seven",
+        "year": 1995,
+        "status": "seen"
+      },
+      {
+        "title": "The Game",
+        "year": 1997,
+        "status": "unknown"
+      },
+      {
+        "title": "Fight Club",
+        "year": 1999,
+        "status": "seen"
+      },
+      {
+        "title": "Panic Room",
+        "year": 2002,
+        "status": "unknown"
+      },
+      {
+        "title": "Zodiac",
+        "year": 2007,
+        "status": "unknown"
+      },
+      {
+        "title": "El curioso caso de Benjamin Button",
+        "year": 2008,
+        "status": "unknown"
+      },
+      {
+        "title": "The Social Network",
+        "year": 2010,
+        "status": "seen"
+      },
+      {
+        "title": "The Girl with the Dragon Tattoo",
+        "year": 2011,
+        "status": "unknown"
+      },
+      {
+        "title": "Perdida",
+        "year": 2014,
+        "status": "unknown"
+      },
+      {
+        "title": "Mank",
+        "year": 2020,
+        "status": "unknown"
+      },
+      {
+        "title": "El asesino / The Killer",
+        "year": 2023,
+        "status": "unknown"
+      }
+    ],
+    "note": "12 largometrajes estrenados como director. 3 marcados como vistos (Fight Club, Seven y The Social Network). Fuera queda The Adventures of Cliff Booth, aún no estrenada, además de videoclips y trabajos de televisión.",
+    "source": "https://en.wikipedia.org/wiki/David_Fincher_filmography"
   }
-        ]
+]
