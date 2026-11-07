@@ -467,5 +467,78 @@
     ],
     "note": "53 títulos de la lista, todavía sin marcar vistos. The Mountain Eagle está perdida y no cuenta como pendiente para ver. Fuera quedan la inacabada Number 13, Elstree Calling, Mary (versión alemana de Asesinato), cortos y televisión.",
     "source": "https://en.wikipedia.org/wiki/Alfred_Hitchcock_filmography"
+  },
+  {
+    "id": "nolan",
+    "name": "Christopher Nolan",
+    "films": [
+      {
+        "title": "Following",
+        "year": 1998,
+        "status": "pending"
+      },
+      {
+        "title": "Memento",
+        "year": 2000,
+        "status": "seen"
+      },
+      {
+        "title": "Insomnia",
+        "year": 2002,
+        "status": "pending"
+      },
+      {
+        "title": "Batman Begins",
+        "year": 2005,
+        "status": "seen"
+      },
+      {
+        "title": "El truco final",
+        "year": 2006,
+        "status": "pending"
+      },
+      {
+        "title": "El caballero oscuro",
+        "year": 2008,
+        "status": "seen"
+      },
+      {
+        "title": "Origen",
+        "year": 2010,
+        "status": "seen"
+      },
+      {
+        "title": "El caballero oscuro: la leyenda renace",
+        "year": 2012,
+        "status": "seen"
+      },
+      {
+        "title": "Interstellar",
+        "year": 2014,
+        "status": "seen"
+      },
+      {
+        "title": "Dunkerque",
+        "year": 2017,
+        "status": "pending"
+      },
+      {
+        "title": "Tenet",
+        "year": 2020,
+        "status": "pending"
+      },
+      {
+        "title": "Oppenheimer",
+        "year": 2023,
+        "status": "seen"
+      },
+      {
+        "title": "La Odisea",
+        "year": 2026,
+        "status": "seen"
+      }
+    ],
+    "note": "13 largometrajes como director. 8 vistos. Fuera quedan cortometrajes y películas que solo ha producido (El hombre de acero, Transcendence, etc.).",
+    "source": "https://es.wikipedia.org/wiki/Filmograf%C3%ADa_de_Christopher_Nolan"
   }
 ]
