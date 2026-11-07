@@ -1261,5 +1261,201 @@
     ],
     "note": "12 películas conservadas completas de las 21 que dirigió: varias se perdieron y de alguna solo quedan fragmentos, que no cuentan como visionables. Ninguna marcada como vista: Jorge dijo 'creo que no he visto ninguna' y su 'creo' queda registrado como provisional (unknown), no como un no definitivo. Filmografía completa: https://en.wikipedia.org/wiki/F._W._Murnau",
     "source": "https://harvardfilmarchive.org/programs/haunted-visions-the-films-of-fw-murnau"
+  },
+  {
+    "id": "john-carpenter",
+    "name": "John Carpenter",
+    "films": [
+      {
+        "title": "Dark Star",
+        "year": 1974,
+        "status": "pending"
+      },
+      {
+        "title": "Assault on Precinct 13",
+        "year": 1976,
+        "status": "pending"
+      },
+      {
+        "title": "Halloween",
+        "year": 1978,
+        "status": "pending"
+      },
+      {
+        "title": "The Fog",
+        "year": 1980,
+        "status": "pending"
+      },
+      {
+        "title": "Escape from New York",
+        "year": 1981,
+        "status": "pending"
+      },
+      {
+        "title": "The Thing",
+        "year": 1982,
+        "status": "seen"
+      },
+      {
+        "title": "Christine",
+        "year": 1983,
+        "status": "pending"
+      },
+      {
+        "title": "Starman",
+        "year": 1984,
+        "status": "pending"
+      },
+      {
+        "title": "Big Trouble in Little China",
+        "year": 1986,
+        "status": "pending"
+      },
+      {
+        "title": "Prince of Darkness",
+        "year": 1987,
+        "status": "pending"
+      },
+      {
+        "title": "They Live",
+        "year": 1988,
+        "status": "pending"
+      },
+      {
+        "title": "Memoirs of an Invisible Man",
+        "year": 1992,
+        "status": "pending"
+      },
+      {
+        "title": "In the Mouth of Madness",
+        "year": 1994,
+        "status": "pending"
+      },
+      {
+        "title": "Village of the Damned",
+        "year": 1995,
+        "status": "pending"
+      },
+      {
+        "title": "Escape from L.A.",
+        "year": 1996,
+        "status": "pending"
+      },
+      {
+        "title": "Vampires",
+        "year": 1998,
+        "status": "pending"
+      },
+      {
+        "title": "Ghosts of Mars",
+        "year": 2001,
+        "status": "pending"
+      },
+      {
+        "title": "The Ward",
+        "year": 2010,
+        "status": "pending"
+      }
+    ],
+    "note": "18 largometrajes de cine. Solo The Thing marcada como vista; las otras 17 pendientes (Jorge dijo explícitamente 'The thing solamente'). Para televisión, fuera del denominador: Someone's Watching Me! (1978), Elvis (1979) y Body Bags (1993, dirección compartida). Filmografía completa: https://en.wikipedia.org/wiki/John_Carpenter_filmography",
+    "source": "https://theofficialjohncarpenter.com/credits/"
+  },
+  {
+    "id": "coen-brothers",
+    "name": "Hermanos Coen",
+    "films": [
+      {
+        "title": "Blood Simple",
+        "year": 1984,
+        "status": "pending"
+      },
+      {
+        "title": "Raising Arizona",
+        "year": 1987,
+        "status": "pending"
+      },
+      {
+        "title": "Miller's Crossing",
+        "year": 1990,
+        "status": "pending"
+      },
+      {
+        "title": "Barton Fink",
+        "year": 1991,
+        "status": "pending"
+      },
+      {
+        "title": "The Hudsucker Proxy",
+        "year": 1994,
+        "status": "pending"
+      },
+      {
+        "title": "Fargo",
+        "year": 1996,
+        "status": "pending"
+      },
+      {
+        "title": "The Big Lebowski",
+        "year": 1998,
+        "status": "pending"
+      },
+      {
+        "title": "O Brother, Where Art Thou?",
+        "year": 2000,
+        "status": "pending"
+      },
+      {
+        "title": "The Man Who Wasn't There",
+        "year": 2001,
+        "status": "pending"
+      },
+      {
+        "title": "Intolerable Cruelty",
+        "year": 2003,
+        "status": "pending"
+      },
+      {
+        "title": "The Ladykillers",
+        "year": 2004,
+        "status": "pending"
+      },
+      {
+        "title": "No Country for Old Men",
+        "year": 2007,
+        "status": "seen"
+      },
+      {
+        "title": "Burn After Reading",
+        "year": 2008,
+        "status": "pending"
+      },
+      {
+        "title": "A Serious Man",
+        "year": 2009,
+        "status": "pending"
+      },
+      {
+        "title": "True Grit",
+        "year": 2010,
+        "status": "pending"
+      },
+      {
+        "title": "Inside Llewyn Davis",
+        "year": 2013,
+        "status": "pending"
+      },
+      {
+        "title": "Hail, Caesar!",
+        "year": 2016,
+        "status": "pending"
+      },
+      {
+        "title": "The Ballad of Buster Scruggs",
+        "year": 2018,
+        "status": "pending"
+      }
+    ],
+    "note": "18 largometrajes dirigidos juntos por Joel y Ethan Coen. Solo No Country for Old Men marcada como vista; las otras 17 pendientes (Jorge dijo explícitamente que solo esa). Aparte, fuera del denominador conjunto, sus trabajos en solitario: Joel dirigió The Tragedy of Macbeth (2021) y Ethan Jerry Lee Lewis: Trouble in Mind (2022, documental), Drive-Away Dolls (2024) y Honey Don't! (2025).",
+    "source": "https://en.wikipedia.org/wiki/Coen_brothers_filmography"
   }
 ]
