@@ -1893,5 +1893,128 @@
     ],
     "note": "74 películas dirigidas por Ford con copias conocidas, según las notas de Wikipedia (no afirma que todas estén completas; lista para reconocer, no su producción entera). 2 marcadas como vistas: El hombre que mató a Liberty Valance y ¡Qué verde era mi valle!. El resto queda sin marcar (unknown, sin negativa explícita; no pendientes). Fuera de la lista: unas cuarenta mudas perdidas y Strong Boy (1929); parciales o alteradas (The Blue Eagle, The Secret Man, By Indian Post, The Last Outlaw, A Gun Fightin' Gentleman, The Village Blacksmith, North of Hudson Bay, Men Without Women) y de estado desconocido (Rustlers, Gun Law, The Gun Packer); How the West Was Won (La conquista del Oeste, 1962), donde Ford dirigió solo el segmento de la Guerra Civil, aparte y sin confirmar; documentales, cortos y televisión; y Pinky, The Adventures of Marco Polo y The Alamo, sin crédito o sustituido. Títulos en español tomados de es.wikipedia. Segunda fuente: https://es.wikipedia.org/wiki/Anexo:Filmograf%C3%ADa_de_John_Ford",
     "source": "https://en.wikipedia.org/wiki/John_Ford_filmography"
+  },
+  {
+    "id": "roman-polanski",
+    "name": "Roman Polanski",
+    "films": [
+      {
+        "title": "Knife in the Water",
+        "year": 1962,
+        "status": "unknown"
+      },
+      {
+        "title": "Repulsion",
+        "year": 1965,
+        "status": "unknown"
+      },
+      {
+        "title": "Cul-de-sac",
+        "year": 1966,
+        "status": "unknown"
+      },
+      {
+        "title": "The Fearless Vampire Killers",
+        "year": 1967,
+        "status": "unknown"
+      },
+      {
+        "title": "Rosemary's Baby",
+        "year": 1968,
+        "status": "unknown"
+      },
+      {
+        "title": "Macbeth",
+        "year": 1971,
+        "status": "unknown"
+      },
+      {
+        "title": "What?",
+        "year": 1972,
+        "status": "unknown"
+      },
+      {
+        "title": "Chinatown",
+        "year": 1974,
+        "status": "unknown"
+      },
+      {
+        "title": "The Tenant",
+        "year": 1976,
+        "status": "unknown"
+      },
+      {
+        "title": "Tess",
+        "year": 1979,
+        "status": "unknown"
+      },
+      {
+        "title": "Pirates",
+        "year": 1986,
+        "status": "unknown"
+      },
+      {
+        "title": "Frantic",
+        "year": 1988,
+        "status": "unknown"
+      },
+      {
+        "title": "Bitter Moon",
+        "year": 1992,
+        "status": "unknown"
+      },
+      {
+        "title": "Death and the Maiden",
+        "year": 1994,
+        "status": "unknown"
+      },
+      {
+        "title": "The Ninth Gate",
+        "year": 1999,
+        "status": "unknown"
+      },
+      {
+        "title": "The Pianist",
+        "year": 2002,
+        "status": "unknown"
+      },
+      {
+        "title": "Oliver Twist",
+        "year": 2005,
+        "status": "seen"
+      },
+      {
+        "title": "The Ghost Writer",
+        "year": 2010,
+        "status": "unknown"
+      },
+      {
+        "title": "Carnage",
+        "year": 2011,
+        "status": "unknown"
+      },
+      {
+        "title": "Venus in Fur",
+        "year": 2013,
+        "status": "unknown"
+      },
+      {
+        "title": "Based on a True Story",
+        "year": 2017,
+        "status": "unknown"
+      },
+      {
+        "title": "An Officer and a Spy",
+        "year": 2019,
+        "status": "unknown"
+      },
+      {
+        "title": "The Palace",
+        "year": 2023,
+        "status": "unknown"
+      }
+    ],
+    "note": "23 largometrajes según la lista entregada a Jorge. Solo Oliver Twist marcada como vista; las otras 22 quedan sin marcar (unknown, sin negativa explícita; no pendientes).",
+    "source": "https://en.wikipedia.org/wiki/Roman_Polanski_filmography"
   }
 ]
