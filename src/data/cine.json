@@ -814,5 +814,163 @@
     ],
     "note": "12 largometrajes estrenados como director. 3 marcados como vistos (Fight Club, Seven y The Social Network). Fuera queda The Adventures of Cliff Booth, aún no estrenada, además de videoclips y trabajos de televisión.",
     "source": "https://en.wikipedia.org/wiki/David_Fincher_filmography"
+  },
+  {
+    "id": "ridley-scott",
+    "name": "Ridley Scott",
+    "films": [
+      {
+        "title": "The Duellists",
+        "year": 1977,
+        "status": "unknown"
+      },
+      {
+        "title": "Alien",
+        "year": 1979,
+        "status": "unknown"
+      },
+      {
+        "title": "Blade Runner",
+        "year": 1982,
+        "status": "seen"
+      },
+      {
+        "title": "Legend",
+        "year": 1985,
+        "status": "unknown"
+      },
+      {
+        "title": "Someone to Watch Over Me",
+        "year": 1987,
+        "status": "unknown"
+      },
+      {
+        "title": "Black Rain",
+        "year": 1989,
+        "status": "unknown"
+      },
+      {
+        "title": "Thelma & Louise",
+        "year": 1991,
+        "status": "unknown"
+      },
+      {
+        "title": "1492: Conquest of Paradise",
+        "year": 1992,
+        "status": "unknown"
+      },
+      {
+        "title": "White Squall",
+        "year": 1996,
+        "status": "unknown"
+      },
+      {
+        "title": "G.I. Jane",
+        "year": 1997,
+        "status": "unknown"
+      },
+      {
+        "title": "Gladiator",
+        "year": 2000,
+        "status": "seen"
+      },
+      {
+        "title": "Hannibal",
+        "year": 2001,
+        "status": "unknown"
+      },
+      {
+        "title": "Black Hawk Down",
+        "year": 2001,
+        "status": "unknown"
+      },
+      {
+        "title": "Matchstick Men",
+        "year": 2003,
+        "status": "unknown"
+      },
+      {
+        "title": "Kingdom of Heaven",
+        "year": 2005,
+        "status": "unknown"
+      },
+      {
+        "title": "A Good Year",
+        "year": 2006,
+        "status": "unknown"
+      },
+      {
+        "title": "American Gangster",
+        "year": 2007,
+        "status": "seen"
+      },
+      {
+        "title": "Body of Lies",
+        "year": 2008,
+        "status": "unknown"
+      },
+      {
+        "title": "Robin Hood",
+        "year": 2010,
+        "status": "unknown"
+      },
+      {
+        "title": "Prometheus",
+        "year": 2012,
+        "status": "seen"
+      },
+      {
+        "title": "The Counselor",
+        "year": 2013,
+        "status": "unknown"
+      },
+      {
+        "title": "Exodus: Gods and Kings",
+        "year": 2014,
+        "status": "unknown"
+      },
+      {
+        "title": "The Martian",
+        "year": 2015,
+        "status": "seen"
+      },
+      {
+        "title": "Alien: Covenant",
+        "year": 2017,
+        "status": "unknown"
+      },
+      {
+        "title": "All the Money in the World",
+        "year": 2017,
+        "status": "unknown"
+      },
+      {
+        "title": "The Last Duel",
+        "year": 2021,
+        "status": "unknown"
+      },
+      {
+        "title": "House of Gucci",
+        "year": 2021,
+        "status": "unknown"
+      },
+      {
+        "title": "Napoleon",
+        "year": 2023,
+        "status": "unknown"
+      },
+      {
+        "title": "Gladiator II",
+        "year": 2024,
+        "status": "unknown"
+      },
+      {
+        "title": "The Dog Stars",
+        "year": 2026,
+        "status": "unknown"
+      }
+    ],
+    "note": "30 largometrajes estrenados como director. 5 marcados como vistos (Blade Runner, Gladiator, American Gangster, Prometheus y The Martian). No cuentan como películas distintas los montajes alternativos (montaje del director de Blade Runner, Kingdom of Heaven, Napoleon...) ni las que solo ha producido (Blade Runner 2049, etc.).",
+    "source": "https://www.fandango.com/people/ridley-scott-605346/film-credits"
   }
 ]
