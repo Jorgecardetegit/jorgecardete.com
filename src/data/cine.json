@@ -1457,5 +1457,63 @@
     ],
     "note": "18 largometrajes dirigidos juntos por Joel y Ethan Coen. Solo No Country for Old Men marcada como vista; las otras 17 pendientes (Jorge dijo explícitamente que solo esa). Aparte, fuera del denominador conjunto, sus trabajos en solitario: Joel dirigió The Tragedy of Macbeth (2021) y Ethan Jerry Lee Lewis: Trouble in Mind (2022, documental), Drive-Away Dolls (2024) y Honey Don't! (2025).",
     "source": "https://en.wikipedia.org/wiki/Coen_brothers_filmography"
+  },
+  {
+    "id": "james-cameron",
+    "name": "James Cameron",
+    "films": [
+      {
+        "title": "Piranha II: The Spawning",
+        "year": 1982,
+        "status": "pending"
+      },
+      {
+        "title": "The Terminator",
+        "year": 1984,
+        "status": "seen"
+      },
+      {
+        "title": "Aliens",
+        "year": 1986,
+        "status": "pending"
+      },
+      {
+        "title": "The Abyss",
+        "year": 1989,
+        "status": "pending"
+      },
+      {
+        "title": "Terminator 2: Judgment Day",
+        "year": 1991,
+        "status": "seen"
+      },
+      {
+        "title": "True Lies",
+        "year": 1994,
+        "status": "pending"
+      },
+      {
+        "title": "Titanic",
+        "year": 1997,
+        "status": "seen"
+      },
+      {
+        "title": "Avatar",
+        "year": 2009,
+        "status": "seen"
+      },
+      {
+        "title": "Avatar: The Way of Water",
+        "year": 2022,
+        "status": "seen"
+      },
+      {
+        "title": "Avatar: Fire and Ash",
+        "year": 2025,
+        "status": "seen"
+      }
+    ],
+    "note": "10 largometrajes de ficción. 6 vistos y 4 pendientes (Jorge dijo explícitamente: todas menos True Lies, The Abyss, Aliens y Piranha II). Aparte, fuera del denominador y sin confirmar, sus documentales y el concierto: Ghosts of the Abyss (2003), Aliens of the Deep (2005) y Billie Eilish - Hit Me Hard and Soft: The Tour (Live in 3D) (2026).",
+    "source": "https://en.wikipedia.org/wiki/James_Cameron_filmography"
   }
 ]
