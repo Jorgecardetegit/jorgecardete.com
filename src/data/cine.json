@@ -972,5 +972,43 @@
     ],
     "note": "30 largometrajes estrenados como director. 5 marcados como vistos (Blade Runner, Gladiator, American Gangster, Prometheus y The Martian). No cuentan como películas distintas los montajes alternativos (montaje del director de Blade Runner, Kingdom of Heaven, Napoleon...) ni las que solo ha producido (Blade Runner 2049, etc.).",
     "source": "https://www.fandango.com/people/ridley-scott-605346/film-credits"
+  },
+  {
+    "id": "george-lucas",
+    "name": "George Lucas",
+    "films": [
+      {
+        "title": "THX 1138",
+        "year": 1971,
+        "status": "pending"
+      },
+      {
+        "title": "American Graffiti",
+        "year": 1973,
+        "status": "pending"
+      },
+      {
+        "title": "Star Wars: episodio IV - A New Hope",
+        "year": 1977,
+        "status": "seen"
+      },
+      {
+        "title": "Star Wars: episodio I - The Phantom Menace",
+        "year": 1999,
+        "status": "seen"
+      },
+      {
+        "title": "Star Wars: episodio II - Attack of the Clones",
+        "year": 2002,
+        "status": "seen"
+      },
+      {
+        "title": "Star Wars: episodio III - Revenge of the Sith",
+        "year": 2005,
+        "status": "seen"
+      }
+    ],
+    "note": "6 largometrajes como director. 4 marcados como vistos (las cuatro de Star Wars que dirigió: episodios IV, I, II y III); THX 1138 y American Graffiti pendientes (dijo explícitamente que no las ha visto). Creó Star Wars pero no dirigió los episodios V y VI; fuera de esta lista quedan sus trabajos como productor y creador de historias (Indiana Jones, Willow, Dentro del laberinto...).",
+    "source": "https://en.wikipedia.org/wiki/George_Lucas_filmography"
   }
 ]
