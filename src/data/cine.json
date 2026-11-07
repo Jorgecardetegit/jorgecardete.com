@@ -1193,5 +1193,73 @@
     ],
     "note": "35 largometrajes. 12 marcados como vistos: las cuatro de Indiana Jones que dirigió (Raiders of the Lost Ark, Temple of Doom, The Last Crusade y Kingdom of the Crystal Skull), las dos de Jurassic Park que dirigió (Jurassic Park y The Lost World), The Adventures of Tintin, E.T., Saving Private Ryan, War Horse, Schindler's List y Catch Me If You Can. El resto queda sin marcar (unknown, no pendientes). Incluye Duel, nacida para televisión pero con versión de cine; fuera quedan Firelight (película juvenil parcialmente perdida) y Twilight Zone, de la que dirigió solo un segmento.",
     "source": "https://en.wikipedia.org/wiki/Steven_Spielberg_filmography"
+  },
+  {
+    "id": "murnau",
+    "name": "F. W. Murnau",
+    "films": [
+      {
+        "title": "Der Gang in die Nacht",
+        "year": 1921,
+        "status": "unknown"
+      },
+      {
+        "title": "Schloß Vogelöd",
+        "year": 1921,
+        "status": "unknown"
+      },
+      {
+        "title": "Der brennende Acker",
+        "year": 1922,
+        "status": "unknown"
+      },
+      {
+        "title": "Nosferatu",
+        "year": 1922,
+        "status": "unknown"
+      },
+      {
+        "title": "Phantom",
+        "year": 1922,
+        "status": "unknown"
+      },
+      {
+        "title": "Die Finanzen des Großherzogs",
+        "year": 1924,
+        "status": "unknown"
+      },
+      {
+        "title": "Der letzte Mann",
+        "year": 1924,
+        "status": "unknown"
+      },
+      {
+        "title": "Tartüff",
+        "year": 1926,
+        "status": "unknown"
+      },
+      {
+        "title": "Faust",
+        "year": 1926,
+        "status": "unknown"
+      },
+      {
+        "title": "Sunrise: A Song of Two Humans",
+        "year": 1927,
+        "status": "unknown"
+      },
+      {
+        "title": "City Girl",
+        "year": 1930,
+        "status": "unknown"
+      },
+      {
+        "title": "Tabu",
+        "year": 1931,
+        "status": "unknown"
+      }
+    ],
+    "note": "12 películas conservadas completas de las 21 que dirigió: varias se perdieron y de alguna solo quedan fragmentos, que no cuentan como visionables. Ninguna marcada como vista: Jorge dijo 'creo que no he visto ninguna' y su 'creo' queda registrado como provisional (unknown), no como un no definitivo. Filmografía completa: https://en.wikipedia.org/wiki/F._W._Murnau",
+    "source": "https://harvardfilmarchive.org/programs/haunted-visions-the-films-of-fw-murnau"
   }
 ]
