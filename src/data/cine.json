@@ -1515,5 +1515,383 @@
     ],
     "note": "10 largometrajes de ficción. 6 vistos y 4 pendientes (Jorge dijo explícitamente: todas menos True Lies, The Abyss, Aliens y Piranha II). Aparte, fuera del denominador y sin confirmar, sus documentales y el concierto: Ghosts of the Abyss (2003), Aliens of the Deep (2005) y Billie Eilish - Hit Me Hard and Soft: The Tour (Live in 3D) (2026).",
     "source": "https://en.wikipedia.org/wiki/James_Cameron_filmography"
+  },
+  {
+    "id": "john-ford",
+    "name": "John Ford",
+    "films": [
+      {
+        "title": "Straight Shooting",
+        "year": 1917,
+        "status": "unknown"
+      },
+      {
+        "title": "Bucking Broadway",
+        "year": 1917,
+        "status": "unknown"
+      },
+      {
+        "title": "The Scarlet Drop",
+        "year": 1918,
+        "status": "unknown"
+      },
+      {
+        "title": "Hell Bent",
+        "year": 1918,
+        "status": "unknown"
+      },
+      {
+        "title": "Just Pals",
+        "year": 1920,
+        "status": "unknown"
+      },
+      {
+        "title": "Cameo Kirby",
+        "year": 1923,
+        "status": "unknown"
+      },
+      {
+        "title": "El caballo de hierro",
+        "year": 1924,
+        "status": "unknown"
+      },
+      {
+        "title": "Lightnin'",
+        "year": 1925,
+        "status": "unknown"
+      },
+      {
+        "title": "Sangre de pista",
+        "year": 1925,
+        "status": "unknown"
+      },
+      {
+        "title": "The Shamrock Handicap",
+        "year": 1926,
+        "status": "unknown"
+      },
+      {
+        "title": "Tres hombres malos",
+        "year": 1926,
+        "status": "unknown"
+      },
+      {
+        "title": "Upstream",
+        "year": 1927,
+        "status": "unknown"
+      },
+      {
+        "title": "¡Madre mía!",
+        "year": 1928,
+        "status": "unknown"
+      },
+      {
+        "title": "Cuatro hijos",
+        "year": 1928,
+        "status": "unknown"
+      },
+      {
+        "title": "Legado trágico",
+        "year": 1928,
+        "status": "unknown"
+      },
+      {
+        "title": "Policías sin esposas",
+        "year": 1928,
+        "status": "unknown"
+      },
+      {
+        "title": "Shari, la hechicera",
+        "year": 1929,
+        "status": "unknown"
+      },
+      {
+        "title": "La audacia triunfa",
+        "year": 1929,
+        "status": "unknown"
+      },
+      {
+        "title": "El intrépido",
+        "year": 1930,
+        "status": "unknown"
+      },
+      {
+        "title": "Río arriba",
+        "year": 1930,
+        "status": "unknown"
+      },
+      {
+        "title": "Mar de fondo",
+        "year": 1931,
+        "status": "unknown"
+      },
+      {
+        "title": "La huerfanita",
+        "year": 1931,
+        "status": "unknown"
+      },
+      {
+        "title": "El Dr. Arrowsmith",
+        "year": 1931,
+        "status": "unknown"
+      },
+      {
+        "title": "Hombres sin miedo",
+        "year": 1932,
+        "status": "unknown"
+      },
+      {
+        "title": "Carne",
+        "year": 1932,
+        "status": "unknown"
+      },
+      {
+        "title": "Peregrinación",
+        "year": 1933,
+        "status": "unknown"
+      },
+      {
+        "title": "Doctor Bull",
+        "year": 1933,
+        "status": "unknown"
+      },
+      {
+        "title": "La patrulla perdida",
+        "year": 1934,
+        "status": "unknown"
+      },
+      {
+        "title": "Paz en la Tierra",
+        "year": 1934,
+        "status": "unknown"
+      },
+      {
+        "title": "El juez Priest",
+        "year": 1934,
+        "status": "unknown"
+      },
+      {
+        "title": "Pasaporte a la fama",
+        "year": 1935,
+        "status": "unknown"
+      },
+      {
+        "title": "El delator",
+        "year": 1935,
+        "status": "unknown"
+      },
+      {
+        "title": "Barco a la deriva",
+        "year": 1935,
+        "status": "unknown"
+      },
+      {
+        "title": "Prisionero del odio",
+        "year": 1936,
+        "status": "unknown"
+      },
+      {
+        "title": "María Estuardo",
+        "year": 1936,
+        "status": "unknown"
+      },
+      {
+        "title": "La Osa Mayor y las estrellas",
+        "year": 1936,
+        "status": "unknown"
+      },
+      {
+        "title": "La mascota del regimiento",
+        "year": 1937,
+        "status": "unknown"
+      },
+      {
+        "title": "Huracán sobre la isla",
+        "year": 1937,
+        "status": "unknown"
+      },
+      {
+        "title": "Cuatro hombres y una plegaria",
+        "year": 1938,
+        "status": "unknown"
+      },
+      {
+        "title": "Submarine Patrol",
+        "year": 1938,
+        "status": "unknown"
+      },
+      {
+        "title": "La diligencia",
+        "year": 1939,
+        "status": "unknown"
+      },
+      {
+        "title": "El joven Lincoln",
+        "year": 1939,
+        "status": "unknown"
+      },
+      {
+        "title": "Corazones indomables",
+        "year": 1939,
+        "status": "unknown"
+      },
+      {
+        "title": "Las uvas de la ira",
+        "year": 1940,
+        "status": "unknown"
+      },
+      {
+        "title": "Hombres intrépidos",
+        "year": 1940,
+        "status": "unknown"
+      },
+      {
+        "title": "Tobacco Road",
+        "year": 1941,
+        "status": "unknown"
+      },
+      {
+        "title": "¡Qué verde era mi valle!",
+        "year": 1941,
+        "status": "seen"
+      },
+      {
+        "title": "No eran imprescindibles",
+        "year": 1945,
+        "status": "unknown"
+      },
+      {
+        "title": "Pasión de los fuertes",
+        "year": 1946,
+        "status": "unknown"
+      },
+      {
+        "title": "El fugitivo",
+        "year": 1947,
+        "status": "unknown"
+      },
+      {
+        "title": "Fort Apache",
+        "year": 1948,
+        "status": "unknown"
+      },
+      {
+        "title": "Tres padrinos",
+        "year": 1948,
+        "status": "unknown"
+      },
+      {
+        "title": "La legión invencible",
+        "year": 1949,
+        "status": "unknown"
+      },
+      {
+        "title": "When Willie Comes Marching Home",
+        "year": 1950,
+        "status": "unknown"
+      },
+      {
+        "title": "Caravana de paz",
+        "year": 1950,
+        "status": "unknown"
+      },
+      {
+        "title": "Río Grande",
+        "year": 1950,
+        "status": "unknown"
+      },
+      {
+        "title": "El hombre tranquilo",
+        "year": 1952,
+        "status": "unknown"
+      },
+      {
+        "title": "What Price Glory",
+        "year": 1952,
+        "status": "unknown"
+      },
+      {
+        "title": "The Sun Shines Bright",
+        "year": 1953,
+        "status": "unknown"
+      },
+      {
+        "title": "Mogambo",
+        "year": 1953,
+        "status": "unknown"
+      },
+      {
+        "title": "The Long Gray Line",
+        "year": 1955,
+        "status": "unknown"
+      },
+      {
+        "title": "Escala en Hawaii",
+        "year": 1955,
+        "status": "unknown"
+      },
+      {
+        "title": "Centauros del desierto",
+        "year": 1956,
+        "status": "unknown"
+      },
+      {
+        "title": "Escrito bajo el sol",
+        "year": 1957,
+        "status": "unknown"
+      },
+      {
+        "title": "The Rising of the Moon",
+        "year": 1957,
+        "status": "unknown"
+      },
+      {
+        "title": "El último hurra",
+        "year": 1958,
+        "status": "unknown"
+      },
+      {
+        "title": "Gideon's Day",
+        "year": 1958,
+        "status": "unknown"
+      },
+      {
+        "title": "Misión de audaces",
+        "year": 1959,
+        "status": "unknown"
+      },
+      {
+        "title": "El sargento negro",
+        "year": 1960,
+        "status": "unknown"
+      },
+      {
+        "title": "Dos cabalgan juntos",
+        "year": 1961,
+        "status": "unknown"
+      },
+      {
+        "title": "El hombre que mató a Liberty Valance",
+        "year": 1962,
+        "status": "seen"
+      },
+      {
+        "title": "La taberna del irlandés",
+        "year": 1963,
+        "status": "unknown"
+      },
+      {
+        "title": "El gran combate",
+        "year": 1964,
+        "status": "unknown"
+      },
+      {
+        "title": "7 Women",
+        "year": 1966,
+        "status": "unknown"
+      }
+    ],
+    "note": "74 películas dirigidas por Ford con copias conocidas, según las notas de Wikipedia (no afirma que todas estén completas; lista para reconocer, no su producción entera). 2 marcadas como vistas: El hombre que mató a Liberty Valance y ¡Qué verde era mi valle!. El resto queda sin marcar (unknown, sin negativa explícita; no pendientes). Fuera de la lista: unas cuarenta mudas perdidas y Strong Boy (1929); parciales o alteradas (The Blue Eagle, The Secret Man, By Indian Post, The Last Outlaw, A Gun Fightin' Gentleman, The Village Blacksmith, North of Hudson Bay, Men Without Women) y de estado desconocido (Rustlers, Gun Law, The Gun Packer); How the West Was Won (La conquista del Oeste, 1962), donde Ford dirigió solo el segmento de la Guerra Civil, aparte y sin confirmar; documentales, cortos y televisión; y Pinky, The Adventures of Marco Polo y The Alamo, sin crédito o sustituido. Títulos en español tomados de es.wikipedia. Segunda fuente: https://es.wikipedia.org/wiki/Anexo:Filmograf%C3%ADa_de_John_Ford",
+    "source": "https://en.wikipedia.org/wiki/John_Ford_filmography"
   }
 ]
