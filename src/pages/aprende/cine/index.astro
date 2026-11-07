@@ -1,0 +1,47 @@
+---
+import Base from '../../../layouts/Base.astro';
+import directors from '../../../data/cine.json';
+const labels: Record<string, string> = { seen: 'Vista', pending: 'Pendiente', unknown: 'Sin marcar', lost: 'Perdida' };
+---
+<Base title="Cuaderno de cine" description="Filmografías y seguimiento personal de películas vistas." translated={false} noindex bare>
+  <main class="cine">
+    <header class="heading">
+      <div class="topline"><a href="/">← jorge.dev</a><span>APRENDIZAJES / CINE</span></div>
+      <p class="eyebrow">UN DIRECTOR CADA VEZ</p>
+      <h1>Cuaderno de cine<span>.</span></h1>
+      <p class="intro">Lo que he visto. Lo que me queda por descubrir.</p>
+      <p class="updated">Actualizado el 7 de noviembre de 2026</p>
+    </header>
+    <section class="overview" aria-label="Resumen por director">
+      {directors.map(d => <a href={`#${d.id}`} class="summary">
+        <span class="director">{d.name}</span>
+        <strong>{d.id === 'hitchcock' ? 'Sin marcar' : `${d.films.filter(f => f.status === 'seen').length} / ${d.films.length}`}</strong>
+        <span>{d.id === 'tarantino' ? 'Completado' : d.id === 'scorsese' ? '18 pendientes' : '52 títulos conservados + 1 perdido'}</span>
+      </a>)}
+    </section>
+    <div class="toolbar"><label for="film-search">Buscar película</label><input id="film-search" type="search" placeholder="Título o año…" autocomplete="off" /><p>Vista ✓ · Pendiente ○ · Sin marcar ?</p></div>
+    {directors.map((d, i) => <section class="filmography" id={d.id}>
+      <header class="director-head"><span class="number">0{i + 1}</span><div><h2>{d.name}</h2><p>{d.note}</p></div></header>
+      <ul class="films">
+        {d.films.map(f => <li data-film={`${f.title} ${f.year}`.toLocaleLowerCase('es')} class:list={[f.status]}>
+          <span class="state-icon" aria-hidden="true">{f.status === 'seen' ? '✓' : f.status === 'pending' ? '○' : f.status === 'lost' ? '−' : '?'}</span>
+          <span class="film-title">{f.title}</span><span class="year">{f.year}</span><span class="state">{labels[f.status]}</span>
+        </li>)}
+      </ul>
+      <p class="source"><a href={d.source} target="_blank" rel="noopener noreferrer">Fuente de la filmografía ↗</a></p>
+    </section>)}
+    <footer><p>Las películas sin marcar no se cuentan como no vistas. Los cambios del seguimiento se guardan en el repositorio, no solo en este navegador.</p><p>Esta página es pública, sin enlace desde la portada ni desde el panel Aprende.</p></footer>
+  </main>
+</Base>
+<script>
+  const input = document.querySelector<HTMLInputElement>('#film-search');
+  input?.addEventListener('input', () => {
+    const q = input.value.trim().toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    document.querySelectorAll<HTMLElement>('[data-film]').forEach(row => {
+      row.hidden = !(row.dataset.film ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q);
+    });
+  });
+</script>
+<style>
+  .cine{max-width:1000px;margin:auto;padding:40px 24px 64px}.topline{display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:var(--mono);font-size:12px}.topline a{color:var(--ink);text-decoration:none}.topline span{color:var(--muted);letter-spacing:.06em}.heading{padding-bottom:28px;border-bottom:2px solid var(--ink)}.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;margin:52px 0 12px;color:var(--muted)}h1{font-family:var(--display);font-size:clamp(38px,7vw,68px);line-height:1.05;letter-spacing:-.04em;margin:0 0 16px}h1 span{color:var(--terracotta)}.intro{font-size:20px;color:var(--text-soft);margin:0 0 20px}.updated{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0}.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0 32px}.summary{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:20px;color:var(--ink);text-decoration:none;background:var(--card)}.summary:hover{border-color:var(--terracotta)}.summary .director{font-size:14px;font-weight:600}.summary strong{font-family:var(--display);font-size:30px;line-height:1.2}.summary>span:last-child{font-size:12px;color:var(--muted)}.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:38px}.toolbar label{font-size:13px;font-weight:600}.toolbar input{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:var(--card);color:var(--ink);width:240px}.toolbar p{font-size:12px;color:var(--muted);margin-left:auto}.filmography{margin:0 0 40px;scroll-margin-top:20px}.director-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}.number{font:12px var(--mono);color:var(--terracotta);padding-top:8px}h2{font:700 28px var(--display);margin:0 0 7px}.director-head p{font-size:13px;line-height:1.65;color:var(--text-soft);margin:0;max-width:760px}.films{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}.films li{display:grid;grid-template-columns:24px minmax(0,1fr) 50px 78px;align-items:center;gap:12px;padding:12px 8px;border-bottom:1px solid var(--line);font-size:14px}.films li[hidden]{display:none}.state-icon{font:14px var(--mono);color:var(--muted)}.seen .state-icon{color:var(--green)}.film-title{font-weight:500;overflow-wrap:anywhere}.year{font:12px var(--mono);color:var(--muted)}.state{font-size:11px;text-align:right;color:var(--muted)}.seen .state{color:var(--green)}.lost{opacity:.65}.source{font-size:11px;text-align:right;margin:10px 0}.source a{color:var(--muted)}footer{border-top:2px solid var(--ink);padding-top:20px;font-size:12px;line-height:1.65;color:var(--muted)}footer p{margin:0 0 8px}@media(max-width:600px){.cine{padding:24px 16px 40px}.topline{font-size:10px}.eyebrow{margin-top:38px}.intro{font-size:17px}.overview{gap:8px}.summary{padding:12px 10px;gap:8px}.summary .director{font-size:12px}.summary strong{font-size:20px}.summary>span:last-child{font-size:10px}.toolbar p{margin:0;width:100%}.toolbar input{width:100%}.toolbar label{width:100%}.films li{grid-template-columns:18px minmax(0,1fr) 38px;gap:8px;padding:11px 2px;font-size:13px}.state{display:none}.year{font-size:11px}h2{font-size:24px}.director-head{gap:10px}.director-head p{font-size:12px}}
+</style>
