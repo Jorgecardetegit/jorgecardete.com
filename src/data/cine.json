@@ -1010,5 +1010,188 @@
     ],
     "note": "6 largometrajes como director. 4 marcados como vistos (las cuatro de Star Wars que dirigió: episodios IV, I, II y III); THX 1138 y American Graffiti pendientes (dijo explícitamente que no las ha visto). Creó Star Wars pero no dirigió los episodios V y VI; fuera de esta lista quedan sus trabajos como productor y creador de historias (Indiana Jones, Willow, Dentro del laberinto...).",
     "source": "https://en.wikipedia.org/wiki/George_Lucas_filmography"
+  },
+  {
+    "id": "spielberg",
+    "name": "Steven Spielberg",
+    "films": [
+      {
+        "title": "Duel",
+        "year": 1971,
+        "status": "unknown"
+      },
+      {
+        "title": "The Sugarland Express",
+        "year": 1974,
+        "status": "unknown"
+      },
+      {
+        "title": "Jaws",
+        "year": 1975,
+        "status": "unknown"
+      },
+      {
+        "title": "Close Encounters of the Third Kind",
+        "year": 1977,
+        "status": "unknown"
+      },
+      {
+        "title": "1941",
+        "year": 1979,
+        "status": "unknown"
+      },
+      {
+        "title": "Raiders of the Lost Ark",
+        "year": 1981,
+        "status": "seen"
+      },
+      {
+        "title": "E.T.",
+        "year": 1982,
+        "status": "seen"
+      },
+      {
+        "title": "Indiana Jones and the Temple of Doom",
+        "year": 1984,
+        "status": "seen"
+      },
+      {
+        "title": "The Color Purple",
+        "year": 1985,
+        "status": "unknown"
+      },
+      {
+        "title": "Empire of the Sun",
+        "year": 1987,
+        "status": "unknown"
+      },
+      {
+        "title": "Indiana Jones and the Last Crusade",
+        "year": 1989,
+        "status": "seen"
+      },
+      {
+        "title": "Always",
+        "year": 1989,
+        "status": "unknown"
+      },
+      {
+        "title": "Hook",
+        "year": 1991,
+        "status": "unknown"
+      },
+      {
+        "title": "Jurassic Park",
+        "year": 1993,
+        "status": "seen"
+      },
+      {
+        "title": "Schindler's List",
+        "year": 1993,
+        "status": "seen"
+      },
+      {
+        "title": "The Lost World: Jurassic Park",
+        "year": 1997,
+        "status": "seen"
+      },
+      {
+        "title": "Amistad",
+        "year": 1997,
+        "status": "unknown"
+      },
+      {
+        "title": "Saving Private Ryan",
+        "year": 1998,
+        "status": "seen"
+      },
+      {
+        "title": "A.I. Artificial Intelligence",
+        "year": 2001,
+        "status": "unknown"
+      },
+      {
+        "title": "Minority Report",
+        "year": 2002,
+        "status": "unknown"
+      },
+      {
+        "title": "Catch Me If You Can",
+        "year": 2002,
+        "status": "seen"
+      },
+      {
+        "title": "The Terminal",
+        "year": 2004,
+        "status": "unknown"
+      },
+      {
+        "title": "War of the Worlds",
+        "year": 2005,
+        "status": "unknown"
+      },
+      {
+        "title": "Munich",
+        "year": 2005,
+        "status": "unknown"
+      },
+      {
+        "title": "Indiana Jones and the Kingdom of the Crystal Skull",
+        "year": 2008,
+        "status": "seen"
+      },
+      {
+        "title": "The Adventures of Tintin",
+        "year": 2011,
+        "status": "seen"
+      },
+      {
+        "title": "War Horse",
+        "year": 2011,
+        "status": "seen"
+      },
+      {
+        "title": "Lincoln",
+        "year": 2012,
+        "status": "unknown"
+      },
+      {
+        "title": "Bridge of Spies",
+        "year": 2015,
+        "status": "unknown"
+      },
+      {
+        "title": "The BFG",
+        "year": 2016,
+        "status": "unknown"
+      },
+      {
+        "title": "The Post",
+        "year": 2017,
+        "status": "unknown"
+      },
+      {
+        "title": "Ready Player One",
+        "year": 2018,
+        "status": "unknown"
+      },
+      {
+        "title": "West Side Story",
+        "year": 2021,
+        "status": "unknown"
+      },
+      {
+        "title": "The Fabelmans",
+        "year": 2022,
+        "status": "unknown"
+      },
+      {
+        "title": "Disclosure Day",
+        "year": 2026,
+        "status": "unknown"
+      }
+    ],
+    "note": "35 largometrajes. 12 marcados como vistos: las cuatro de Indiana Jones que dirigió (Raiders of the Lost Ark, Temple of Doom, The Last Crusade y Kingdom of the Crystal Skull), las dos de Jurassic Park que dirigió (Jurassic Park y The Lost World), The Adventures of Tintin, E.T., Saving Private Ryan, War Horse, Schindler's List y Catch Me If You Can. El resto queda sin marcar (unknown, no pendientes). Incluye Duel, nacida para televisión pero con versión de cine; fuera quedan Firelight (película juvenil parcialmente perdida) y Twilight Zone, de la que dirigió solo un segmento.",
+    "source": "https://en.wikipedia.org/wiki/Steven_Spielberg_filmography"
   }
 ]
