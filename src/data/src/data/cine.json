@@ -1,0 +1,471 @@
+[
+  {
+    "id": "tarantino",
+    "name": "Quentin Tarantino",
+    "films": [
+      {
+        "title": "Reservoir Dogs",
+        "year": 1992,
+        "status": "seen"
+      },
+      {
+        "title": "Pulp Fiction",
+        "year": 1994,
+        "status": "seen"
+      },
+      {
+        "title": "Jackie Brown",
+        "year": 1997,
+        "status": "seen"
+      },
+      {
+        "title": "Kill Bill: Volumen 1",
+        "year": 2003,
+        "status": "seen"
+      },
+      {
+        "title": "Kill Bill: Volumen 2",
+        "year": 2004,
+        "status": "seen"
+      },
+      {
+        "title": "Death Proof",
+        "year": 2007,
+        "status": "seen"
+      },
+      {
+        "title": "Malditos bastardos",
+        "year": 2009,
+        "status": "seen"
+      },
+      {
+        "title": "Django desencadenado",
+        "year": 2012,
+        "status": "seen"
+      },
+      {
+        "title": "Los odiosos ocho",
+        "year": 2015,
+        "status": "seen"
+      },
+      {
+        "title": "Érase una vez en Hollywood",
+        "year": 2019,
+        "status": "seen"
+      }
+    ],
+    "note": "10 largometrajes contando Kill Bill en dos partes. Todos vistos. Fuera quedan cortos, televisión y segmentos de películas colectivas.",
+    "source": "https://en.wikipedia.org/wiki/Quentin_Tarantino_filmography"
+  },
+  {
+    "id": "scorsese",
+    "name": "Martin Scorsese",
+    "films": [
+      {
+        "title": "¿Quién llama a mi puerta?",
+        "year": 1967,
+        "status": "pending"
+      },
+      {
+        "title": "El tren de Bertha",
+        "year": 1972,
+        "status": "pending"
+      },
+      {
+        "title": "Malas calles",
+        "year": 1973,
+        "status": "pending"
+      },
+      {
+        "title": "Alicia ya no vive aquí",
+        "year": 1974,
+        "status": "pending"
+      },
+      {
+        "title": "Taxi Driver",
+        "year": 1976,
+        "status": "seen"
+      },
+      {
+        "title": "New York, New York",
+        "year": 1977,
+        "status": "pending"
+      },
+      {
+        "title": "Toro salvaje",
+        "year": 1980,
+        "status": "seen"
+      },
+      {
+        "title": "El rey de la comedia",
+        "year": 1982,
+        "status": "pending"
+      },
+      {
+        "title": "¡Jo, qué noche!",
+        "year": 1985,
+        "status": "pending"
+      },
+      {
+        "title": "El color del dinero",
+        "year": 1986,
+        "status": "pending"
+      },
+      {
+        "title": "La última tentación de Cristo",
+        "year": 1988,
+        "status": "pending"
+      },
+      {
+        "title": "Uno de los nuestros",
+        "year": 1990,
+        "status": "seen"
+      },
+      {
+        "title": "El cabo del miedo",
+        "year": 1991,
+        "status": "pending"
+      },
+      {
+        "title": "La edad de la inocencia",
+        "year": 1993,
+        "status": "pending"
+      },
+      {
+        "title": "Casino",
+        "year": 1995,
+        "status": "seen"
+      },
+      {
+        "title": "Kundun",
+        "year": 1997,
+        "status": "pending"
+      },
+      {
+        "title": "Al límite",
+        "year": 1999,
+        "status": "pending"
+      },
+      {
+        "title": "Gangs of New York",
+        "year": 2002,
+        "status": "pending"
+      },
+      {
+        "title": "El aviador",
+        "year": 2004,
+        "status": "pending"
+      },
+      {
+        "title": "Infiltrados",
+        "year": 2006,
+        "status": "seen"
+      },
+      {
+        "title": "Shutter Island",
+        "year": 2010,
+        "status": "seen"
+      },
+      {
+        "title": "La invención de Hugo",
+        "year": 2011,
+        "status": "pending"
+      },
+      {
+        "title": "El lobo de Wall Street",
+        "year": 2013,
+        "status": "seen"
+      },
+      {
+        "title": "Silencio",
+        "year": 2016,
+        "status": "pending"
+      },
+      {
+        "title": "El irlandés",
+        "year": 2019,
+        "status": "seen"
+      },
+      {
+        "title": "Los asesinos de la luna",
+        "year": 2023,
+        "status": "pending"
+      }
+    ],
+    "note": "26 largometrajes de ficción. Fuera quedan documentales, cortos, televisión y su episodio de Historias de Nueva York.",
+    "source": "https://en.wikipedia.org/wiki/Martin_Scorsese_filmography"
+  },
+  {
+    "id": "hitchcock",
+    "name": "Alfred Hitchcock",
+    "films": [
+      {
+        "title": "El jardín de la alegría",
+        "year": 1925,
+        "status": "unknown"
+      },
+      {
+        "title": "The Mountain Eagle",
+        "year": 1926,
+        "status": "lost"
+      },
+      {
+        "title": "El enemigo de las rubias",
+        "year": 1927,
+        "status": "unknown"
+      },
+      {
+        "title": "El ring",
+        "year": 1927,
+        "status": "unknown"
+      },
+      {
+        "title": "Cuesta abajo",
+        "year": 1927,
+        "status": "unknown"
+      },
+      {
+        "title": "La mujer del granjero",
+        "year": 1928,
+        "status": "unknown"
+      },
+      {
+        "title": "Vida alegre",
+        "year": 1928,
+        "status": "unknown"
+      },
+      {
+        "title": "Champagne",
+        "year": 1928,
+        "status": "unknown"
+      },
+      {
+        "title": "El hombre de la isla de Man",
+        "year": 1929,
+        "status": "unknown"
+      },
+      {
+        "title": "Chantaje",
+        "year": 1929,
+        "status": "unknown"
+      },
+      {
+        "title": "Juno y el pavo real",
+        "year": 1930,
+        "status": "unknown"
+      },
+      {
+        "title": "Asesinato",
+        "year": 1930,
+        "status": "unknown"
+      },
+      {
+        "title": "Juego sucio",
+        "year": 1931,
+        "status": "unknown"
+      },
+      {
+        "title": "Ricos y extraños",
+        "year": 1931,
+        "status": "unknown"
+      },
+      {
+        "title": "El número 17",
+        "year": 1932,
+        "status": "unknown"
+      },
+      {
+        "title": "Valses de Viena",
+        "year": 1934,
+        "status": "unknown"
+      },
+      {
+        "title": "El hombre que sabía demasiado",
+        "year": 1934,
+        "status": "unknown"
+      },
+      {
+        "title": "39 escalones",
+        "year": 1935,
+        "status": "unknown"
+      },
+      {
+        "title": "Sabotaje",
+        "year": 1936,
+        "status": "unknown"
+      },
+      {
+        "title": "El agente secreto",
+        "year": 1936,
+        "status": "unknown"
+      },
+      {
+        "title": "Inocencia y juventud",
+        "year": 1937,
+        "status": "unknown"
+      },
+      {
+        "title": "Alarma en el expreso",
+        "year": 1938,
+        "status": "unknown"
+      },
+      {
+        "title": "Posada Jamaica",
+        "year": 1939,
+        "status": "unknown"
+      },
+      {
+        "title": "Rebeca",
+        "year": 1940,
+        "status": "unknown"
+      },
+      {
+        "title": "Corresponsal extranjero",
+        "year": 1940,
+        "status": "unknown"
+      },
+      {
+        "title": "Matrimonio original",
+        "year": 1941,
+        "status": "unknown"
+      },
+      {
+        "title": "Sospecha",
+        "year": 1941,
+        "status": "unknown"
+      },
+      {
+        "title": "Sabotaje",
+        "year": 1942,
+        "status": "unknown"
+      },
+      {
+        "title": "La sombra de una duda",
+        "year": 1943,
+        "status": "unknown"
+      },
+      {
+        "title": "Náufragos",
+        "year": 1944,
+        "status": "unknown"
+      },
+      {
+        "title": "Recuerda",
+        "year": 1945,
+        "status": "unknown"
+      },
+      {
+        "title": "Encadenados",
+        "year": 1946,
+        "status": "unknown"
+      },
+      {
+        "title": "El proceso Paradine",
+        "year": 1947,
+        "status": "unknown"
+      },
+      {
+        "title": "La soga",
+        "year": 1948,
+        "status": "unknown"
+      },
+      {
+        "title": "Atormentada",
+        "year": 1949,
+        "status": "unknown"
+      },
+      {
+        "title": "Pánico en la escena",
+        "year": 1950,
+        "status": "unknown"
+      },
+      {
+        "title": "Extraños en un tren",
+        "year": 1951,
+        "status": "unknown"
+      },
+      {
+        "title": "Yo confieso",
+        "year": 1953,
+        "status": "unknown"
+      },
+      {
+        "title": "Crimen perfecto",
+        "year": 1954,
+        "status": "unknown"
+      },
+      {
+        "title": "La ventana indiscreta",
+        "year": 1954,
+        "status": "unknown"
+      },
+      {
+        "title": "Atrapa a un ladrón",
+        "year": 1955,
+        "status": "unknown"
+      },
+      {
+        "title": "Pero... ¿quién mató a Harry?",
+        "year": 1955,
+        "status": "unknown"
+      },
+      {
+        "title": "El hombre que sabía demasiado",
+        "year": 1956,
+        "status": "unknown"
+      },
+      {
+        "title": "Falso culpable",
+        "year": 1956,
+        "status": "unknown"
+      },
+      {
+        "title": "Vértigo (de entre los muertos)",
+        "year": 1958,
+        "status": "unknown"
+      },
+      {
+        "title": "Con la muerte en los talones",
+        "year": 1959,
+        "status": "unknown"
+      },
+      {
+        "title": "Psicosis",
+        "year": 1960,
+        "status": "unknown"
+      },
+      {
+        "title": "Los pájaros",
+        "year": 1963,
+        "status": "unknown"
+      },
+      {
+        "title": "Marnie la ladrona",
+        "year": 1964,
+        "status": "unknown"
+      },
+      {
+        "title": "Cortina rasgada",
+        "year": 1966,
+        "status": "unknown"
+      },
+      {
+        "title": "Topaz",
+        "year": 1969,
+        "status": "unknown"
+      },
+      {
+        "title": "Frenesí",
+        "year": 1972,
+        "status": "unknown"
+      },
+      {
+        "title": "La trama",
+        "year": 1976,
+        "status": "unknown"
+      }
+    ],
+    "note": "53 títulos de la lista, todavía sin marcar vistos. The Mountain Eagle está perdida y no cuenta como pendiente para ver. Fuera quedan la inacabada Number 13, Elstree Calling, Mary (versión alemana de Asesinato), cortos y televisión.",
+    "source": "https://en.wikipedia.org/wiki/Alfred_Hitchcock_filmography"
+  }
+]
