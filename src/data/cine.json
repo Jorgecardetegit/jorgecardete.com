@@ -465,7 +465,7 @@
         "status": "unknown"
       }
     ],
-    "note": "53 títulos de la lista, 4 marcados como vistos. The Mountain Eagle está perdida y no cuenta como pendiente para ver. Fuera quedan la inacabada Number 13, Elstree Calling, Mary (versión alemana de Asesinato), cortos y televisión.",
+    "note": "52 títulos visionables, 4 marcados como vistos. The Mountain Eagle está perdida y no entra en el denominador. Fuera quedan la inacabada Number 13, Elstree Calling, Mary (versión alemana de Asesinato), cortos y televisión.",
     "source": "https://en.wikipedia.org/wiki/Alfred_Hitchcock_filmography"
   },
   {
@@ -556,7 +556,7 @@
         "status": "pending"
       },
       {
-        "title": "Dementia 13",
+        "title": "Demencia 13",
         "year": 1963,
         "status": "pending"
       },
@@ -566,12 +566,12 @@
         "status": "pending"
       },
       {
-        "title": "Finian's Rainbow",
+        "title": "El valle del arco iris",
         "year": 1968,
         "status": "pending"
       },
       {
-        "title": "The Rain People",
+        "title": "Llueve sobre mi corazón",
         "year": 1969,
         "status": "pending"
       },
@@ -596,12 +596,12 @@
         "status": "seen"
       },
       {
-        "title": "One from the Heart",
+        "title": "Corazonada",
         "year": 1982,
         "status": "pending"
       },
       {
-        "title": "The Outsiders",
+        "title": "Rebeldes",
         "year": 1983,
         "status": "pending"
       },
@@ -616,12 +616,12 @@
         "status": "pending"
       },
       {
-        "title": "Peggy Sue Got Married",
+        "title": "Peggy Sue se casó",
         "year": 1986,
         "status": "pending"
       },
       {
-        "title": "Gardens of Stone",
+        "title": "Jardines de piedra",
         "year": 1987,
         "status": "pending"
       },
@@ -646,12 +646,12 @@
         "status": "pending"
       },
       {
-        "title": "The Rainmaker",
+        "title": "Legítima defensa",
         "year": 1997,
         "status": "pending"
       },
       {
-        "title": "Youth Without Youth",
+        "title": "El hombre sin edad",
         "year": 2007,
         "status": "pending"
       },
@@ -666,12 +666,12 @@
         "status": "pending"
       },
       {
-        "title": "Megalopolis",
+        "title": "Megalópolis",
         "year": 2024,
         "status": "pending"
       }
     ],
-    "note": "25 largometrajes como director. 5 marcados como vistos. Fuera quedan producciones (American Graffiti, THX 1138), guiones ajenos (Patton) y su segmento de Historias de Nueva York.",
+    "note": "25 largometrajes como director, incluidos sus dos primeros trabajos de explotación (Tonight for Sure y The Bellboy and the Playgirls, esta última un remontaje con escenas añadidas). 5 vistos. Fuera quedan producciones (American Graffiti, THX 1138), guiones ajenos (Patton) y su segmento de Historias de Nueva York.",
     "source": "https://es.wikipedia.org/wiki/Francis_Ford_Coppola"
   },
   {
@@ -747,4 +747,4 @@
     "note": "13 largometrajes como director. 4 marcados como vistos. Fuera quedan sus cortos documentales (Day of the Fight, Flying Padre, The Seafarers).",
     "source": "https://es.wikipedia.org/wiki/Anexo:Filmograf%C3%ADa_de_Stanley_Kubrick"
   }
-]
+        ]
