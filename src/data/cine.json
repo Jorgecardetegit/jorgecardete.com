@@ -2941,6 +2941,7 @@
   {
     "id": "martin-campbell",
     "name": "Martin Campbell",
+    "partial": true,
     "films": [
       {
         "title": "Al límite (Edge of Darkness)",
