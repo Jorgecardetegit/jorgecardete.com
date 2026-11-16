@@ -2951,4 +2951,34 @@
     ],
     "note": "Solo consta lo visto y registrado: no es una filmografía completa ni hay pendientes marcados. Ojo: Al límite (2010) de Campbell y Al límite (1999) de Scorsese son películas distintas con el mismo título en España.",
     "source": "https://en.wikipedia.org/wiki/Martin_Campbell"
-  }]
+  },
+  {
+    "id": "robert-zemeckis",
+    "name": "Robert Zemeckis",
+    "partial": true,
+    "films": [
+      {
+        "title": "Regreso al futuro",
+        "year": 1985,
+        "status": "seen"
+      },
+      {
+        "title": "Regreso al futuro II",
+        "year": 1989,
+        "status": "seen"
+      },
+      {
+        "title": "Regreso al futuro III",
+        "year": 1990,
+        "status": "seen"
+      },
+      {
+        "title": "Forrest Gump",
+        "year": 1994,
+        "status": "seen"
+      }
+    ],
+    "note": "Registro parcial: solo constan las películas confirmadas como vistas por Jorge el 16 de noviembre de 2026: la trilogía de Regreso al futuro y Forrest Gump. No es una filmografía completa ni hay pendientes marcados.",
+    "source": "https://www.backtothefuture.com/cast/robert-zemeckis"
+  }
+]
