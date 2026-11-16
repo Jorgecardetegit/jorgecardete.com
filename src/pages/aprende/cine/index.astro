@@ -5,6 +5,16 @@ type Film = { title: string; year: number; status: string };
 type Director = { id: string; name: string; films: Film[]; note?: string; source?: string; documentaries?: Film[] };
 const directors = rawDirectors as Director[];
 const labels: Record<string, string> = { seen: 'Vista', pending: 'Pendiente', unknown: 'Sin marcar', lost: 'Perdida' };
+const stats = (d: Director) => {
+  const visionables = d.films.filter(f => f.status !== 'lost');
+  const seen = visionables.filter(f => f.status === 'seen').length;
+  const pending = visionables.filter(f => f.status === 'pending').length;
+  const unmarked = visionables.filter(f => f.status === 'unknown').length;
+  const parts: string[] = [];
+  if (pending > 0) parts.push(`${pending} pendientes`);
+  if (unmarked > 0) parts.push(`${unmarked} sin marcar`);
+  return { seen, total: visionables.length, sub: parts.length ? parts.join(' · ') : 'Completado' };
+};
 ---
 <Base title="Cuaderno de cine" description="Filmografías y seguimiento personal de películas vistas." translated={false} noindex bare>
   <main class="cine">
@@ -16,11 +26,11 @@ const labels: Record<string, string> = { seen: 'Vista', pending: 'Pendiente', un
       <p class="updated">Actualizado el 16 de noviembre de 2026</p>
     </header>
     <section class="overview" aria-label="Resumen por director">
-      {directors.map(d => <a href={`#${d.id}`} class="summary">
+      {directors.map(d => { const s = stats(d); return <a href={`#${d.id}`} class="summary">
         <span class="director">{d.name}</span>
-        <strong>{d.id === 'hitchcock' ? 'Sin marcar' : `${d.films.filter(f => f.status === 'seen').length} / ${d.films.length}`}</strong>
-        <span>{d.id === 'tarantino' ? 'Completado' : d.id === 'scorsese' ? '9 pendientes' : '52 títulos conservados + 1 perdido'}</span>
-      </a>)}
+        <strong>{s.seen} / {s.total}</strong>
+        <span>{s.sub}</span>
+      </a> })}
     </section>
     <div class="toolbar"><label for="film-search">Buscar película</label><input id="film-search" type="search" placeholder="Título o año…" autocomplete="off" /><p>Vista ✓ · Pendiente ○ · Sin marcar ?</p></div>
     {directors.map((d, i) => <section class="filmography" id={d.id}>
