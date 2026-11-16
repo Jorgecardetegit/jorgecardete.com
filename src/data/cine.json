@@ -2980,5 +2980,19 @@
     ],
     "note": "Registro parcial: solo constan las películas confirmadas como vistas por Jorge el 16 de noviembre de 2026: la trilogía de Regreso al futuro y Forrest Gump. No es una filmografía completa ni hay pendientes marcados.",
     "source": "https://www.backtothefuture.com/cast/robert-zemeckis"
+  },
+  {
+    "id": "wim-wenders",
+    "name": "Wim Wenders",
+    "partial": true,
+    "films": [
+      {
+        "title": "Perfect Days",
+        "year": 2023,
+        "status": "seen"
+      }
+    ],
+    "note": "Registro parcial: solo consta Perfect Days, confirmada como vista por Jorge en noviembre de 2026. No es una filmografía completa ni hay pendientes marcados.",
+    "source": "https://en.wikipedia.org/wiki/Wim_Wenders"
   }
 ]
