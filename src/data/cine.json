@@ -192,7 +192,14 @@
         "status": "pending"
       }
     ],
-    "note": "26 largometrajes de ficción. Fuera quedan documentales, cortos, televisión y su episodio de Historias de Nueva York.",
+    "documentaries": [
+      {
+        "title": "The Last Waltz",
+        "year": 1978,
+        "status": "seen"
+      }
+    ],
+    "note": "26 largometrajes de ficción; los documentales van en un apartado propio, abajo. Fuera quedan cortos, televisión y su episodio de Historias de Nueva York.",
     "source": "https://en.wikipedia.org/wiki/Martin_Scorsese_filmography"
   },
   {
@@ -2931,4 +2938,4 @@
     "note": "13 largometrajes narrativos dirigidos por Peter Weir (retirado como director en 2024). 2 marcadas como vistas, declaradas por Jorge el 7 de noviembre de 2026: El club de los poetas muertos y El show de Truman. El resto queda sin marcar (unknown, sin negativa explícita; no pendientes). Aparte: el segmento Michael de Three to Go (1969), los cortos Homesdale, Three Directions in Pop Music e Incredible Floridas y televisión (Man on a Green Bike; The Plumber, 1978). Títulos en español de es.wikipedia.",
     "source": "https://es.wikipedia.org/wiki/Peter_Weir"
   }
-        ]
+    ]
