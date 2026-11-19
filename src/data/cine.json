@@ -1805,12 +1805,12 @@
       {
         "title": "Río Grande",
         "year": 1950,
-        "status": "unknown"
+        "status": "seen"
       },
       {
         "title": "El hombre tranquilo",
         "year": 1952,
-        "status": "unknown"
+        "status": "seen"
       },
       {
         "title": "What Price Glory",
@@ -2994,5 +2994,18 @@
     ],
     "note": "Registro parcial: solo consta Perfect Days, confirmada como vista por Jorge en noviembre de 2026. No es una filmografía completa ni hay pendientes marcados.",
     "source": "https://en.wikipedia.org/wiki/Wim_Wenders"
+  },
+  {
+    "id": "woody-allen",
+    "name": "Woody Allen",
+    "films": [
+      {
+        "title": "Annie Hall",
+        "year": 1977,
+        "status": "seen"
+      }
+    ],
+    "note": "Registro inicial: solo se incluye Annie Hall, confirmada como vista por Jorge. Otras películas de Woody Allen aún no están registradas; esto no significa que no las haya visto.",
+    "source": "https://en.wikipedia.org/wiki/Woody_Allen_filmography"
   }
 ]
